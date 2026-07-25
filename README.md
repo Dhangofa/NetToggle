@@ -26,7 +26,7 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
 To execute the privileged baseband commands, NetToggle requires an elevated execution environment. It features a built-in UI to select between two independent working modes:
 
 ### 1. Root Mode (`su`)
-* **Requirements:** A rooted device (e.g., Magisk or KernelSU).
+* **Requirements:** A rooted device (e.g., Magisk, Apatch or KernelSU).
 * **How it works:** Executes the telephony command directly through the system's superuser binary.
 * **Benefits:** Zero background overhead, completely self-contained, and survives device reboots without any manual intervention.
 
