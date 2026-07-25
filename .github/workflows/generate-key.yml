@@ -1,0 +1,16 @@
+name: Generate Keystore Base64
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate and Encode Keystore
+        run: |
+          keytool -genkeypair -v -keystore release.keystore -alias NetToggle -keyalg RSA -keysize 2048 -validity 10000 -storepass 'NetToggle2026!' -keypass 'NetToggle2026!' -dname "CN=NetToggle, OU=Dev, O=NetToggle, L=City, ST=State, C=IN"
+          
+          echo "=== COPY THE STRING BELOW ==="
+          cat release.keystore | base64 | tr -d '\n'
+          echo ""
+          echo "============================="
+
