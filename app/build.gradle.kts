@@ -29,7 +29,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // Prevents GitHub Actions from failing due to headless UI rules
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -37,5 +36,7 @@ android {
 }
 
 dependencies {
-    // Left completely empty to keep the app minimal and pure Java
+    // Shizuku API
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
 }
