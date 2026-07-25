@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:gravity="center_horizontal"
+    android:background="?android:attr/colorBackground">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NetToggle Configuration"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select the background execution method for the Quick Settings tile."
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginBottom="48dp" />
+
+    <RadioGroup
+        android:id="@+id/modeRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radioRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Root (su)"
+            android:textSize="18sp"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <RadioButton
+            android:id="@+id/radioShizuku"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Shizuku (ADB)"
+            android:textSize="18sp"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/shizukuStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="#FF5555"
+        android:layout_marginTop="24dp" />
+
+</LinearLayout>
