@@ -14,6 +14,10 @@ android {
         versionName = "1.0"
     }
 
+    buildFeatures {
+        aidl = true // Enable AIDL for Root IPC communication
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -31,5 +35,7 @@ android {
 }
 
 dependencies {
-    // Left completely empty to keep the app minimal and pure Java
+    val libsuVersion = "5.2.2"
+    implementation("com.github.topjohnwu.libsu:core:$libsuVersion")
+    implementation("com.github.topjohnwu.libsu:service:$libsuVersion")
 }
