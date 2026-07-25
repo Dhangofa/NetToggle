@@ -19,8 +19,8 @@ public class NetworkTileService extends TileService {
     // Hardware Telephony Bitmasks (Legacy IDs 11, 23, 33, 9)
     private static final String BIN_4G_ONLY = "1000000000000";
     private static final String BIN_5G_ONLY = "10000000000000000000";
-    private static final String BIN_PREF_5G = "11011111101111111111"; // ID 33
-    private static final String BIN_PREF_4G = "1001101001110000111"; // ID 9
+    private static final String BIN_PREF_5G = "11011111101111111111"; // Exact ID 33
+    private static final String BIN_PREF_4G = "1001101001110000111";  // ID 9
 
     @Override
     public void onStartListening() {
@@ -128,9 +128,6 @@ public class NetworkTileService extends TileService {
             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-}
         }
     }
 }
