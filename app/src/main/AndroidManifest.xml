@@ -6,9 +6,14 @@
         android:label="NetToggle"
         android:supportsRtl="true">
 
+        <!-- Declaring the hidden LibSU Root Service -->
+        <service android:name=".RootNetworkService"
+                 android:exported="false" />
+
+        <!-- Your standard Tile Service -->
         <service android:name=".NetworkTileService"
             android:label="NetToggle"
-            android:icon="@drawable/ic_qs_network" 
+            android:icon="@drawable/ic_qs_network"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
             <intent-filter>
