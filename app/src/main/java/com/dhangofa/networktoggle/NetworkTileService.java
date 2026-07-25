@@ -10,6 +10,7 @@ import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import java.io.DataOutputStream;
+import java.lang.reflect.Method;
 import rikka.shizuku.Shizuku;
 
 public class NetworkTileService extends TileService {
@@ -108,11 +109,18 @@ public class NetworkTileService extends TileService {
         String command = "cmd phone set-allowed-network-types-for-users -s 0 " + binaryString;
 
         if (execMode == 2) {
-            // Shizuku Execution Method
+            // Shizuku Execution Method via Reflection
             try {
                 if (Shizuku.pingBinder() && Shizuku.checkSelfPermission() == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    Process process = Shizuku.newProcess(new String[]{"sh", "-c", command}, null, null);
-                    process.waitFor();
+                    
+                    // Uses Reflection to bypass the private access restriction on Shizuku.newProcess
+                    Method newProcessMethod = Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
+                    newProcessMethod.setAccessible(true);
+                    
+                    Process process = (Process) newProcessMethod.invoke(null, new String[]{"sh", "-c", command}, null, null);
+                    if (process != null) {
+                        process.waitFor();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
