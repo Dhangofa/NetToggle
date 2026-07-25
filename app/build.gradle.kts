@@ -14,10 +14,6 @@ android {
         versionName = "1.0"
     }
 
-    buildFeatures {
-        aidl = true 
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -33,7 +29,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // ADD THIS BLOCK to force GitHub Actions to ignore strict UI checks
+    // Prevents GitHub Actions from failing due to headless UI rules
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -41,7 +37,5 @@ android {
 }
 
 dependencies {
-    val libsuVersion = "5.2.2"
-    implementation("com.github.topjohnwu.libsu:core:$libsuVersion")
-    implementation("com.github.topjohnwu.libsu:service:$libsuVersion")
+    // Left completely empty to keep the app minimal and pure Java
 }
