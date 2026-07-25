@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#0066FF"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0" />
+        
+    <!-- Stylized Cell Tower & Signal Waves -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28 A2,2 0 0,0 52,30 L52,42 L42,42 A2,2 0 0,0 40,44 L40,78 A2,2 0 0,0 42,80 L66,80 A2,2 0 0,0 68,78 L68,44 A2,2 0 0,0 66,42 L56,42 L56,30 A2,2 0 0,0 54,28 Z M45,47 L63,47 L63,75 L45,75 Z M32,46 A2,2 0 0,0 30,48 C30,58 34,68 40,75 A2,2 0 0,0 43,72 C37,66 34,58 34,48 A2,2 0 0,0 32,46 Z M76,46 A2,2 0 0,0 74,48 C74,58 71,66 65,72 A2,2 0 0,0 68,75 C74,68 78,58 78,48 A2,2 0 0,0 76,46 Z M23,36 A2,2 0 0,0 21,38 C21,52 26,65 35,76 A2,2 0 0,0 38,73 C29,63 25,51 25,38 A2,2 0 0,0 23,36 Z M85,36 A2,2 0 0,0 83,38 C83,51 79,63 70,73 A2,2 0 0,0 73,76 C82,65 87,52 87,38 A2,2 0 0,0 85,36 Z" />
+</vector>
