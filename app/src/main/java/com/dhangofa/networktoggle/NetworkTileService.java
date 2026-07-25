@@ -69,7 +69,7 @@ public class NetworkTileService extends TileService {
         // Massively scale up the font size to push it to the edges of the canvas
         // 160f for 2-character strings ("4G", "5G")
         // 115f for 3-character strings ("P5G", "P4G")
-        float textSize = (text.length() <= 2) ? 160f : 115f; 
+        float textSize = (text.length() <= 2) ? 170f : 170f; 
         paint.setTextSize(textSize);
 
         Paint.FontMetrics fm = paint.getFontMetrics();
