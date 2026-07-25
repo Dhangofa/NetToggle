@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Shizuku Permission -->
+    <!-- Shizuku Permission REQUIRED for Auto-Popup -->
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
     <application
@@ -11,6 +11,15 @@
         android:roundIcon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault.DayNight"
         android:supportsRtl="true">
+
+        <!-- REQUIRED FOR SHIZUKU BINDER RECEPTION -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <!-- Main UI Screen -->
         <activity
