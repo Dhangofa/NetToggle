@@ -40,6 +40,6 @@ dependencies {
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
     
-    // Required to prevent Shizuku RestrictTo$Scope compilation errors
-    compileOnly("androidx.annotation:annotation:1.6.0")
+    // Aligned with Shizuku's strict version requirement to satisfy Gradle compiler
+    compileOnly("androidx.annotation:annotation:1.3.0")
 }
