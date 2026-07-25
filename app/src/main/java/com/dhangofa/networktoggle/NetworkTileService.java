@@ -51,46 +51,68 @@ public class NetworkTileService extends TileService {
         updateTileUI(nextState);
     }
 
-    private Icon createTextIcon(String text) {
-        Bitmap bitmap = Bitmap.createBitmap(144, 144, Bitmap.Config.ARGB_8888);
+    /**
+     * Draws a colored circular background with enlarged text.
+     */
+    private Icon createCustomIcon(String text, int bgColor, int textColor) {
+        int size = 192; // High-res canvas for crisp rendering
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
-        
-        paint.setColor(Color.WHITE); 
-        paint.setTextSize(55f);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         paint.setAntiAlias(true);
-        
+
+        // 1. Draw Background Circle
+        paint.setColor(bgColor);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(size / 2f, size / 2f, (size / 2f) - 2f, paint);
+
+        // 2. Draw Enlarged Text
+        paint.setColor(textColor);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTextAlign(Paint.Align.CENTER);
+
+        // Scales font size up (88pt for "4G/5G", 68pt for "P5G/P4G")
+        float textSize = (text.length() <= 2) ? 88f : 68f; 
+        paint.setTextSize(textSize);
+
         Paint.FontMetrics fm = paint.getFontMetrics();
-        float y = (144 / 2f) - (fm.descent + fm.ascent) / 2f;
-        canvas.drawText(text, 144 / 2f, y, paint);
-        
+        float y = (size / 2f) - (fm.descent + fm.ascent) / 2f;
+        canvas.drawText(text, size / 2f, y, paint);
+
         return Icon.createWithBitmap(bitmap);
     }
 
     private void updateTileUI(int state) {
         Tile tile = getQsTile();
         if (tile == null) return;
-        
+
         tile.setState(Tile.STATE_ACTIVE);
-        
+
+        // Hex Colors
+        int white  = Color.parseColor("#FFFFFF");
+        int blue   = Color.parseColor("#0066FF");
+        int green  = Color.parseColor("#1B873F");
+        int yellow = Color.parseColor("#FFB300");
+
         switch (state) {
-            case 1: 
-                tile.setLabel("4G Only"); 
-                tile.setIcon(createTextIcon("4G"));
+            case 1: // 4G -> Blue background, White text
+                tile.setLabel("4G Only");
+                tile.setIcon(createCustomIcon("4G", blue, white));
                 break;
-            case 2: 
-                tile.setLabel("5G Only"); 
-                tile.setIcon(createTextIcon("5G"));
+
+            case 2: // 5G -> White background, Blue text
+                tile.setLabel("5G Only");
+                tile.setIcon(createCustomIcon("5G", white, blue));
                 break;
-            case 3: 
-                tile.setLabel("Pref 5G"); 
-                tile.setIcon(createTextIcon("P5G"));
+
+            case 3: // P5G -> White background, Green text
+                tile.setLabel("Pref 5G");
+                tile.setIcon(createCustomIcon("P5G", white, green));
                 break;
-            case 4: 
-                tile.setLabel("Pref 4G"); 
-                tile.setIcon(createTextIcon("P4G"));
+
+            case 4: // P4G -> Yellow background, White text
+                tile.setLabel("Pref 4G");
+                tile.setIcon(createCustomIcon("P4G", yellow, white));
                 break;
         }
         tile.updateTile();
@@ -98,17 +120,17 @@ public class NetworkTileService extends TileService {
 
     private void applyNetworkMode(String binaryString) {
         try {
-            // Spawns a raw interactive root shell session
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            
-            // Writes the command directly into the root shell without string-escaping issues
             os.writeBytes("cmd phone set-allowed-network-types-for-users -s 0 " + binaryString + "\n");
             os.writeBytes("exit\n");
             os.flush();
             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+}
         }
     }
 }
