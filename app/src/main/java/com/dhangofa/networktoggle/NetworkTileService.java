@@ -9,16 +9,17 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+import java.io.DataOutputStream;
 
 public class NetworkTileService extends TileService {
 
     private static final String PREFS_NAME = "NetTogglePrefs";
     private static final String STATE_KEY = "net_state";
 
-    // Hardware Telephony Bitmasks (Translated from legacy IDs 11, 23, 33, 9)
+    // Hardware Telephony Bitmasks (Legacy IDs 11, 23, 33, 9)
     private static final String BIN_4G_ONLY = "1000000000000";
     private static final String BIN_5G_ONLY = "10000000000000000000";
-    private static final String BIN_PREF_5G = "11011101001110000111"; // ID 33 (Includes TDSCDMA)
+    private static final String BIN_PREF_5G = "11011101001110000111"; // ID 33
     private static final String BIN_PREF_4G = "1001101001110000111"; // ID 9
 
     @Override
@@ -50,7 +51,6 @@ public class NetworkTileService extends TileService {
         updateTileUI(nextState);
     }
 
-    // Dynamically draws the text into an icon so MIUI Control Center displays it correctly
     private Icon createTextIcon(String text) {
         Bitmap bitmap = Bitmap.createBitmap(144, 144, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -97,10 +97,15 @@ public class NetworkTileService extends TileService {
     }
 
     private void applyNetworkMode(String binaryString) {
-        // Sends the raw binary string straight to the Telephony parser via standard root shell
-        String command = "su -c 'cmd phone set-allowed-network-types-for-users -s 0 " + binaryString + "'";
         try {
-            Process process = Runtime.getRuntime().exec(command);
+            // Spawns a raw interactive root shell session
+            Process process = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            
+            // Writes the command directly into the root shell without string-escaping issues
+            os.writeBytes("cmd phone set-allowed-network-types-for-users -s 0 " + binaryString + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
