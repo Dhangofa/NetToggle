@@ -1,1 +1,2 @@
--keep class com.dhangofa.networktoggle.NetworkTileService { *; }
+-keep class com.dhangofa.networktoggle.RootNetworkService { *; }
+-keep interface com.dhangofa.networktoggle.INetworkService { *; }
