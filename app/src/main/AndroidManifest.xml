@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"> <!-- Add the tools namespace here -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Shizuku Permission -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
     <application
         android:allowBackup="false"
         android:label="NetToggle"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:theme="@android:style/Theme.DeviceDefault.DayNight"
         android:supportsRtl="true">
 
-        <!-- We declare the root service, but explicitly tell the compiler to ignore the Instantiatable rule -->
-        <service
-            android:name=".RootNetworkService"
-            android:exported="false"
-            tools:ignore="Instantiatable" />
+        <!-- Main UI Screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="NetToggle">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service android:name=".NetworkTileService"
             android:label="NetToggle"
