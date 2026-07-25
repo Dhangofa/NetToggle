@@ -1,8 +1,7 @@
 # NetToggle
 
 <div align="center">
-  <!-- Replace the src link below with the direct link to your uploaded app icon -->
-  <img src="app/src/main/res/drawable/ic_launcher.xml" alt="NetToggle Icon" width="128">
+  <img src="screenshot/ic_launcher.png" alt="NetToggle Icon" width="128">
   <br><br>
   <a href="https://github.com/dhangofa/NetToggle/releases/latest">
     <img src="https://img.shields.io/github/v/release/dhangofa/NetToggle?style=for-the-badge&label=Download%20Latest%20Release&color=0066FF" alt="Download Latest Release">
@@ -21,7 +20,7 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
 
 | Configuration UI | 4G Only | 5G Only | Preferred 5G | Preferred 4G |
 | :---: | :---: | :---: | :---: | :---: |
-| <img src="URL_TO_MAIN_SCREEN_IMAGE" width="160"> | <img src="URL_TO_4G_IMAGE" width="160"> | <img src="URL_TO_5G_IMAGE" width="160"> | <img src="URL_TO_P5G_IMAGE" width="160"> | <img src="URL_TO_P4G_IMAGE" width="160"> |
+| <img src="screenshot/main.png" width="160"> | <img src="screenshot/4g.png" width="160"> | <img src="screenshot/5g.png" width="160"> | <img src="screenshot/p5g.png" width="160"> | <img src="screenshot/p4g.png" width="160"> |
 
 ## ⚙️ Working Modes & Requirements
 To execute the privileged baseband commands, NetToggle requires an elevated execution environment. It features a built-in UI to select between two independent working modes:
@@ -38,5 +37,5 @@ To execute the privileged baseband commands, NetToggle requires an elevated exec
 
 ## 📱 Supported Android Versions
 * **Minimum Required:** Android 7.0 (API Level 24)
-* **Target Version:** Android 17 (API Level 37)
-* **Tested & Optimized for:** MIUI 14 (Android 13) and AOSP-based Custom ROMs.
+* **Target Version:** Android 16 (API Level 36)
+* **Tested & Optimized for:** MIUI 14 (Android 13).
