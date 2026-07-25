@@ -120,25 +120,3 @@ public class NetworkTileService extends TileService {
         }
     }
 }
-
-            case 4: // P4G -> Yellow background, White text
-                tile.setLabel("Pref 4G");
-                tile.setIcon(createCustomIcon("P4G", yellow, white));
-                break;
-        }
-        tile.updateTile();
-    }
-
-    private void applyNetworkMode(String binaryString) {
-        try {
-            Process process = Runtime.getRuntime().exec("su");
-            DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes("cmd phone set-allowed-network-types-for-users -s 0 " + binaryString + "\n");
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}
