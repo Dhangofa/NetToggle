@@ -22,6 +22,11 @@ jobs:
       with:
         gradle-version: '8.7'
 
+    - name: Accept Licenses and Install SDK 37
+      run: |
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-37"
+
     - name: Compile Release APK using Gradle
       run: gradle assembleRelease -PversionCode=${{ github.run_number }}
 
