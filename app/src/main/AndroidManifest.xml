@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"> <!-- Add the tools namespace here -->
 
     <application
         android:allowBackup="false"
         android:label="NetToggle"
         android:supportsRtl="true">
 
-        <!-- ONLY the Quick Settings Tile Service is registered here -->
+        <!-- We declare the root service, but explicitly tell the compiler to ignore the Instantiatable rule -->
+        <service
+            android:name=".RootNetworkService"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+
         <service android:name=".NetworkTileService"
             android:label="NetToggle"
             android:icon="@drawable/ic_qs_network"
