@@ -52,26 +52,32 @@ public class NetworkTileService extends TileService {
     }
 
     /**
-     * Draws only the enlarged text on a transparent background so MIUI can tint it correctly.
+     * Draws edge-to-edge, uniform height text to bypass MIUI's shrinking.
      */
     private Icon createTextOnlyIcon(String text) {
-        int size = 256; // Increased canvas resolution for maximum crispness
+        int size = 256; 
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-
-        // We only draw the text in white; MIUI will automatically use it as an alpha mask
         paint.setColor(Color.WHITE);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        // 1. Use a condensed font to naturally fit more text inside a circle
+        paint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         paint.setTextAlign(Paint.Align.CENTER);
 
-        // Massively scale up the font size to push it to the edges of the canvas
-        // 160f for 2-character strings ("4G", "5G")
-        // 115f for 3-character strings ("P5G", "P4G")
-        float textSize = (text.length() <= 2) ? 170f : 170f; 
-        paint.setTextSize(textSize);
+        // 2. Set one MASSIVE baseline height for ALL text so there is zero mismatch
+        paint.setTextSize(190f); 
 
+        // 3. Prevent horizontal clipping for 3-letter strings (P5G, P4G)
+        // If the text is wider than the 256 canvas (minus an 8px safety margin on each side),
+        // we gently squish the letters horizontally to make them fit without losing height.
+        float textWidth = paint.measureText(text);
+        if (textWidth > 240f) { 
+            paint.setTextScaleX(240f / textWidth);
+        }
+
+        // Draw it perfectly vertically centered
         Paint.FontMetrics fm = paint.getFontMetrics();
         float y = (size / 2f) - (fm.descent + fm.ascent) / 2f;
         canvas.drawText(text, size / 2f, y, paint);
