@@ -52,27 +52,24 @@ public class NetworkTileService extends TileService {
     }
 
     /**
-     * Draws a colored circular background with enlarged text.
+     * Draws only the enlarged text on a transparent background so MIUI can tint it correctly.
      */
-    private Icon createCustomIcon(String text, int bgColor, int textColor) {
-        int size = 192; // High-res canvas for crisp rendering
+    private Icon createTextOnlyIcon(String text) {
+        int size = 256; // Increased canvas resolution for maximum crispness
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
 
-        // 1. Draw Background Circle
-        paint.setColor(bgColor);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawCircle(size / 2f, size / 2f, (size / 2f) - 2f, paint);
-
-        // 2. Draw Enlarged Text
-        paint.setColor(textColor);
+        // We only draw the text in white; MIUI will automatically use it as an alpha mask
+        paint.setColor(Color.WHITE);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         paint.setTextAlign(Paint.Align.CENTER);
 
-        // Scales font size up (88pt for "4G/5G", 68pt for "P5G/P4G")
-        float textSize = (text.length() <= 2) ? 88f : 68f; 
+        // Massively scale up the font size to push it to the edges of the canvas
+        // 160f for 2-character strings ("4G", "5G")
+        // 115f for 3-character strings ("P5G", "P4G")
+        float textSize = (text.length() <= 2) ? 160f : 115f; 
         paint.setTextSize(textSize);
 
         Paint.FontMetrics fm = paint.getFontMetrics();
@@ -86,29 +83,43 @@ public class NetworkTileService extends TileService {
         Tile tile = getQsTile();
         if (tile == null) return;
 
+        // Force the tile to always stay "Active" so MIUI keeps the background blue
         tile.setState(Tile.STATE_ACTIVE);
 
-        // Hex Colors
-        int white  = Color.parseColor("#FFFFFF");
-        int blue   = Color.parseColor("#0066FF");
-        int green  = Color.parseColor("#1B873F");
-        int yellow = Color.parseColor("#FFB300");
-
         switch (state) {
-            case 1: // 4G -> Blue background, White text
+            case 1: 
                 tile.setLabel("4G Only");
-                tile.setIcon(createCustomIcon("4G", blue, white));
+                tile.setIcon(createTextOnlyIcon("4G"));
                 break;
-
-            case 2: // 5G -> White background, Blue text
+            case 2: 
                 tile.setLabel("5G Only");
-                tile.setIcon(createCustomIcon("5G", white, blue));
+                tile.setIcon(createTextOnlyIcon("5G"));
                 break;
-
-            case 3: // P5G -> White background, Green text
+            case 3: 
                 tile.setLabel("Pref 5G");
-                tile.setIcon(createCustomIcon("P5G", white, green));
+                tile.setIcon(createTextOnlyIcon("P5G"));
                 break;
+            case 4: 
+                tile.setLabel("Pref 4G");
+                tile.setIcon(createTextOnlyIcon("P4G"));
+                break;
+        }
+        tile.updateTile();
+    }
+
+    private void applyNetworkMode(String binaryString) {
+        try {
+            Process process = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes("cmd phone set-allowed-network-types-for-users -s 0 " + binaryString + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
 
             case 4: // P4G -> Yellow background, White text
                 tile.setLabel("Pref 4G");
