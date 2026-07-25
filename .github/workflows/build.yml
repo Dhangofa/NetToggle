@@ -1,9 +1,7 @@
 name: Build and Automate NetToggle Release
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
