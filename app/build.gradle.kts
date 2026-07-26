@@ -13,6 +13,13 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+    // Suggested by IzzyOnDroid
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles (for Google Play)
+        includeInBundle = false
+    }
 
     buildTypes {
         release {
