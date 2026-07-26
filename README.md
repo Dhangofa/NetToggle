@@ -18,10 +18,32 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
 
 ## 📸 Screenshots
 
-| Configuration UI | 4G Only | 5G Only | Preferred 5G | Preferred 4G |
-| :---: | :---: | :---: | :---: | :---: |
-| <img src="screenshot/main.png" width="160"> | <img src="screenshot/4g.png" width="160"> | <img src="screenshot/5g.png" width="160"> | <img src="screenshot/p5g.png" width="160"> | <img src="screenshot/p4g.png" width="160"> |
-
+<table>
+  <tr>
+    <th align="center">Configuration UI</th>
+    <th align="center">4G Only</th>
+    <th align="center">5G Only</th>
+    <th align="center">Preferred 5G</th>
+    <th align="center">Preferred 4G</th>
+  </tr>
+  <tr>
+    <td valign="top" align="center">
+      <img src="screenshot/main.png" width="160">
+    </td>
+    <td valign="top" align="center">
+      <img src="screenshot/4g.png" width="160">
+    </td>
+    <td valign="top" align="center">
+      <img src="screenshot/5g.png" width="160">
+    </td>
+    <td valign="top" align="center">
+      <img src="screenshot/p5g.png" width="160">
+    </td>
+    <td valign="top" align="center">
+      <img src="screenshot/p4g.png" width="160">
+    </td>
+  </tr>
+</table>
 ## ⚙️ Working Modes & Requirements
 To execute the privileged baseband commands, NetToggle requires an elevated execution environment. It features a built-in UI to select between two independent working modes:
 
