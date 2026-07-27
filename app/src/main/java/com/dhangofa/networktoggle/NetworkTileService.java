@@ -9,13 +9,17 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import android.telephony.SubscriptionManager;
 import android.os.Handler;
 import android.os.Looper;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import rikka.shizuku.Shizuku;
 
 public class NetworkTileService extends TileService {
@@ -37,12 +41,21 @@ public class NetworkTileService extends TileService {
     private static final String BIN_4G_ONLY = "1000000000000"; // Legacy Id 11, bitmask 4096
     private static final String BIN_5G_ONLY = "10000000000000000000"; // Legacy Id 23, bitmask 524288
     private static final String BIN_PREF_5G = "11011111101111111111"; // Legacy Id 33, bitmask 916479
-    private static final String BIN_PREF_4G = "1001101001110000111"; // Legacy Id 9 , bitmask 316295
+    private static final String BIN_PREF_4G = "1001101001110000111"; // Legacy Id 9, bitmask 316295
+	
+	private static final int LEGACY_4G_ONLY = 11;
+	private static final int LEGACY_5G_ONLY = 23;
+	private static final int LEGACY_PREF_5G = 33;
+	private static final int LEGACY_PREF_4G = 9;
 	
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 	private static final AtomicBoolean IS_SWITCHING = new AtomicBoolean(false);
 	
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
+	
 	private final Handler mainHandler = new Handler(Looper.getMainLooper());
+	
+	private static Method SHIZUKU_NEW_PROCESS_METHOD;
 	
 	private static Icon ICON_4G;
 	private static Icon ICON_5G;
@@ -50,12 +63,39 @@ public class NetworkTileService extends TileService {
 	private static Icon ICON_P4G;
 	private static Icon ICON_UNKNOWN;
 
-    @Override
-    public void onStartListening() {
-        super.onStartListening();
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        updateTileUI(prefs.getInt(STATE_KEY, STATE_UNKNOWN));
-    }
+	@Override
+	public void onStartListening() {
+		super.onStartListening();
+
+		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		int cachedState = prefs.getInt(STATE_KEY, STATE_UNKNOWN);
+
+		updateTileUI(cachedState);
+
+		int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
+		if (execMode == MODE_NONE) {
+			return;
+		}
+
+		// Lightweight behavior:
+		// Only read real system mode if we do not have a cached state yet.
+		if (cachedState != STATE_UNKNOWN) {
+			return;
+		}
+
+		EXECUTOR.execute(() -> {
+			int realState = readCurrentNetworkState();
+
+			mainHandler.post(() -> {
+				if (realState != STATE_UNKNOWN) {
+					prefs.edit().putInt(STATE_KEY, realState).apply();
+					updateTileUI(realState);
+				} else {
+					updateTileUI(cachedState);
+				}
+			});
+		});
+	}
 	
 	@Override
 	public void onClick() {
@@ -134,7 +174,31 @@ public class NetworkTileService extends TileService {
 				return BIN_4G_ONLY;
 		}
 	}
+	
+	private static Method getShizukuNewProcessMethod() throws NoSuchMethodException {
+		if (SHIZUKU_NEW_PROCESS_METHOD == null) {
+			SHIZUKU_NEW_PROCESS_METHOD = Shizuku.class.getDeclaredMethod(
+					"newProcess",
+					String[].class,
+					String[].class,
+					String.class
+			);
+			SHIZUKU_NEW_PROCESS_METHOD.setAccessible(true);
+		}
 
+		return SHIZUKU_NEW_PROCESS_METHOD;
+	}
+	
+	private static class CommandResult {
+		final int exitCode;
+		final String stdout;
+
+		CommandResult(int exitCode, String stdout) {
+			this.exitCode = exitCode;
+			this.stdout = stdout;
+		}
+	}
+	
     private Icon createTextOnlyIcon(String text) {
         int size = 256; 
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
@@ -252,9 +316,150 @@ public class NetworkTileService extends TileService {
 		tile.updateTile();
 	}
 	
-	private int getDefaultDataSubId() {
-		return SubscriptionManager.getDefaultDataSubscriptionId();
+	private int readCurrentNetworkState() {
+		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
+
+		if (execMode == MODE_NONE) {
+			return STATE_UNKNOWN;
+		}
+
+		String command =
+				"data_sim=$(settings get global multi_sim_data_call); " +
+				"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
+				"settings get global preferred_network_mode${data_sim}";
+
+		CommandResult result;
+
+		if (execMode == MODE_SHIZUKU) {
+			result = runCommandForResultWithShizuku(command);
+		} else if (execMode == MODE_ROOT) {
+			result = runCommandForResultWithRoot(command);
+		} else {
+			return STATE_UNKNOWN;
+		}
+
+		if (result.exitCode != 0) {
+			return STATE_UNKNOWN;
+		}
+
+		return mapLegacyNetworkModeToState(result.stdout);
 	}
+	
+	private CommandResult runCommandForResultWithRoot(String command) {
+		Process process = null;
+
+		try {
+			process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
+
+			int exitCode = process.waitFor();
+			String stdout = readStream(process.getInputStream());
+
+			return new CommandResult(exitCode, stdout);
+		} catch (Exception e) {
+			return new CommandResult(-1, "");
+		} finally {
+			if (process != null) {
+				process.destroy();
+			}
+		}
+	}
+	
+	private CommandResult runCommandForResultWithShizuku(String command) {
+		Process process = null;
+
+		try {
+			if (!Shizuku.pingBinder()) {
+				return new CommandResult(-1, "");
+			}
+
+			if (Shizuku.checkSelfPermission() != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+				return new CommandResult(-1, "");
+			}
+
+			process = (Process) getShizukuNewProcessMethod().invoke(
+				null,
+				new String[]{"sh", "-c", command},
+				null,
+				null
+			);
+
+			if (process == null) {
+				return new CommandResult(-1, "");
+			}
+
+			int exitCode = process.waitFor();
+			String stdout = readStream(process.getInputStream());
+
+			return new CommandResult(exitCode, stdout);
+		} catch (Exception e) {
+			return new CommandResult(-1, "");
+		} finally {
+			if (process != null) {
+				process.destroy();
+			}
+		}
+	}
+	
+	private String readStream(InputStream inputStream) {
+		StringBuilder builder = new StringBuilder();
+
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				builder.append(line).append('\n');
+			}
+		} catch (Exception ignored) {
+		}
+
+		return builder.toString().trim();
+	}
+	
+	private Integer extractFirstInt(String text) {
+		try {
+			if (text == null || text.trim().isEmpty() || text.trim().equalsIgnoreCase("null")) {
+				return null;
+			}
+
+			Matcher matcher = NUMBER_PATTERN.matcher(text);
+
+			if (matcher.find()) {
+				return Integer.parseInt(matcher.group());
+			}
+
+			return null;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private int mapLegacyNetworkModeToState(String output) {
+		Integer legacyMode = extractFirstInt(output);
+
+		if (legacyMode == null) {
+			return STATE_UNKNOWN;
+		}
+
+		switch (legacyMode) {
+			case LEGACY_4G_ONLY:
+				return STATE_4G_ONLY;
+
+			case LEGACY_5G_ONLY:
+				return STATE_5G_ONLY;
+
+			case LEGACY_PREF_5G:
+				return STATE_PREF_5G;
+
+			case LEGACY_PREF_4G:
+				return STATE_PREF_4G;
+
+			default:
+				return STATE_UNKNOWN;
+		}
+	}
+	
 	
 	private boolean applyNetworkMode(String binaryString) {
 		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -264,13 +469,11 @@ public class NetworkTileService extends TileService {
 			return false;
 		}
 
-		int subId = getDefaultDataSubId();
-
-		if (subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
-			return false;
-		}
-
-		String command = "cmd phone set-allowed-network-types-for-users -s " + subId + " " + binaryString;
+		String command =
+				"data_sim=$(settings get global multi_sim_data_call); " +
+				"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
+				"phone_index=$((data_sim - 1)); " +
+				"cmd phone set-allowed-network-types-for-users -s \"$phone_index\" " + binaryString;
 
 		if (execMode == MODE_SHIZUKU) {
 			return runCommandWithShizuku(command);
@@ -282,17 +485,25 @@ public class NetworkTileService extends TileService {
 	}
 	
 	private boolean runCommandWithRoot(String command) {
+		Process process = null;
+
 		try {
-			Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
+			process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
 			int exitCode = process.waitFor();
 			return exitCode == 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			if (process != null) {
+				process.destroy();
+			}
 		}
 	}
 	
 	private boolean runCommandWithShizuku(String command) {
+		Process process = null;
+		
 		try {
 			if (!Shizuku.pingBinder()) {
 				return false;
@@ -302,19 +513,11 @@ public class NetworkTileService extends TileService {
 				return false;
 			}
 
-			Method newProcessMethod = Shizuku.class.getDeclaredMethod(
-					"newProcess",
-					String[].class,
-					String[].class,
-					String.class
-			);
-			newProcessMethod.setAccessible(true);
-
-			Process process = (Process) newProcessMethod.invoke(
-					null,
-					new String[]{"sh", "-c", command},
-					null,
-					null
+			process = (Process) getShizukuNewProcessMethod().invoke(
+				null,
+				new String[]{"sh", "-c", command},
+				null,
+				null
 			);
 
 			if (process == null) {
@@ -327,6 +530,10 @@ public class NetworkTileService extends TileService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}finally {
+			if (process != null) {
+				process.destroy();
+			}
 		}
 	}
 }
