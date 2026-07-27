@@ -10,6 +10,9 @@ import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.telephony.SubscriptionManager;
+import android.os.Handler;
+import android.os.Looper;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +40,9 @@ public class NetworkTileService extends TileService {
     private static final String BIN_PREF_4G = "1001101001110000111"; // Legacy Id 9 , bitmask 316295
 	
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	private static final AtomicBoolean IS_SWITCHING = new AtomicBoolean(false);
+	
+	private final Handler mainHandler = new Handler(Looper.getMainLooper());
 	
 	private static Icon ICON_4G;
 	private static Icon ICON_5G;
@@ -55,10 +61,16 @@ public class NetworkTileService extends TileService {
 	public void onClick() {
 		super.onClick();
 
+		if (!IS_SWITCHING.compareAndSet(false, true)) {
+			updateTileSwitchingUI();
+			return;
+		}
+
 		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
 		int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
 		if (execMode == MODE_NONE) {
+			IS_SWITCHING.set(false);
 			updateTileUI(STATE_UNKNOWN);
 			return;
 		}
@@ -73,12 +85,16 @@ public class NetworkTileService extends TileService {
 		EXECUTOR.execute(() -> {
 			boolean success = applyNetworkMode(targetBinary);
 
-			getMainExecutor().execute(() -> {
-				if (success) {
-					prefs.edit().putInt(STATE_KEY, nextState).apply();
-					updateTileUI(nextState);
-				} else {
-					updateTileUI(currentState);
+			mainHandler.post(() -> {
+				try {
+					if (success) {
+						prefs.edit().putInt(STATE_KEY, nextState).apply();
+						updateTileUI(nextState);
+					} else {
+						updateTileUI(currentState);
+					}
+				} finally {
+					IS_SWITCHING.set(false);
 				}
 			});
 		});
