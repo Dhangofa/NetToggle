@@ -11,6 +11,8 @@ import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.telephony.SubscriptionManager;
 import java.lang.reflect.Method;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import rikka.shizuku.Shizuku;
 
 public class NetworkTileService extends TileService {
@@ -34,6 +36,8 @@ public class NetworkTileService extends TileService {
     private static final String BIN_PREF_5G = "11011111101111111111"; // Legacy Id 33, bitmask 916479
     private static final String BIN_PREF_4G = "1001101001110000111"; // Legacy Id 9 , bitmask 316295
 	
+	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	
 	private static Icon ICON_4G;
 	private static Icon ICON_5G;
 	private static Icon ICON_P5G;
@@ -46,32 +50,39 @@ public class NetworkTileService extends TileService {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         updateTileUI(prefs.getInt(STATE_KEY, STATE_UNKNOWN));
     }
+	
+	@Override
+	public void onClick() {
+		super.onClick();
 
-    @Override
-    public void onClick() {
-        super.onClick();
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		
+		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
 		int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
 		if (execMode == MODE_NONE) {
 			updateTileUI(STATE_UNKNOWN);
 			return;
 		}
 
-        int currentState = prefs.getInt(STATE_KEY, STATE_UNKNOWN);
+		int currentState = prefs.getInt(STATE_KEY, STATE_UNKNOWN);
 
-        int nextState = getNextState(currentState);
+		int nextState = getNextState(currentState);
 		String targetBinary = getBinaryForState(nextState);
 
-        boolean success = applyNetworkMode(targetBinary);
+		updateTileSwitchingUI();
 
-        if (success) {
-			prefs.edit().putInt(STATE_KEY, nextState).apply();
-			updateTileUI(nextState);
-		} else {
-			updateTileUI(currentState);
-		}
-    }
+		EXECUTOR.execute(() -> {
+			boolean success = applyNetworkMode(targetBinary);
+
+			getMainExecutor().execute(() -> {
+				if (success) {
+					prefs.edit().putInt(STATE_KEY, nextState).apply();
+					updateTileUI(nextState);
+				} else {
+					updateTileUI(currentState);
+				}
+			});
+		});
+	}
 	
 	private int getNextState(int currentState) {
 		switch (currentState) {
@@ -164,6 +175,16 @@ public class NetworkTileService extends TileService {
 				}
 				return ICON_UNKNOWN;
 		}
+	}
+	
+	private void updateTileSwitchingUI() {
+		Tile tile = getQsTile();
+		if (tile == null) return;
+
+		tile.setState(Tile.STATE_INACTIVE);
+		tile.setLabel("Switching...");
+		tile.setIcon(getCachedIcon("?"));
+		tile.updateTile();
 	}
 
     private void updateTileUI(int state) {
