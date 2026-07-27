@@ -9,7 +9,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import java.io.DataOutputStream;
 import java.lang.reflect.Method;
 import rikka.shizuku.Shizuku;
 
@@ -63,10 +62,14 @@ public class NetworkTileService extends TileService {
         int nextState = getNextState(currentState);
 		String targetBinary = getBinaryForState(nextState);
 
-        applyNetworkMode(targetBinary);
+        boolean success = applyNetworkMode(targetBinary);
 
-        prefs.edit().putInt(STATE_KEY, nextState).apply();
-        updateTileUI(nextState);
+        if (success) {
+			prefs.edit().putInt(STATE_KEY, nextState).apply();
+			updateTileUI(nextState);
+		} else {
+			updateTileUI(currentState);
+		}
     }
 	
 	private int getNextState(int currentState) {
@@ -193,49 +196,89 @@ public class NetworkTileService extends TileService {
 
 			case STATE_UNKNOWN:
 			default:
-				tile.setState(Tile.STATE_UNAVAILABLE);
-				tile.setLabel("Net Mode ?");
+				SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+				int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
+
+				if (execMode == MODE_NONE) {
+					tile.setState(Tile.STATE_UNAVAILABLE);
+					tile.setLabel("Setup Required");
+				} else {
+					tile.setState(Tile.STATE_INACTIVE);
+					tile.setLabel("Tap to Set 4G");
+				}
+
 				tile.setIcon(getCachedIcon("?"));
 				break;
 		}
 
 		tile.updateTile();
 	}
+	
+	private boolean applyNetworkMode(String binaryString) {
+		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
 
-    private void applyNetworkMode(String binaryString) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
-        String command = "cmd phone set-allowed-network-types-for-users -s 0 " + binaryString;
+		if (execMode == MODE_NONE) {
+			return false;
+		}
 
-        if (execMode == MODE_SHIZUKU) {
-            // Shizuku Execution Method via Reflection
-            try {
-                if (Shizuku.pingBinder() && Shizuku.checkSelfPermission() == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    
-                    // Uses Reflection to bypass the private access restriction on Shizuku.newProcess
-                    Method newProcessMethod = Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
-                    newProcessMethod.setAccessible(true);
-                    
-                    Process process = (Process) newProcessMethod.invoke(null, new String[]{"sh", "-c", command}, null, null);
-                    if (process != null) {
-                        process.waitFor();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (execMode == MODE_ROOT) {
-            // Standard Root Execution Method
-            try {
-                Process process = Runtime.getRuntime().exec("su");
-                DataOutputStream os = new DataOutputStream(process.getOutputStream());
-                os.writeBytes(command + "\n");
-                os.writeBytes("exit\n");
-                os.flush();
-                process.waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+		String command = "cmd phone set-allowed-network-types-for-users -s 0 " + binaryString;
+
+		if (execMode == MODE_SHIZUKU) {
+			return runCommandWithShizuku(command);
+		} else if (execMode == MODE_ROOT) {
+			return runCommandWithRoot(command);
+		}
+
+		return false;
+	}
+	
+	private boolean runCommandWithRoot(String command) {
+		try {
+			Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
+			int exitCode = process.waitFor();
+			return exitCode == 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private boolean runCommandWithShizuku(String command) {
+		try {
+			if (!Shizuku.pingBinder()) {
+				return false;
+			}
+
+			if (Shizuku.checkSelfPermission() != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+				return false;
+			}
+
+			Method newProcessMethod = Shizuku.class.getDeclaredMethod(
+					"newProcess",
+					String[].class,
+					String[].class,
+					String.class
+			);
+			newProcessMethod.setAccessible(true);
+
+			Process process = (Process) newProcessMethod.invoke(
+					null,
+					new String[]{"sh", "-c", command},
+					null,
+					null
+			);
+
+			if (process == null) {
+				return false;
+			}
+
+			int exitCode = process.waitFor();
+			return exitCode == 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 }
