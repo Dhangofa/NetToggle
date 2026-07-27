@@ -34,40 +34,51 @@ public class MainActivity extends Activity {
     private RadioButton radioShizuku;
     private TextView statusText;
     private SharedPreferences prefs;
-
+	
+	private volatile boolean activityDestroyed = false;
+	private Thread rootCheckThread;
+	private Process rootCheckProcess;
+	
     // 1. First check Shizuku mode selected then wait for Shizuku Binder to be injected, then check permissions
     private final Shizuku.OnBinderReceivedListener binderReceivedListener = () -> {
-		runOnUiThread(() -> {
-			if (prefs != null && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
-				checkShizukuPermission(false);
-			}
-		});
+	    runOnUiThread(() -> {
+	        if (!activityDestroyed
+	                && prefs != null
+	                && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
+	            checkShizukuPermission(false);
+	        }
+	    });
 	};
 
     // 2. Handle if Shizuku suddenly dies in the background
     private final Shizuku.OnBinderDeadListener binderDeadListener = () -> {
-		runOnUiThread(() -> {
-			if (prefs != null && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
-				statusText.setText("Shizuku is not running.");
-				statusText.setTextColor(0xFFFF5555);
-			}
-		});
+	    runOnUiThread(() -> {
+	        if (!activityDestroyed
+	                && prefs != null
+	                && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
+	            statusText.setText("Shizuku is not running.");
+	            statusText.setTextColor(0xFFFF5555);
+	        }
+	    });
 	};
 
 
     // 3. React instantly when the user taps "Allow" on the Shizuku Popup
     private final Shizuku.OnRequestPermissionResultListener permissionResultListener = (requestCode, grantResult) -> {
-        runOnUiThread(() -> {
-            if (prefs != null && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
-                checkShizukuPermission(false);
-            }
-        });
-    };
+	    runOnUiThread(() -> {
+	        if (!activityDestroyed
+	                && prefs != null
+	                && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
+	            checkShizukuPermission(false);
+	        }
+	    });
+	};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        activityDestroyed = false;
+		setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         
@@ -106,48 +117,84 @@ public class MainActivity extends Activity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Prevent memory leaks by destroying the listeners when the app closes
-        Shizuku.removeBinderReceivedListener(binderReceivedListener);
-        Shizuku.removeBinderDeadListener(binderDeadListener);
-        Shizuku.removeRequestPermissionResultListener(permissionResultListener);
-    }
+   @Override
+	protected void onDestroy() {
+	    activityDestroyed = true;
+	
+	    // Prevent memory leaks by destroying Shizuku listeners when the app closes
+	    Shizuku.removeBinderReceivedListener(binderReceivedListener);
+	    Shizuku.removeBinderDeadListener(binderDeadListener);
+	    Shizuku.removeRequestPermissionResultListener(permissionResultListener);
+	
+	    // Stop any running root permission check process
+	    if (rootCheckProcess != null) {
+	        rootCheckProcess.destroy();
+	        rootCheckProcess = null;
+	    }
+	
+	    // Interrupt root check thread if it is still active
+	    if (rootCheckThread != null && rootCheckThread.isAlive()) {
+	        rootCheckThread.interrupt();
+	        rootCheckThread = null;
+	    }
+	
+	    super.onDestroy();
+	}
 
     private void checkRootPermission() {
-        statusText.setText("Checking root permission...");
-        statusText.setTextColor(0xFFFFB300);
-    
-        new Thread(() -> {
-            boolean granted = false;
-    
-            try {
-                Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
-                int exitCode = process.waitFor();
-                granted = exitCode == 0;
-            } catch (Exception ignored) {
-                granted = false;
-            }
-    
-            boolean finalGranted = granted;
-			runOnUiThread(() -> {
-				if (prefs == null || prefs.getInt(EXEC_MODE_KEY, MODE_NONE) != MODE_ROOT) {
-					return;
-				}
-
-				if (finalGranted) {
-					statusText.setText("Root mode active & authorized!");
-					statusText.setTextColor(0xFF1B873F);
-				} else {
-					statusText.setText("Root permission denied or unavailable.");
-					statusText.setTextColor(0xFFFF5555);
-				}
-			});
-        }).start();
-    }
+	    statusText.setText("Checking root permission...");
+	    statusText.setTextColor(0xFFFFB300);
+	
+	    rootCheckThread = new Thread(() -> {
+	        boolean granted = false;
+	        Process process = null;
+	
+	        try {
+	            process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
+	            rootCheckProcess = process;
+	
+	            int exitCode = process.waitFor();
+	            granted = exitCode == 0;
+	        } catch (Exception ignored) {
+	            granted = false;
+	        } finally {
+	            if (process != null) {
+	                process.destroy();
+	            }
+	
+	            if (rootCheckProcess == process) {
+	                rootCheckProcess = null;
+	            }
+	        }
+	
+	        boolean finalGranted = granted;
+	
+	        runOnUiThread(() -> {
+	            if (activityDestroyed) {
+	                return;
+	            }
+	
+	            if (prefs == null || prefs.getInt(EXEC_MODE_KEY, MODE_NONE) != MODE_ROOT) {
+	                return;
+	            }
+	
+	            if (finalGranted) {
+	                statusText.setText("Root mode active & authorized!");
+	                statusText.setTextColor(0xFF1B873F);
+	            } else {
+	                statusText.setText("Root permission denied or unavailable.");
+	                statusText.setTextColor(0xFFFF5555);
+	            }
+	        });
+	    });
+	
+	    rootCheckThread.start();
+	}
     
     private void checkShizukuPermission(boolean requestIfNeeded) {
+		if (activityDestroyed) {
+		    return;
+		}
 		try {
 			if (!Shizuku.pingBinder()) {
 				statusText.setText("Shizuku is not running.");
