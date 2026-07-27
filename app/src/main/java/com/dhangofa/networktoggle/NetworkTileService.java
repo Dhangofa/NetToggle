@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+import android.telephony.SubscriptionManager;
 import java.lang.reflect.Method;
 import rikka.shizuku.Shizuku;
 
@@ -28,10 +29,10 @@ public class NetworkTileService extends TileService {
 	private static final int STATE_PREF_5G = 3;
 	private static final int STATE_PREF_4G = 4;
 
-    private static final String BIN_4G_ONLY = "1000000000000"; // Legacy Id 11 (4096)
-    private static final String BIN_5G_ONLY = "10000000000000000000"; // Legacy Id 23 (524288)
-    private static final String BIN_PREF_5G = "11011111101111111111"; // Legacy Id 33 (916479)
-    private static final String BIN_PREF_4G = "1001101001110000111"; // Legacy Id 9 (316295)
+    private static final String BIN_4G_ONLY = "1000000000000"; // Legacy Id 11, bitmask 4096
+    private static final String BIN_5G_ONLY = "10000000000000000000"; // Legacy Id 23, bitmask 524288
+    private static final String BIN_PREF_5G = "11011111101111111111"; // Legacy Id 33, bitmask 916479
+    private static final String BIN_PREF_4G = "1001101001110000111"; // Legacy Id 9 , bitmask 316295
 	
 	private static Icon ICON_4G;
 	private static Icon ICON_5G;
@@ -214,6 +215,10 @@ public class NetworkTileService extends TileService {
 		tile.updateTile();
 	}
 	
+	private int getDefaultDataSubId() {
+		return SubscriptionManager.getDefaultDataSubscriptionId();
+	}
+	
 	private boolean applyNetworkMode(String binaryString) {
 		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		int execMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
@@ -222,7 +227,13 @@ public class NetworkTileService extends TileService {
 			return false;
 		}
 
-		String command = "cmd phone set-allowed-network-types-for-users -s 0 " + binaryString;
+		int subId = getDefaultDataSubId();
+
+		if (subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+			return false;
+		}
+
+		String command = "cmd phone set-allowed-network-types-for-users -s " + subId + " " + binaryString;
 
 		if (execMode == MODE_SHIZUKU) {
 			return runCommandWithShizuku(command);
