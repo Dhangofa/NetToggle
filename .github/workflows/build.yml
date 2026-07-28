@@ -28,7 +28,7 @@ jobs:
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36"
 
     - name: Compile Release APK using Gradle
-      run: gradle assembleRelease -PversionCode=${{ github.run_number }}
+      run: gradle assembleRelease -PversionCode=${{ github.run_number }} -PversionName=1.0.${{ github.run_number }}
 
     - name: Decode Permanent Keystore
       run: |
