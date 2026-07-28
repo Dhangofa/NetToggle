@@ -93,78 +93,73 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="18dp" />
 
-        <TextView
-            android:id="@+id/developerTitleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Developer"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="10dp" />
+       <TextView
+			android:id="@+id/developerTitleText"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Developer"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			android:gravity="center"
+			android:layout_marginBottom="12dp" />
 
-        <LinearLayout
-            android:id="@+id/developerInfoRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="14dp">
+		<ImageView
+			android:id="@+id/developerPersonIcon"
+			android:layout_width="72dp"
+			android:layout_height="72dp"
+			android:padding="14dp"
+			android:src="@drawable/ic_person"
+			android:tint="?android:attr/textColorPrimary"
+			android:background="@drawable/social_icon_bg"
+			android:contentDescription="Developer"
+			android:layout_marginBottom="8dp" />
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_person"
-                android:tint="?android:attr/textColorPrimary"
-                android:contentDescription="Developer" />
+		<TextView
+			android:id="@+id/developerNameText"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Dhangofa"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			android:gravity="center"
+			android:layout_marginBottom="18dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dhangofa"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:paddingStart="8dp"
-                android:paddingLeft="8dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
+		<LinearLayout
 			android:id="@+id/socialLinksRow"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
 			android:gravity="center"
-			android:layout_marginTop="8dp"
+			android:layout_marginTop="4dp"
 			android:layout_marginBottom="8dp">
 
 			<ImageView
 				android:id="@+id/githubLink"
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:padding="10dp"
+				android:layout_width="72dp"
+				android:layout_height="72dp"
+				android:padding="16dp"
 				android:src="@drawable/ic_github"
 				android:tint="?android:attr/textColorPrimary"
+				android:background="@drawable/social_icon_bg"
 				android:contentDescription="GitHub"
 				android:clickable="true"
-				android:focusable="true"
-				android:background="?android:attr/selectableItemBackgroundBorderless" />
+				android:focusable="true" />
 
 			<Space
-				android:layout_width="24dp"
+				android:layout_width="28dp"
 				android:layout_height="1dp" />
 
 			<ImageView
 				android:id="@+id/telegramLink"
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:padding="10dp"
+				android:layout_width="72dp"
+				android:layout_height="72dp"
+				android:padding="16dp"
 				android:src="@drawable/ic_telegram"
 				android:tint="?android:attr/textColorPrimary"
+				android:background="@drawable/social_icon_bg"
 				android:contentDescription="Telegram"
 				android:clickable="true"
-				android:focusable="true"
-				android:background="?android:attr/selectableItemBackgroundBorderless" />
+				android:focusable="true" />
 
 		</LinearLayout>
 
