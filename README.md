@@ -28,7 +28,7 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
   </tr>
   <tr>
     <td valign="top" align="center">
-      <img src="screenshot/main.png" width="160" height="355">
+      <img src="screenshot/main_new.png" width="160" height="355">
     </td>
     <td valign="top" align="center">
       <img src="screenshot/4g.png" width="160" height="355">
