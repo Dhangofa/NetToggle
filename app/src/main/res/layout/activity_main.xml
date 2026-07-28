@@ -151,15 +151,15 @@
 
 			<ImageView
 				android:id="@+id/telegramLink"
-				android:layout_width="56dp"
-				android:layout_height="56dp"
-				android:padding="12dp"
+				android:layout_width="72dp"
+				android:layout_height="72dp"
+				android:padding="16dp"
 				android:src="@drawable/ic_telegram"
 				android:tint="?android:attr/textColorPrimary"
-				android:background="@drawable/social_icon_bg"
 				android:contentDescription="Telegram"
 				android:clickable="true"
-				android:focusable="true" />
+				android:focusable="true"
+				android:background="?android:attr/selectableItemBackgroundBorderless" />
 
 		</LinearLayout>
 
