@@ -11,9 +11,13 @@ Behavior:
 package com.dhangofa.networktoggle;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -33,6 +37,9 @@ public class MainActivity extends Activity {
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
     private TextView statusText;
+	private TextView appVersionText;
+	private ImageView githubLink;
+	private ImageView telegramLink;
     private SharedPreferences prefs;
 	
 	private volatile boolean activityDestroyed = false;
@@ -86,6 +93,15 @@ public class MainActivity extends Activity {
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
         statusText = findViewById(R.id.shizukuStatusText);
+		
+		appVersionText = findViewById(R.id.appVersionText);
+		githubLink = findViewById(R.id.githubLink);
+		telegramLink = findViewById(R.id.telegramLink);
+
+		appVersionText.setText("v" + getAppVersionName());
+
+		githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
+		telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofa"));
 
         // Register the lifecycle listeners
         Shizuku.addBinderReceivedListener(binderReceivedListener);
@@ -219,6 +235,23 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			statusText.setText("Shizuku check failed.");
 			statusText.setTextColor(0xFFFF5555);
+		}
+	}
+	
+	private String getAppVersionName() {
+		try {
+			PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			return packageInfo.versionName;
+		} catch (Exception e) {
+			return "unknown";
+		}
+	}
+
+	private void openUrl(String url) {
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+			startActivity(intent);
+		} catch (Exception ignored) {
 		}
 	}
 }
