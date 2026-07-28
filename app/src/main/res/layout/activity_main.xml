@@ -1,65 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="32dp"
-    android:gravity="center_horizontal"
-    android:background="?android:attr/colorBackground">
+    android:background="?android:attr/colorBackground"
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="NetToggle Configuration"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="8dp" />
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select the background execution method for the Quick Settings tile."
-        android:textSize="14sp"
-        android:gravity="center"
-        android:textColor="?android:attr/textColorSecondary"
-        android:layout_marginBottom="48dp" />
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:gravity="center_horizontal">
 
-    <RadioGroup
-        android:id="@+id/modeRadioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        <TextView
+            android:id="@+id/appTitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NetToggle"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="2dp" />
 
-        <RadioButton
-            android:id="@+id/radioRoot"
+        <TextView
+            android:id="@+id/appVersionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="v0.0.0"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginBottom="10dp" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Root (su)"
-            android:textSize="18sp"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:background="?android:attr/selectableItemBackground" />
+            android:text="Switch Network between 5G, 4G, Preferred 5G and Preferred 4G from Quick Settings."
+            android:textSize="14sp"
+            android:gravity="center"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginBottom="36dp" />
 
-        <RadioButton
-            android:id="@+id/radioShizuku"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Shizuku (ADB)"
-            android:textSize="18sp"
-            android:padding="16dp"
-            android:background="?android:attr/selectableItemBackground" />
+            android:text="Execution Mode"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
 
-    </RadioGroup>
+        <RadioGroup
+            android:id="@+id/modeRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/shizukuStatusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="14sp"
-        android:gravity="center"
-        android:textColor="#FF5555"
-        android:layout_marginTop="24dp" />
+            <RadioButton
+                android:id="@+id/radioRoot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Root (su)"
+                android:textSize="18sp"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp"
+                android:background="?android:attr/selectableItemBackground" />
 
-</LinearLayout>
+            <RadioButton
+                android:id="@+id/radioShizuku"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shizuku (ADB)"
+                android:textSize="18sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/shizukuStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:gravity="center"
+            android:textColor="#FF5555"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="28dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#333333"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="18dp" />
+
+        <TextView
+            android:id="@+id/developerTitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Developer"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="10dp" />
+
+        <LinearLayout
+            android:id="@+id/developerInfoRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="14dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_person"
+                android:tint="?android:attr/textColorPrimary"
+                android:contentDescription="Developer" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dhangofa"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:paddingLeft="8dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+			android:id="@+id/socialLinksRow"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="center"
+			android:layout_marginTop="8dp"
+			android:layout_marginBottom="8dp">
+
+			<ImageView
+				android:id="@+id/githubLink"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:padding="10dp"
+				android:src="@drawable/ic_github"
+				android:tint="?android:attr/textColorPrimary"
+				android:contentDescription="GitHub"
+				android:clickable="true"
+				android:focusable="true"
+				android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+			<Space
+				android:layout_width="24dp"
+				android:layout_height="1dp" />
+
+			<ImageView
+				android:id="@+id/telegramLink"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:padding="10dp"
+				android:src="@drawable/ic_telegram"
+				android:tint="?android:attr/textColorPrimary"
+				android:contentDescription="Telegram"
+				android:clickable="true"
+				android:focusable="true"
+				android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+		</LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
