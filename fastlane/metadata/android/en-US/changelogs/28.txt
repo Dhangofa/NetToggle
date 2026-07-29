@@ -1,0 +1,8 @@
+- Added improved Root/Shizuku handling
+- Async QS tile execution
+- Duplicate-tap protection
+- Active SIM handling
+- Cached icons
+- Developer links
+- Runtime version display
+- Lower QS refresh overhead.
