@@ -18,32 +18,38 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
 
 ## 📸 Screenshots
 
+<div align="center">
+
 <table>
   <tr>
-    <th align="center">Configuration UI</th>
-    <th align="center">4G Only</th>
-    <th align="center">5G Only</th>
-    <th align="center">Preferred 5G</th>
-    <th align="center">Preferred 4G</th>
+    <td align="center">
+      <strong>5G Only</strong><br><br>
+      <img src="screenshot/5g.png">
+    </td>
+    <td align="center">
+      <strong>4G Only</strong><br><br>
+      <img src="screenshot/4g.png">
+    </td>
   </tr>
   <tr>
-    <td valign="top" align="center">
-      <img src="screenshot/main.png" width="160" height="355">
+    <td align="center">
+      <strong>Preferred 5G</strong><br><br>
+      <img src="screenshot/p5g.png">
     </td>
-    <td valign="top" align="center">
-      <img src="screenshot/4g.png" width="160" height="355">
+    <td align="center">
+      <strong>Preferred 4G</strong><br><br>
+      <img src="screenshot/p4g.png">
     </td>
-    <td valign="top" align="center">
-      <img src="screenshot/5g.png" width="160" height="355">
-    </td>
-    <td valign="top" align="center">
-      <img src="screenshot/p5g.png" width="160" height="355">
-    </td>
-    <td valign="top" align="center">
-      <img src="screenshot/p4g.png" width="160" height="355">
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <strong>Configuration UI</strong><br><br>
+      <img src="screenshot/main.png">
     </td>
   </tr>
 </table>
+
+</div>
 
 ## ⚙️ Working Modes & Requirements
 To execute the privileged baseband commands, NetToggle requires an elevated execution environment. It features a built-in UI to select between two independent working modes:
