@@ -85,7 +85,7 @@ cd NetToggle
 ```
 ## 📜 License
 NetToggle is licensed under the **GNU General Public License v3.0**.
-See the [LICENSE]() file for the full license text.
+See the [LICENSE](https://github.com/Dhangofa/NetToggle/tree/main/LICENSE) file for the full license text.
 
 ## 🧾 Notices
 
