@@ -44,7 +44,7 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
   <tr>
     <td align="center" colspan="2">
       <strong>Configuration UI</strong><br><br>
-      <img src="screenshot/main.png">
+      <img src="screenshot/main_new.png">
     </td>
   </tr>
 </table>
