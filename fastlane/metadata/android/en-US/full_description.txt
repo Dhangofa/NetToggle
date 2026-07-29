@@ -1,0 +1,8 @@
+NetToggle is a lightweight Android Quick Settings tile for switching cellular network modes.
+Supported modes:
+- 5G Only
+- 4G Only
+- Preferred 5G
+- Preferred 4G
+NetToggle supports Root and Shizuku execution modes. Root or Shizuku is required because standard Android apps cannot directly change preferred network modes.
+The app is designed to stay lightweight by using cached tile state, async command execution, cached icons, and no background polling.
