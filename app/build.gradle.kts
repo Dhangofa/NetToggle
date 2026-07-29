@@ -10,8 +10,8 @@ android {
         applicationId = "com.dhangofa.networktoggle"
         minSdk = 24
         targetSdk = 36
-        versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 29
-        versionName = (project.findProperty("versionName") as String?) ?: "1.0.29"
+        versionCode = 30
+        versionName = "1.0.30"
     }
     // Suggested by IzzyOnDroid
     dependenciesInfo {
