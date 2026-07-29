@@ -1,0 +1,1 @@
+This release prepares NetToggle for F-Droid submission with upstream metadata, notices, README updates, deterministic version fallback, and developer link UI updates.
