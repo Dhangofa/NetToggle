@@ -22,7 +22,6 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
 
 ## 📸 Screenshots
 
-<div align="center">
 <table>
   <tr>
     <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/main_new.png?raw=true" alt="Configuration UI Light" width="100%"></td>
