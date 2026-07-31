@@ -8,6 +8,8 @@
   </a>
 </div>
 
+[![Get it on Orion Store](https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png)](https://rookieenough.github.io/Orion-Data/redirect.html?id=nettoggle)
+
 ## 📖 Description
 NetToggle is a lightweight Android Quick Settings tile application designed to force specific cellular network modes directly from your status bar. It allows you to quickly cycle through **4G Only**, **5G Only**, **Pref 5G**, and **Pref 4G** with a single tap. NetToggle uses privileged shell access to apply network mode changes that are normally unavailable to standard Android apps.
 
