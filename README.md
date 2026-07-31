@@ -23,37 +23,18 @@ NetToggle bridges this gap by completely bypassing standard Android APIs. Instea
 ## 📸 Screenshots
 
 <div align="center">
-
 <table>
   <tr>
-    <td align="center">
-      <strong>5G Only</strong><br><br>
-      <img src="screenshot/5g.png">
-    </td>
-    <td align="center">
-      <strong>4G Only</strong><br><br>
-      <img src="screenshot/4g.png">
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <strong>Preferred 5G</strong><br><br>
-      <img src="screenshot/p5g.png">
-    </td>
-    <td align="center">
-      <strong>Preferred 4G</strong><br><br>
-      <img src="screenshot/p4g.png">
-    </td>
-  </tr>
-  <tr>
-    <td align="center" colspan="2">
-      <strong>Configuration UI</strong><br><br>
-      <img src="screenshot/main_new.png">
-    </td>
+    <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/main_new.png?raw=true" alt="Configuration UI Light" width="100%"></td>
+  <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/main_new_light.jpg?raw=true" alt="Configuration UI Dark" width="100%"></td>
+    <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/5g.png?raw=true" alt="5G Only" width="100%"></td>
+</tr>
+<tr>
+    <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/4g.png?raw=true" alt="4G Only" width="100%"></td>
+    <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/p5g.png?raw=true" alt="Preferred 5G" width="100%"></td>
+    <td width="20%" align="center"><img src="https://github.com/Dhangofa/NetToggle/blob/main/screenshot/p4g.png?raw=true" alt="Preferred 4G" width="100%"></td>
   </tr>
 </table>
-
-</div>
 
 ## ⚙️ Working Modes & Requirements
 To execute the privileged baseband commands, NetToggle requires an elevated execution environment. It features a built-in UI to select between two independent working modes:
