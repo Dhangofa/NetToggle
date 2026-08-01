@@ -52,7 +52,7 @@ To execute the privileged baseband commands, NetToggle requires an elevated exec
 * **Minimum Required:** Android 7.0 (API Level 24)
 * **Target Version:** Android 16 (API Level 36)
 * **Tested on:** MIUI 14 (Android 13), OriginOS 6 (Android 16)
-
+* **Note:** As of now Samsung One UI not supported, will add support in next build.
 ## 🔐 Privacy
 
 NetToggle does not contain ads, analytics, trackers, telemetry, or background network communication.
