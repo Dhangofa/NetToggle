@@ -15,3 +15,4 @@ Execution methods:
 Root or Shizuku is required because standard Android apps cannot directly change preferred network modes.
 
 The app is designed to stay lightweight by using cached tile state, async command execution, cached icons, and no background polling.
+- Note : Samsung One UI not supported as of now.
