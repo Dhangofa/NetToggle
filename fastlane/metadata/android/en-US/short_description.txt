@@ -1,1 +1,1 @@
-Quick Settings network mode switcher
+QS Tile to force 5G/4G/Pref 5G/Pref 4G network modes using Root or Shizuku
