@@ -59,6 +59,7 @@ public class NetworkTileService extends TileService {
 	private static final int TARGET_SIM_2 = 2;
 
 	private static final int INVALID_SLOT_INDEX = -1;
+	private static final int INVALID_SUB_ID = -1;
 	
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 	private static final AtomicBoolean IS_SWITCHING = new AtomicBoolean(false);
@@ -344,25 +345,34 @@ public class NetworkTileService extends TileService {
 			return STATE_UNKNOWN;
 		}
 
-		int dataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+		int targetSim = prefs.getInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
+		int targetSubId = INVALID_SUB_ID;
+
+		if (targetSim == TARGET_SIM_AUTO) {
+			targetSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+		} else if (targetSim == TARGET_SIM_1) {
+			targetSubId = resolveSubIdFromDumpsys(execMode, 0);
+		} else if (targetSim == TARGET_SIM_2) {
+			targetSubId = resolveSubIdFromDumpsys(execMode, 1);
+		}
 
 		String command;
 
-		if (dataSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+		if (targetSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID && targetSubId != INVALID_SUB_ID) {
 			command =
-					"value=$(settings get global preferred_network_mode" + dataSubId + "); " +
+					"value=$(settings get global preferred_network_mode" + targetSubId + "); " +
 					"if [ -n \"$value\" ] && [ \"$value\" != \"null\" ]; then " +
 					"echo \"$value\"; " +
 					"else " +
-					"data_sim=$(settings get global multi_sim_data_call); " +
-					"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
-					"settings get global preferred_network_mode${data_sim}; " +
+					"exit 1; " +
 					"fi";
-		} else {
+		} else if (targetSim == TARGET_SIM_AUTO) {
 			command =
 					"data_sim=$(settings get global multi_sim_data_call); " +
 					"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
 					"settings get global preferred_network_mode${data_sim}";
+		} else {
+			return STATE_UNKNOWN;
 		}
 
 		CommandResult result;
@@ -607,6 +617,36 @@ public class NetworkTileService extends TileService {
 		}
 
 		return slotIndex;
+	}
+	
+	private int resolveSubIdFromDumpsys(int execMode, int slotIndex) {
+		String command =
+				"dumpsys isub | grep -E \"simSlotIndex=" + slotIndex + "([^0-9]| )\" " +
+				"| head -n 1 " +
+				"| grep -o -E \"\\{id=[0-9]+\" " +
+				"| cut -d '=' -f 2";
+
+		CommandResult result;
+
+		if (execMode == MODE_SHIZUKU) {
+			result = runCommandForResultWithShizuku(command);
+		} else if (execMode == MODE_ROOT) {
+			result = runCommandForResultWithRoot(command);
+		} else {
+			return INVALID_SUB_ID;
+		}
+
+		if (result.exitCode != 0) {
+			return INVALID_SUB_ID;
+		}
+
+		Integer subId = extractFirstInt(result.stdout);
+
+		if (subId == null || subId <= 0) {
+			return INVALID_SUB_ID;
+		}
+
+		return subId;
 	}
 	
 	
