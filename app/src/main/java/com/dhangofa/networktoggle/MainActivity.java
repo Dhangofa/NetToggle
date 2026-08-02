@@ -38,17 +38,18 @@ public class MainActivity extends Activity {
 
     private static final String PREFS_NAME = "NetTogglePrefs";
     private static final String EXEC_MODE_KEY = "exec_mode";
+	private static final String TARGET_SIM_KEY = "target_sim";
+	private static final String AUTO_SIM_ERROR_KEY = "auto_sim_error";
+	private static final String STATE_KEY = "net_state";
 	
     private static final int MODE_NONE = 0;
     private static final int MODE_ROOT = 1;
     private static final int MODE_SHIZUKU = 2;
+	private static final int STATE_UNKNOWN = 0;
 	
 	private static final int TARGET_SIM_AUTO = 0;
 	private static final int TARGET_SIM_1 = 1;
 	private static final int TARGET_SIM_2 = 2;
-	
-	private static final String TARGET_SIM_KEY = "target_sim";
-	private static final String AUTO_SIM_ERROR_KEY = "auto_sim_error";
 
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
@@ -154,31 +155,41 @@ public class MainActivity extends Activity {
 		loadSavedTargetSimMode();
 		updateAutoSimWarning();
 
-        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.radioRoot) {
-                prefs.edit().putInt(EXEC_MODE_KEY, MODE_ROOT).apply();
-                checkRootPermission();
-            } else if (checkedId == R.id.radioShizuku) {
-                prefs.edit().putInt(EXEC_MODE_KEY, MODE_SHIZUKU).apply();
-                checkShizukuPermission(true);
-            }
-        });
+		radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			if (checkedId == R.id.radioRoot) {
+				prefs.edit()
+						.putInt(EXEC_MODE_KEY, MODE_ROOT)
+						.putInt(STATE_KEY, STATE_UNKNOWN)
+						.putBoolean(AUTO_SIM_ERROR_KEY, false)
+						.apply();
+
+				checkRootPermission();
+			} else if (checkedId == R.id.radioShizuku) {
+				prefs.edit()
+						.putInt(EXEC_MODE_KEY, MODE_SHIZUKU)
+						.putInt(STATE_KEY, STATE_UNKNOWN)
+						.putBoolean(AUTO_SIM_ERROR_KEY, false)
+						.apply();
+
+				checkShizukuPermission(true);
+			}
+		});
 		
 		targetSimRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
 			SharedPreferences.Editor editor = prefs.edit();
 
 			if (checkedId == R.id.radioSimAuto) {
 				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
-				editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
 			} else if (checkedId == R.id.radioSim1) {
 				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_1);
-				editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
 			} else if (checkedId == R.id.radioSim2) {
 				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_2);
-				editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
 			}
 
+			editor.putInt(STATE_KEY, STATE_UNKNOWN);
+			editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
 			editor.apply();
+
 			updateAutoSimWarning();
 		});
     }
