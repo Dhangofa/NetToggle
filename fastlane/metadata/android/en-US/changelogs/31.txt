@@ -1,0 +1,4 @@
+- Fixed Samsung One UI dual-SIM switching by resolving the selected SIM to the correct subscription ID and physical slot. 
+- Added Auto/SIM 1/SIM 2 targeting
+- Safe Auto SIM failure handling
+- Expanded OEM network mode readback mappings.
