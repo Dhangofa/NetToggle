@@ -1,11 +1,20 @@
 /*
 Behavior:
-- Fresh install: no option selected.
+- Fresh install: no execution mode selected.
 - Root selected: root permission checked.
 - Shizuku selected: Shizuku permission checked/requested only then.
 - Saved Root: root rechecked on open.
 - Saved Shizuku: status checked without auto-popup.
 - Shizuku callbacks update UI only when Shizuku mode is selected.
+
+Target SIM behavior:
+- Target SIM defaults to Auto.
+- Auto mode is handled by the QS tile service using the active data subscription.
+- Auto mode resolves the active data subscription to the physical SIM slot before applying changes.
+- If Auto SIM detection fails, the QS tile sets auto_sim_error=true and shows a Toast.
+- MainActivity shows a persistent warning when auto_sim_error=true.
+- Selecting any Target SIM option clears the previous Auto SIM warning.
+- SIM 1 and SIM 2 use the chosen physical SIM slot directly.
 */
 
 package com.dhangofa.networktoggle;
@@ -21,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.view.View;
 
 import rikka.shizuku.Shizuku;
 
@@ -32,6 +42,13 @@ public class MainActivity extends Activity {
     private static final int MODE_NONE = 0;
     private static final int MODE_ROOT = 1;
     private static final int MODE_SHIZUKU = 2;
+	
+	private static final int TARGET_SIM_AUTO = 0;
+	private static final int TARGET_SIM_1 = 1;
+	private static final int TARGET_SIM_2 = 2;
+	
+	private static final String TARGET_SIM_KEY = "target_sim";
+	private static final String AUTO_SIM_ERROR_KEY = "auto_sim_error";
 
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
@@ -42,11 +59,17 @@ public class MainActivity extends Activity {
 	private ImageView telegramLink;
     private SharedPreferences prefs;
 	
+	private RadioGroup targetSimRadioGroup;
+	private RadioButton radioSimAuto;
+	private RadioButton radioSim1;
+	private RadioButton radioSim2;
+	private TextView autoSimWarningText;
+	
 	private volatile boolean activityDestroyed = false;
 	private Thread rootCheckThread;
 	private Process rootCheckProcess;
 	
-    // 1. First check Shizuku mode selected then wait for Shizuku Binder to be injected, then check permissions
+    // Wait for Shizuku Binder, then check permission only if Shizuku mode is selected.
     private final Shizuku.OnBinderReceivedListener binderReceivedListener = () -> {
 	    runOnUiThread(() -> {
 	        if (!activityDestroyed
@@ -57,7 +80,7 @@ public class MainActivity extends Activity {
 	    });
 	};
 
-    // 2. Handle if Shizuku suddenly dies in the background
+    // Handle Shizuku service death only when Shizuku mode is selected.
     private final Shizuku.OnBinderDeadListener binderDeadListener = () -> {
 	    runOnUiThread(() -> {
 	        if (!activityDestroyed
@@ -70,7 +93,7 @@ public class MainActivity extends Activity {
 	};
 
 
-    // 3. React instantly when the user taps "Allow" on the Shizuku Popup
+    // React when the user grants or denies Shizuku permission.
     private final Shizuku.OnRequestPermissionResultListener permissionResultListener = (requestCode, grantResult) -> {
 	    runOnUiThread(() -> {
 	        if (!activityDestroyed
@@ -93,6 +116,12 @@ public class MainActivity extends Activity {
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
         statusText = findViewById(R.id.shizukuStatusText);
+		
+		targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
+		radioSimAuto = findViewById(R.id.radioSimAuto);
+		radioSim1 = findViewById(R.id.radioSim1);
+		radioSim2 = findViewById(R.id.radioSim2);
+		autoSimWarningText = findViewById(R.id.autoSimWarningText);
 		
 		appVersionText = findViewById(R.id.appVersionText);
 		githubLink = findViewById(R.id.githubLink);
@@ -121,6 +150,9 @@ public class MainActivity extends Activity {
             statusText.setText("Select Root or Shizuku mode.");
             statusText.setTextColor(0xFFFFB300);
         }
+		
+		loadSavedTargetSimMode();
+		updateAutoSimWarning();
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.radioRoot) {
@@ -131,7 +163,34 @@ public class MainActivity extends Activity {
                 checkShizukuPermission(true);
             }
         });
+		
+		targetSimRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			SharedPreferences.Editor editor = prefs.edit();
+
+			if (checkedId == R.id.radioSimAuto) {
+				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
+				editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
+			} else if (checkedId == R.id.radioSim1) {
+				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_1);
+				editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
+			} else if (checkedId == R.id.radioSim2) {
+				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_2);
+				editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
+			}
+
+			editor.apply();
+			updateAutoSimWarning();
+		});
     }
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (prefs != null) {
+			updateAutoSimWarning();
+		}
+	}
 
    @Override
 	protected void onDestroy() {
@@ -254,4 +313,34 @@ public class MainActivity extends Activity {
 		} catch (Exception ignored) {
 		}
 	}
+	
+	private void loadSavedTargetSimMode() {
+		int targetSim = prefs.getInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
+
+		if (targetSim == TARGET_SIM_1) {
+			radioSim1.setChecked(true);
+		} else if (targetSim == TARGET_SIM_2) {
+			radioSim2.setChecked(true);
+		} else {
+			radioSimAuto.setChecked(true);
+		}
+	}
+	
+	private void updateAutoSimWarning() {
+		if (autoSimWarningText == null || prefs == null) {
+			return;
+		}
+
+		boolean hasAutoSimError = prefs.getBoolean(AUTO_SIM_ERROR_KEY, false);
+		int targetSim = prefs.getInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
+
+		if (hasAutoSimError && targetSim == TARGET_SIM_AUTO) {
+			autoSimWarningText.setVisibility(View.VISIBLE);
+			autoSimWarningText.setText("Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually.");
+			autoSimWarningText.setTextColor(0xFFFF5555);
+		} else {
+			autoSimWarningText.setVisibility(View.GONE);
+		}
+	}
+	
 }
