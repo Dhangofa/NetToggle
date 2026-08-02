@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Shizuku Permission REQUIRED for Auto-Popup -->
+    <!-- Shizuku permission required for Shizuku API access -->
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+
+    <!-- Used only to clear stale cached QS tile state after reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="false"
@@ -12,7 +15,19 @@
         android:theme="@android:style/Theme.DeviceDefault.DayNight"
         android:supportsRtl="true">
 
-        <!-- REQUIRED FOR SHIZUKU BINDER RECEPTION -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+
+        </receiver>
+
+        <!-- Required for Shizuku binder reception -->
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
@@ -21,26 +36,32 @@
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
-        <!-- Main UI Screen -->
+        <!-- Main UI screen -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="NetToggle">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <service android:name=".NetworkTileService"
+        <service
+            android:name=".NetworkTileService"
             android:label="NetToggle"
             android:icon="@drawable/ic_qs_network"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+
         </service>
 
     </application>
+
 </manifest>
