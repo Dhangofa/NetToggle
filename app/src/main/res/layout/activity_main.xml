@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="32dp"
+        android:padding="24dp"
         android:gravity="center_horizontal">
 
         <TextView
@@ -40,51 +40,138 @@
             android:textColor="?android:attr/textColorSecondary"
             android:layout_marginBottom="36dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Execution Mode"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+		<LinearLayout
+			android:id="@+id/controlCardsRow"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:baselineAligned="false"
+			android:layout_marginBottom="26dp">
 
-        <RadioGroup
-            android:id="@+id/modeRadioGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+			<LinearLayout
+				android:id="@+id/executionModeCard"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:orientation="vertical"
+				android:background="@drawable/section_outline_bg"
+				android:layout_marginEnd="8dp">
 
-            <RadioButton
-                android:id="@+id/radioRoot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Root (su)"
-                android:textSize="18sp"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp"
-                android:background="?android:attr/selectableItemBackground" />
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="Execution Mode"
+					android:textSize="16sp"
+					android:textStyle="bold"
+					android:layout_marginBottom="8dp" />
 
-            <RadioButton
-                android:id="@+id/radioShizuku"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Shizuku (ADB)"
-                android:textSize="18sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground" />
+				<RadioGroup
+					android:id="@+id/modeRadioGroup"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
 
-        </RadioGroup>
+					<RadioButton
+						android:id="@+id/radioRoot"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="Root"
+						android:textSize="15sp"
+						android:padding="10dp"
+						android:layout_marginBottom="6dp"
+						android:background="?android:attr/selectableItemBackground" />
 
-        <TextView
-            android:id="@+id/shizukuStatusText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="14sp"
-            android:gravity="center"
-            android:textColor="#FF5555"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="28dp" />
+					<RadioButton
+						android:id="@+id/radioShizuku"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="Shizuku"
+						android:textSize="15sp"
+						android:padding="10dp"
+						android:background="?android:attr/selectableItemBackground" />
+
+				</RadioGroup>
+
+				<TextView
+					android:id="@+id/shizukuStatusText"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text=""
+					android:textSize="12sp"
+					android:gravity="center"
+					android:textColor="#FF5555"
+					android:layout_marginTop="12dp" />
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/targetSimCard"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:orientation="vertical"
+				android:background="@drawable/section_outline_bg"
+				android:layout_marginStart="8dp">
+
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="Target SIM"
+					android:textSize="16sp"
+					android:textStyle="bold"
+					android:layout_marginBottom="8dp" />
+
+				<RadioGroup
+					android:id="@+id/targetSimRadioGroup"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<RadioButton
+						android:id="@+id/radioSimAuto"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="Auto"
+						android:textSize="15sp"
+						android:padding="10dp"
+						android:layout_marginBottom="6dp"
+						android:background="?android:attr/selectableItemBackground" />
+
+					<RadioButton
+						android:id="@+id/radioSim1"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="SIM 1"
+						android:textSize="15sp"
+						android:padding="10dp"
+						android:layout_marginBottom="6dp"
+						android:background="?android:attr/selectableItemBackground" />
+
+					<RadioButton
+						android:id="@+id/radioSim2"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="SIM 2"
+						android:textSize="15sp"
+						android:padding="10dp"
+						android:background="?android:attr/selectableItemBackground" />
+
+				</RadioGroup>
+
+				<TextView
+					android:id="@+id/autoSimWarningText"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually."
+					android:textSize="12sp"
+					android:gravity="center"
+					android:textColor="#FF5555"
+					android:visibility="gone"
+					android:layout_marginTop="12dp" />
+
+			</LinearLayout>
+
+		</LinearLayout>
 
         <View
             android:layout_width="match_parent"
