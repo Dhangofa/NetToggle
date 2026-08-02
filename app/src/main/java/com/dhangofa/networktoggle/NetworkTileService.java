@@ -11,6 +11,9 @@ import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Build;
+import android.telephony.SubscriptionManager;
+import android.widget.Toast;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutorService;
@@ -47,6 +50,15 @@ public class NetworkTileService extends TileService {
 	private static final int LEGACY_5G_ONLY = 23;
 	private static final int LEGACY_PREF_5G = 33;
 	private static final int LEGACY_PREF_4G = 9;
+	
+	private static final String TARGET_SIM_KEY = "target_sim";
+	private static final String AUTO_SIM_ERROR_KEY = "auto_sim_error";
+
+	private static final int TARGET_SIM_AUTO = 0;
+	private static final int TARGET_SIM_1 = 1;
+	private static final int TARGET_SIM_2 = 2;
+
+	private static final int INVALID_SLOT_INDEX = -1;
 	
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 	private static final AtomicBoolean IS_SWITCHING = new AtomicBoolean(false);
@@ -128,10 +140,18 @@ public class NetworkTileService extends TileService {
 			mainHandler.post(() -> {
 				try {
 					if (success) {
-						prefs.edit().putInt(STATE_KEY, nextState).apply();
+						prefs.edit()
+								.putInt(STATE_KEY, nextState)
+								.putBoolean(AUTO_SIM_ERROR_KEY, false)
+								.apply();
+
 						updateTileUI(nextState);
 					} else {
 						updateTileUI(currentState);
+
+						if (prefs.getBoolean(AUTO_SIM_ERROR_KEY, false)) {
+							showAutoSimErrorToast();
+						}
 					}
 				} finally {
 					IS_SWITCHING.set(false);
@@ -324,10 +344,26 @@ public class NetworkTileService extends TileService {
 			return STATE_UNKNOWN;
 		}
 
-		String command =
-				"data_sim=$(settings get global multi_sim_data_call); " +
-				"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
-				"settings get global preferred_network_mode${data_sim}";
+		int dataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+
+		String command;
+
+		if (dataSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+			command =
+					"value=$(settings get global preferred_network_mode" + dataSubId + "); " +
+					"if [ -n \"$value\" ] && [ \"$value\" != \"null\" ]; then " +
+					"echo \"$value\"; " +
+					"else " +
+					"data_sim=$(settings get global multi_sim_data_call); " +
+					"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
+					"settings get global preferred_network_mode${data_sim}; " +
+					"fi";
+		} else {
+			command =
+					"data_sim=$(settings get global multi_sim_data_call); " +
+					"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
+					"settings get global preferred_network_mode${data_sim}";
+		}
 
 		CommandResult result;
 
@@ -455,9 +491,122 @@ public class NetworkTileService extends TileService {
 			case LEGACY_PREF_4G:
 				return STATE_PREF_4G;
 
+			// Preferred 4G / LTE-preferred variants across OEMs/ROMs
+			case 8:  // CDMA + LTE/EvDo (PRL)
+			case 10: // LTE/CDMA/EvDo/GSM/WCDMA (PRL)
+			case 12:
+			case 15:
+			case 17:
+			case 19:
+			case 20:
+			case 22:
+				return STATE_PREF_4G;
+
 			default:
+				// Preferred 5G / NR-capable preferred variants across OEMs/ROMs
+				if (legacyMode >= 24 && legacyMode <= 32) {
+					return STATE_PREF_5G;
+				}
+
 				return STATE_UNKNOWN;
 		}
+	}
+	
+	private boolean isValidSlotIndex(int slotIndex) {
+		return slotIndex == 0 || slotIndex == 1;
+	}
+
+	private void setAutoSimError(boolean hasError) {
+		getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+				.edit()
+				.putBoolean(AUTO_SIM_ERROR_KEY, hasError)
+				.apply();
+	}
+
+	private void showAutoSimErrorToast() {
+		Toast.makeText(
+				this,
+				"Unable to detect active data SIM automatically. Please choose SIM from the app.",
+				Toast.LENGTH_LONG
+		).show();
+	}
+
+	private int resolveTargetSlotIndex(int execMode) {
+		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		int targetSim = prefs.getInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
+
+		if (targetSim == TARGET_SIM_1) {
+			setAutoSimError(false);
+			return 0;
+		}
+
+		if (targetSim == TARGET_SIM_2) {
+			setAutoSimError(false);
+			return 1;
+		}
+
+		return resolveAutoSlotIndex(execMode);
+	}
+
+	private int resolveAutoSlotIndex(int execMode) {
+		int dataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+
+		if (dataSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+			setAutoSimError(true);
+			return INVALID_SLOT_INDEX;
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			try {
+				int slotIndex = SubscriptionManager.getSlotIndex(dataSubId);
+
+				if (isValidSlotIndex(slotIndex)) {
+					setAutoSimError(false);
+					return slotIndex;
+				}
+			} catch (Exception ignored) {
+			}
+		}
+
+		int slotIndexFromDumpsys = resolveSlotIndexFromDumpsys(execMode, dataSubId);
+
+		if (isValidSlotIndex(slotIndexFromDumpsys)) {
+			setAutoSimError(false);
+			return slotIndexFromDumpsys;
+		}
+
+		setAutoSimError(true);
+		return INVALID_SLOT_INDEX;
+	}
+
+	private int resolveSlotIndexFromDumpsys(int execMode, int dataSubId) {
+		String command =
+				"dumpsys isub | grep -E \"\\{id=" + dataSubId + "([^0-9]| )\" " +
+				"| head -n 1 " +
+				"| grep -o -E \"simSlotIndex=[0-9]+\" " +
+				"| cut -d '=' -f 2";
+
+		CommandResult result;
+
+		if (execMode == MODE_SHIZUKU) {
+			result = runCommandForResultWithShizuku(command);
+		} else if (execMode == MODE_ROOT) {
+			result = runCommandForResultWithRoot(command);
+		} else {
+			return INVALID_SLOT_INDEX;
+		}
+
+		if (result.exitCode != 0) {
+			return INVALID_SLOT_INDEX;
+		}
+
+		Integer slotIndex = extractFirstInt(result.stdout);
+
+		if (slotIndex == null || !isValidSlotIndex(slotIndex)) {
+			return INVALID_SLOT_INDEX;
+		}
+
+		return slotIndex;
 	}
 	
 	
@@ -469,11 +618,17 @@ public class NetworkTileService extends TileService {
 			return false;
 		}
 
+		int slotIndex = resolveTargetSlotIndex(execMode);
+
+		if (!isValidSlotIndex(slotIndex)) {
+			return false;
+		}
+
 		String command =
-				"data_sim=$(settings get global multi_sim_data_call); " +
-				"[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; " +
-				"phone_index=$((data_sim - 1)); " +
-				"cmd phone set-allowed-network-types-for-users -s \"$phone_index\" " + binaryString;
+				"cmd phone set-allowed-network-types-for-users -s " +
+				slotIndex +
+				" " +
+				binaryString;
 
 		if (execMode == MODE_SHIZUKU) {
 			return runCommandWithShizuku(command);
@@ -483,6 +638,8 @@ public class NetworkTileService extends TileService {
 
 		return false;
 	}
+	
+	
 	
 	private boolean runCommandWithRoot(String command) {
 		Process process = null;
