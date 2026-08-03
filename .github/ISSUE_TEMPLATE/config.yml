@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Telegram
+    url: https://t.me/dhangofa
+    about: For quick discussion or informal support.
+  - name: NetToggle Releases
+    url: https://github.com/Dhangofa/NetToggle/releases
+    about: Check the latest release before reporting an issue.
