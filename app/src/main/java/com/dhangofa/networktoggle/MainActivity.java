@@ -109,7 +109,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
-		// Inject custom version pill into the default Action Bar on the right side
+		// Inject custom version pill into the default Action Bar
         if (getActionBar() != null) {
             getActionBar().setDisplayOptions(
                     android.app.ActionBar.DISPLAY_SHOW_TITLE | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -134,7 +134,6 @@ public class MainActivity extends Activity {
             getActionBar().setCustomView(versionText, layoutParams);
             getActionBar().setElevation(0);
         }
-
 		// ADDED THIS BLOCK FOR STATUS BAR LIGHT/DARK ICON CONTRAST
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             boolean isNight = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
