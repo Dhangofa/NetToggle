@@ -133,6 +133,14 @@ public class MainActivity extends Activity {
             
             getActionBar().setCustomView(versionText, layoutParams);
             getActionBar().setElevation(0);
+			// Try to make the default Action Bar title bold
+            try {
+                int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+                android.widget.TextView titleText = findViewById(titleId);
+                if (titleText != null) {
+                    titleText.setTypeface(null, android.graphics.Typeface.BOLD);
+                }
+            } catch (Exception ignored) {}
         }
 		// ADDED THIS BLOCK FOR STATUS BAR LIGHT/DARK ICON CONTRAST
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
