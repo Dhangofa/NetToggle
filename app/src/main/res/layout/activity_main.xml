@@ -35,7 +35,7 @@
                     android:layout_height="32dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_network_bars"
-                    app:tint="@color/brand_primary"
+                    android:tint="@color/brand_primary"
                     android:contentDescription="NetToggle" />
             </FrameLayout>
 
@@ -96,7 +96,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_network_bars"
-                    app:tint="@color/brand_primary"
+                    android:tint="@color/brand_primary"
                     android:contentDescription="QS Tile" />
             </FrameLayout>
 
@@ -318,7 +318,7 @@
                 android:layout_height="56dp"
                 android:padding="10dp"
                 android:src="@drawable/ic_person"
-                app:tint="@color/brand_primary"
+                android:tint="@color/brand_primary"
                 android:background="@drawable/social_icon_bg"
                 android:contentDescription="Developer"
                 android:layout_marginBottom="8dp" />
@@ -346,7 +346,7 @@
                     android:layout_height="44dp"
                     android:padding="10dp"
                     android:src="@drawable/ic_github"
-                    app:tint="@color/text_primary"
+                    android:tint="@color/text_primary"
                     android:background="@drawable/social_icon_bg"
                     android:contentDescription="GitHub"
                     android:clickable="true"
@@ -362,7 +362,7 @@
                     android:layout_height="44dp"
                     android:padding="10dp"
                     android:src="@drawable/ic_telegram"
-                    app:tint="@color/text_primary"
+                    android:tint="@color/text_primary"
                     android:background="@drawable/social_icon_bg"
                     android:contentDescription="Telegram"
                     android:clickable="true"
