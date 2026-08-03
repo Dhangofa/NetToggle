@@ -12,27 +12,60 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
-        android:paddingTop="16dp"
+        android:paddingTop="12dp"
         android:paddingBottom="32dp"
         android:gravity="center_horizontal">
 
-        <!-- Header Section: Integrated Hero Branding & Version Pill -->
+        <!-- Top Action Bar Header with Title & Version Pill -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/topBarTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="NetToggle"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/appVersionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="v0.0.0"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/brand_on_primary_container"
+                android:background="@drawable/shape_pill_badge_bg"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp" />
+        </RelativeLayout>
+
+        <!-- Header Section: Integrated Hero Branding -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingVertical="16dp">
+            android:paddingVertical="8dp">
 
             <FrameLayout
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:background="@drawable/shape_pill_badge_bg"
                 android:layout_marginBottom="12dp">
 
                 <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_network_bars"
                     android:tint="@color/brand_primary"
@@ -44,24 +77,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="NetToggle"
-                android:textSize="28sp"
+                android:textSize="24sp"
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/text_primary"
-                android:letterSpacing="0.02" />
-
-            <TextView
-                android:id="@+id/appVersionText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="v1.0.31"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/text_secondary"
-                android:background="@drawable/shape_pill_badge_bg"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="12dp" />
+                android:letterSpacing="0.02"
+                android:layout_marginBottom="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -83,6 +103,7 @@
             android:background="@drawable/shape_qs_hint_bg"
             android:padding="14dp"
             android:gravity="center_vertical"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="20dp">
 
             <FrameLayout
@@ -117,7 +138,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add NetToggle tile to your notification shade"
+                    android:text="Add NetToggle tile to your Control Center or Quick Settings"
                     android:textSize="11sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -136,26 +157,42 @@
             <LinearLayout
                 android:id="@+id/executionModeCard"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:background="@drawable/section_outline_bg"
                 android:padding="16dp"
                 android:layout_marginEnd="6dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Execution Mode"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="12dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_shield"
+                        android:tint="@color/brand_primary"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="Shield" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Execution Mode"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary" />
+                </LinearLayout>
 
                 <RadioGroup
                     android:id="@+id/modeRadioGroup"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <RadioButton
@@ -208,26 +245,42 @@
             <LinearLayout
                 android:id="@+id/targetSimCard"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:background="@drawable/section_outline_bg"
                 android:padding="16dp"
                 android:layout_marginStart="6dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Target SIM"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="12dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_smartphone"
+                        android:tint="@color/brand_primary"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="Phone" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Target SIM"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary" />
+                </LinearLayout>
 
                 <RadioGroup
                     android:id="@+id/targetSimRadioGroup"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <RadioButton
