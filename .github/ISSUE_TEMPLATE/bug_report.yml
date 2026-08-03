@@ -106,19 +106,33 @@ body:
     validations:
       required: true
 
-  - type: dropdown
+    - type: dropdown
     id: shizuku_status
     attributes:
-      label: Shizuku status
-      description: Fill this if you use Shizuku.
+      label: Shizuku status, if applicable
+      description: Fill this only if you are using Shizuku mode.
       options:
+        - Not using Shizuku
         - Shizuku running and permission granted
         - Shizuku running but permission not granted
         - Shizuku not running
-        - Not using Shizuku
         - Not sure
     validations:
-      required: true
+      required: false
+
+      - type: dropdown
+    id: root_status
+    attributes:
+      label: Root status, if applicable
+      description: Fill this only if you are using Root mode.
+      options:
+        - Not using Root
+        - Root available and permission granted
+        - Root available but permission denied
+        - Root not available
+        - Not sure
+    validations:
+      required: false
 
   - type: textarea
     id: current_behavior
@@ -213,7 +227,7 @@ body:
           required: true
         - label: I provided Android version, device model, OEM skin/ROM, SIM setup, and execution mode.
           required: true
-        - label: I checked whether Shizuku or Root is actually working.
+        - label: I checked whether the selected execution mode, Root or Shizuku, is actually working if applicable.
           required: true
         - label: I understand that network mode support can depend on Android version, OEM skin, modem, carrier, and SIM setup.
           required: true
