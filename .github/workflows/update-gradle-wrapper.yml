@@ -1,0 +1,54 @@
+name: Update Gradle Wrapper
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-wrapper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Fetch official Gradle checksum
+        id: checksum
+        run: |
+          SHA=$(curl -fsSL https://services.gradle.org/distributions/gradle-8.7-bin.zip.sha256 | tr -d '[:space:]')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Gradle 8.7 bin checksum: $SHA"
+
+      - name: Regenerate Gradle Wrapper with checksum
+        run: |
+          gradle wrapper \
+            --gradle-version 8.7 \
+            --distribution-type bin \
+            --gradle-distribution-sha256-sum "${{ steps.checksum.outputs.sha }}"
+
+      - name: Commit Gradle Wrapper changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
+
+          if git diff --cached --quiet; then
+            echo "No Gradle Wrapper changes to commit."
+          else
+            git commit -m "Add Gradle wrapper distribution checksum"
+            git push
+          fi
