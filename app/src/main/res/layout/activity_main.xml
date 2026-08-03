@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface_background"
@@ -35,7 +34,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_qs_network"
+                    android:src="@drawable/ic_network_bars"
                     app:tint="@color/brand_primary"
                     android:contentDescription="NetToggle" />
             </FrameLayout>
@@ -67,7 +66,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch Network mode (5G, 4G, Preferred) seamlessly from Quick Settings tiles."
+                android:text="Switch Network between 5G, 4G, Preferred 5G and Preferred 4G from Quick Settings."
                 android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:gravity="center"
@@ -86,13 +85,20 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="20dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_qs_network"
-                app:tint="@color/brand_primary"
-                android:contentDescription="QS Tile"
-                android:layout_marginEnd="12dp" />
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/shape_pill_badge_bg"
+                android:layout_marginEnd="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_network_bars"
+                    app:tint="@color/brand_primary"
+                    android:contentDescription="QS Tile" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -111,7 +117,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add NetToggle tile in your Android notification shade"
+                    android:text="Add NetToggle tile to your notification shade"
                     android:textSize="11sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -124,7 +130,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:baselineAligned="false"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="20dp">
 
             <!-- Card 1: Execution Mode -->
             <LinearLayout
@@ -133,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="@drawable/shape_card_bg"
+                android:background="@drawable/section_outline_bg"
                 android:padding="16dp"
                 android:layout_marginEnd="6dp">
 
@@ -205,7 +211,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="@drawable/shape_card_bg"
+                android:background="@drawable/section_outline_bg"
                 android:padding="16dp"
                 android:layout_marginStart="6dp">
 
@@ -290,7 +296,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/shape_card_bg"
+            android:background="@drawable/section_outline_bg"
             android:padding="20dp"
             android:gravity="center_horizontal"
             android:layout_marginTop="4dp">
