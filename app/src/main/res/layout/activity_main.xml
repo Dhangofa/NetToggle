@@ -16,39 +16,6 @@
         android:paddingBottom="32dp"
         android:gravity="center_horizontal">
 
-        <!-- Top Action Bar Header with Title & Version Pill -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="8dp"
-            android:layout_marginBottom="8dp">
-
-            <TextView
-                android:id="@+id/topBarTitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="NetToggle"
-                android:textSize="20sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/text_primary" />
-
-            <TextView
-                android:id="@+id/appVersionText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:text="v0.0.0"
-                android:textSize="11sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/brand_on_primary_container"
-                android:background="@drawable/shape_pill_badge_bg"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp" />
-        </RelativeLayout>
-
         <!-- Header Section: Integrated Hero Branding -->
         <LinearLayout
             android:layout_width="match_parent"
