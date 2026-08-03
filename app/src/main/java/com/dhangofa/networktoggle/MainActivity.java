@@ -109,10 +109,32 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
-		// Hide Default Action Bar
-		if (getActionBar() != null) {
-            getActionBar().hide();
+		// Inject custom version pill into the default Action Bar on the right side
+        if (getActionBar() != null) {
+            getActionBar().setDisplayOptions(
+                    android.app.ActionBar.DISPLAY_SHOW_TITLE | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+            
+            android.widget.TextView versionText = new android.widget.TextView(this);
+            versionText.setText("v" + getAppVersionName());
+            versionText.setTextSize(12);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                versionText.setTextColor(getColor(R.color.brand_on_primary_container));
+            }
+            versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
+            int padX = (int) (10 * getResources().getDisplayMetrics().density);
+            int padY = (int) (4 * getResources().getDisplayMetrics().density);
+            versionText.setPadding(padX, padY, padX, padY);
+            
+            android.app.ActionBar.LayoutParams layoutParams = new android.app.ActionBar.LayoutParams(
+                    android.app.ActionBar.LayoutParams.WRAP_CONTENT,
+                    android.app.ActionBar.LayoutParams.WRAP_CONTENT,
+                    android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+            layoutParams.setMarginEnd((int) (16 * getResources().getDisplayMetrics().density));
+            
+            getActionBar().setCustomView(versionText, layoutParams);
+            getActionBar().setElevation(0);
         }
+
 		// ADDED THIS BLOCK FOR STATUS BAR LIGHT/DARK ICON CONTRAST
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             boolean isNight = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
