@@ -55,7 +55,6 @@ public class MainActivity extends Activity {
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
     private TextView statusText;
-	private TextView appVersionText;
 	private ImageView githubLink;
 	private ImageView telegramLink;
     private SharedPreferences prefs;
@@ -161,11 +160,8 @@ public class MainActivity extends Activity {
 		radioSim2 = findViewById(R.id.radioSim2);
 		autoSimWarningText = findViewById(R.id.autoSimWarningText);
 		
-		appVersionText = findViewById(R.id.appVersionText);
 		githubLink = findViewById(R.id.githubLink);
 		telegramLink = findViewById(R.id.telegramLink);
-
-		appVersionText.setText("v" + getAppVersionName());
 
 		githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
 		telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofa"));
