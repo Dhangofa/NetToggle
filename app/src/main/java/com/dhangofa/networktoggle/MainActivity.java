@@ -108,6 +108,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
+		
 		// Inject custom version pill into the default Action Bar
         if (getActionBar() != null) {
             getActionBar().setDisplayOptions(
@@ -142,7 +143,8 @@ public class MainActivity extends Activity {
                 }
             } catch (Exception ignored) {}
         }
-		// ADDED THIS BLOCK FOR STATUS BAR LIGHT/DARK ICON CONTRAST
+		
+		// Keep status bar icon contrast readable in light and dark themes
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             boolean isNight = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
             getWindow().setStatusBarColor(getColor(R.color.surface_background));
@@ -153,7 +155,7 @@ public class MainActivity extends Activity {
                 decor.setSystemUiVisibility(0);
             }
         }
-        // -------------------------------------------------------------
+
 		setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
