@@ -109,7 +109,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
-		// --- ADDED THIS BLOCK FOR STATUS BAR LIGHT/DARK ICON CONTRAST
+		// Hide Default Action Bar
+		if (getActionBar() != null) {
+            getActionBar().hide();
+        }
+		// ADDED THIS BLOCK FOR STATUS BAR LIGHT/DARK ICON CONTRAST
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             boolean isNight = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
             getWindow().setStatusBarColor(getColor(R.color.surface_background));
