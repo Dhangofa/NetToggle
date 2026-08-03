@@ -55,7 +55,6 @@ public class MainActivity extends Activity {
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
     private TextView statusText;
-	private TextView appVersionText;
 	private ImageView githubLink;
 	private ImageView telegramLink;
     private SharedPreferences prefs;
@@ -109,6 +108,54 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
+		
+		// Inject custom version pill into the default Action Bar
+        if (getActionBar() != null) {
+            getActionBar().setDisplayOptions(
+                    android.app.ActionBar.DISPLAY_SHOW_TITLE | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+            
+            android.widget.TextView versionText = new android.widget.TextView(this);
+            versionText.setText("v" + getAppVersionName());
+            versionText.setTextSize(12);
+			versionText.setTypeface(null, android.graphics.Typeface.BOLD);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                versionText.setTextColor(getColor(R.color.brand_on_primary_container));
+            }
+            versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
+            int padX = (int) (10 * getResources().getDisplayMetrics().density);
+            int padY = (int) (4 * getResources().getDisplayMetrics().density);
+            versionText.setPadding(padX, padY, padX, padY);
+            
+            android.app.ActionBar.LayoutParams layoutParams = new android.app.ActionBar.LayoutParams(
+                    android.app.ActionBar.LayoutParams.WRAP_CONTENT,
+                    android.app.ActionBar.LayoutParams.WRAP_CONTENT,
+                    android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+            layoutParams.setMarginEnd((int) (16 * getResources().getDisplayMetrics().density));
+            
+            getActionBar().setCustomView(versionText, layoutParams);
+            getActionBar().setElevation(0);
+			// Try to make the default Action Bar title bold
+            try {
+                int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+                android.widget.TextView titleText = findViewById(titleId);
+                if (titleText != null) {
+                    titleText.setTypeface(null, android.graphics.Typeface.BOLD);
+                }
+            } catch (Exception ignored) {}
+        }
+		
+		// Keep status bar icon contrast readable in light and dark themes
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            boolean isNight = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            getWindow().setStatusBarColor(getColor(R.color.surface_background));
+            View decor = getWindow().getDecorView();
+            if (!isNight) {
+                decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                decor.setSystemUiVisibility(0);
+            }
+        }
+
 		setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -124,11 +171,8 @@ public class MainActivity extends Activity {
 		radioSim2 = findViewById(R.id.radioSim2);
 		autoSimWarningText = findViewById(R.id.autoSimWarningText);
 		
-		appVersionText = findViewById(R.id.appVersionText);
 		githubLink = findViewById(R.id.githubLink);
 		telegramLink = findViewById(R.id.telegramLink);
-
-		appVersionText.setText("v" + getAppVersionName());
 
 		githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
 		telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofa"));

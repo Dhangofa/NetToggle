@@ -1,36 +1,41 @@
-NetToggle is a lightweight Android Quick Settings (QS) tile application designed to force specific cellular network modes directly from your Quick Settings. Modern phones and carrier configurations aggressively drop your connection from 5G to 4G/LTE to save battery or manage traffic, and their system settings intentionally hide the option to lock your connection. Standard third-party apps only offer "Preferred" parameters or open the hidden menu to choose network modes. NetToggle solves this by using privileged shell access via Root or Shizuku to execute raw baseband telephony commands, forcing a true, hardware-level network lock that prevents unwanted network downgrades.<br><br>
+NetToggle is a lightweight Android Quick Settings (QS) tile app for switching cellular network modes directly from Quick Settings. Many phones and carrier configurations hide or limit advanced network mode options, especially strict 5G/4G switching. NetToggle uses privileged shell access through Root or Shizuku to run Android telephony commands and apply selected network modes where supported by the device, ROM, modem, and carrier.<br><br>
 
 <b>━━ ⚙️ NETWORK MODES ━━</b><br><br>
 
-<b>5G Only</b> — strictly locked network mode that forces your phone to stay on 5G.<br>
-<b>4G Only</b> — strictly locked network mode that forces your phone to stay on 4G.<br>
-<b>Preferred 5G</b> — sets 5G as the primary preferred type.<br>
-<b>Preferred 4G</b> — sets 4G as the primary preferred type.<br><br>
+<b>5G Only</b> — attempts to keep the selected SIM on 5G-only mode where supported.<br>
+<b>4G Only</b> — attempts to keep the selected SIM on 4G/LTE-only mode where supported.<br>
+<b>Preferred 5G</b> — sets 5G as the preferred network type with fallback behavior controlled by the device and carrier.<br>
+<b>Preferred 4G</b> — sets 4G/LTE as the preferred network type with fallback behavior controlled by the device and carrier.<br><br>
 
-<b>━━ 📱 SIM SELECTION MODE ━━</b><br><br>
+<b>━━ 📱 TARGET SIM ━━</b><br><br>
 
-<b>Auto Mode</b> — automatically dynamically maps active data subscriptions to the correct physical SIM slot.<br>
-<b>SIM 1 Selection</b> — manually force all custom baseband telephony configurations strictly onto the physical SIM 1 hardware slot layout.<br>
-<b>SIM 2 Selection</b> — manually force all custom baseband telephony configurations strictly onto the physical SIM 2 hardware slot layout.<br><br>
+<b>Auto</b> — detects the active data subscription and maps it to the correct physical SIM slot.<br>
+<b>SIM 1</b> — applies network mode changes to physical SIM slot 1.<br>
+<b>SIM 2</b> — applies network mode changes to physical SIM slot 2.<br><br>
 
 <b>━━ 🔌 REQUIREMENTS ━━</b><br><br>
 
-<b>Root Mode (su)</b> — works via Magisk, APatch, or KernelSU. It features zero background overhead, is completely self-contained, and survives device reboots without manual intervention.<br>
-<b>Shizuku Mode (ADB)</b> — routes commands through the Shizuku background binder daemon utilizing native ADB shell permissions (UID 2000). It functions perfectly without requiring full system root.<br><br>
+<b>Root Mode</b> — uses su access from solutions such as Magisk, APatch, or KernelSU.<br>
+<b>Shizuku Mode</b> — uses Shizuku's ADB shell permission path without requiring full system root.<br><br>
 
-<b>━━ 🛠️ ARCHITECTURE  ━━</b><br><br>
+<b>━━ 🛠️ DESIGN ━━</b><br><br>
 
-<b>Zero Background Overheads</b> — designed to stay ultra-lightweight with no background polling or system battery drain.<br>
-<b>Cached Tile State</b> — prevents performance lag by caching generated QS tile icons and states instead of recreating objects on every update.<br>
-<b>Asynchronous Execution</b> — moves heavy Root/Shizuku commands off the main UI click path onto a background executor.<br>
-<b>Immediate Feedback</b> — includes duplicate-tap protection and a temporary "Switching..." tile state while commands are running.<br><br>
+<b>Modern UI</b> — clean single-screen interface with light/dark theme support, card-based controls, and clear SIM/mode status indicators.<br>
+<b>Quick Settings Tile</b> — switch modes directly from Android's QS panel.<br>
+<b>Lightweight Operation</b> — no background polling and no continuous service.<br>
+<b>Cached Tile State</b> — keeps the tile fast and avoids unnecessary privileged reads.<br>
+<b>Async Execution</b> — runs Root/Shizuku commands away from the main UI path.<br>
+<b>Safe Feedback</b> — shows a temporary Switching state while commands are running.<br><br>
 
-<b>━━ 💻 COMPATIBILITY & SUPPORT ━━</b><br><br>
+<b>━━ 💻 COMPATIBILITY ━━</b><br><br>
 
-<b>Broad ROM Compatibility</b> — expanded preferred network mode mappings recognize standard and legacy OEM-specific network mode IDs.<br>
-<b>Android Support</b> — supports Android 7.0 (API Level 24) up to Android 16 (API Level 36).<br><br>
+<b>Dual-SIM Support</b> — supports Auto, SIM 1, and SIM 2 target selection.<br>
+<b>OEM Mapping Support</b> — includes expanded readback mappings for several OEM/ROM network mode variants.<br>
+<b>Android Support</b> — supports Android 7.0, API 24, through Android 16, API 36.<br><br>
 
-<b>━━ 🛡️ PRIVACY FOCUS ━━</b><br><br>
+Network mode support may vary depending on Android version, OEM skin, ROM, modem, SIM setup, and carrier restrictions.<br><br>
 
-<b>No Trackers</b> — contains zero ads, analytics, tracking toolkits, or telemetry signatures.<br>
-<b>No Network Permission</b> — completely offline application logic. The app does not collect, store, or transmit any user or device data.
+<b>━━ 🛡️ PRIVACY ━━</b><br><br>
+
+<b>No Trackers</b> — no ads, analytics, telemetry, or tracking SDKs.<br>
+<b>No Internet Permission</b> — NetToggle works offline and does not collect, store, or transmit user data.

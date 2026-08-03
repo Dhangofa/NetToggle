@@ -1,0 +1,4 @@
+- Refreshed the main app UI with modern cards, icons, pill badges, and improved light/dark styling.
+- Added a compact version pill in the top bar.
+- Updated app metadata and descriptions.
+- Improved release build hygiene with Gradle Wrapper builds and distribution checksum support.

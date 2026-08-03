@@ -1,254 +1,414 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
-    android:fillViewport="true">
+    android:background="@color/surface_background"
+    android:fillViewport="true"
+    android:overScrollMode="never">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="32dp"
         android:gravity="center_horizontal">
 
-        <TextView
-            android:id="@+id/appTitleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NetToggle"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="2dp" />
-
-        <TextView
-            android:id="@+id/appVersionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="v0.0.0"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:layout_marginBottom="10dp" />
-
-        <TextView
+        <!-- Header Section: Integrated Hero Branding -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switch Network between 5G, 4G, Preferred 5G and Preferred 4G from Quick Settings."
-            android:textSize="14sp"
+            android:orientation="vertical"
             android:gravity="center"
-            android:textColor="?android:attr/textColorSecondary"
-            android:layout_marginBottom="36dp" />
+            android:paddingVertical="8dp">
 
-		<LinearLayout
-			android:id="@+id/controlCardsRow"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:baselineAligned="false"
-			android:layout_marginBottom="26dp">
+            <FrameLayout
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/shape_pill_badge_bg"
+                android:layout_marginBottom="12dp">
 
-			<LinearLayout
-				android:id="@+id/executionModeCard"
-				android:layout_width="0dp"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:orientation="vertical"
-				android:background="@drawable/section_outline_bg"
-				android:layout_marginEnd="8dp">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_network_bars"
+                    android:tint="@color/brand_primary"
+                    android:contentDescription="NetToggle" />
+            </FrameLayout>
 
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text="Execution Mode"
-					android:textSize="16sp"
-					android:textStyle="bold"
-					android:layout_marginBottom="8dp" />
+            <TextView
+                android:id="@+id/appTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NetToggle"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:letterSpacing="0.02"
+                android:layout_marginBottom="6dp" />
 
-				<RadioGroup
-					android:id="@+id/modeRadioGroup"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Switch Network between 5G, 4G, Preferred 5G and Preferred 4G from Quick Settings."
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.2"
+                android:textColor="@color/text_secondary"
+                android:paddingHorizontal="12dp" />
+        </LinearLayout>
 
-					<RadioButton
-						android:id="@+id/radioRoot"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:text="Root"
-						android:textSize="15sp"
-						android:padding="10dp"
-						android:layout_marginBottom="6dp"
-						android:background="?android:attr/selectableItemBackground" />
-
-					<RadioButton
-						android:id="@+id/radioShizuku"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:text="Shizuku"
-						android:textSize="15sp"
-						android:padding="10dp"
-						android:background="?android:attr/selectableItemBackground" />
-
-				</RadioGroup>
-
-				<TextView
-					android:id="@+id/shizukuStatusText"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text=""
-					android:textSize="12sp"
-					android:gravity="center"
-					android:textColor="#FF5555"
-					android:layout_marginTop="12dp" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/targetSimCard"
-				android:layout_width="0dp"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:orientation="vertical"
-				android:background="@drawable/section_outline_bg"
-				android:layout_marginStart="8dp">
-
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text="Target SIM"
-					android:textSize="16sp"
-					android:textStyle="bold"
-					android:layout_marginBottom="8dp" />
-
-				<RadioGroup
-					android:id="@+id/targetSimRadioGroup"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="vertical">
-
-					<RadioButton
-						android:id="@+id/radioSimAuto"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:text="Auto"
-						android:textSize="15sp"
-						android:padding="10dp"
-						android:layout_marginBottom="6dp"
-						android:background="?android:attr/selectableItemBackground" />
-
-					<RadioButton
-						android:id="@+id/radioSim1"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:text="SIM 1"
-						android:textSize="15sp"
-						android:padding="10dp"
-						android:layout_marginBottom="6dp"
-						android:background="?android:attr/selectableItemBackground" />
-
-					<RadioButton
-						android:id="@+id/radioSim2"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:text="SIM 2"
-						android:textSize="15sp"
-						android:padding="10dp"
-						android:background="?android:attr/selectableItemBackground" />
-
-				</RadioGroup>
-
-				<TextView
-					android:id="@+id/autoSimWarningText"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text="Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually."
-					android:textSize="12sp"
-					android:gravity="center"
-					android:textColor="#FF5555"
-					android:visibility="gone"
-					android:layout_marginTop="12dp" />
-
-			</LinearLayout>
-
-		</LinearLayout>
-
-        <View
+        <!-- Quick Settings Tile Hint Card -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#333333"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="18dp" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/shape_qs_hint_bg"
+            android:padding="14dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp">
 
-       <TextView
-			android:id="@+id/developerTitleText"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Developer"
-			android:textSize="16sp"
-			android:textStyle="bold"
-			android:gravity="center"
-			android:layout_marginBottom="12dp" />
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/shape_pill_badge_bg"
+                android:layout_marginEnd="12dp">
 
-		<ImageView
-			android:id="@+id/developerPersonIcon"
-			android:layout_width="72dp"
-			android:layout_height="72dp"
-			android:padding="14dp"
-			android:src="@drawable/ic_person"
-			android:tint="?android:attr/textColorPrimary"
-			android:background="@drawable/social_icon_bg"
-			android:contentDescription="Developer"
-			android:layout_marginBottom="8dp" />
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_network_bars"
+                    android:tint="@color/brand_primary"
+                    android:contentDescription="QS Tile" />
+            </FrameLayout>
 
-		<TextView
-			android:id="@+id/developerNameText"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Dhangofa"
-			android:textSize="16sp"
-			android:textStyle="bold"
-			android:gravity="center"
-			android:layout_marginBottom="18dp" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-		<LinearLayout
-			android:id="@+id/socialLinksRow"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center"
-			android:layout_marginTop="4dp"
-			android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quick Settings Ready"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
 
-			<ImageView
-				android:id="@+id/githubLink"
-				android:layout_width="72dp"
-				android:layout_height="72dp"
-				android:padding="16dp"
-				android:src="@drawable/ic_github"
-				android:tint="?android:attr/textColorPrimary"
-				android:contentDescription="GitHub"
-				android:clickable="true"
-				android:focusable="true"
-				android:background="?android:attr/selectableItemBackgroundBorderless" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add NetToggle tile to your Control Center or Quick Settings"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+        </LinearLayout>
 
-			<Space
-				android:layout_width="28dp"
-				android:layout_height="1dp" />
+        <!-- Main Controls Row (Execution Mode & Target SIM) -->
+        <LinearLayout
+            android:id="@+id/controlCardsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="20dp">
 
-			<ImageView
-				android:id="@+id/telegramLink"
-				android:layout_width="72dp"
-				android:layout_height="72dp"
-				android:padding="16dp"
-				android:src="@drawable/ic_telegram"
-				android:tint="?android:attr/textColorPrimary"
-				android:contentDescription="Telegram"
-				android:clickable="true"
-				android:focusable="true"
-				android:background="?android:attr/selectableItemBackgroundBorderless" />
+            <!-- Card 1: Execution Mode -->
+            <LinearLayout
+                android:id="@+id/executionModeCard"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/section_outline_bg"
+                android:padding="16dp"
+                android:layout_marginEnd="6dp">
 
-		</LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_shield"
+                        android:tint="@color/brand_primary"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="Shield" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Execution Mode"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/card_border"
+                    android:layout_marginBottom="8dp" />
+
+                <RadioGroup
+                    android:id="@+id/modeRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radioRoot"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Root"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:buttonTint="@color/brand_primary"
+                        android:background="@drawable/shape_radio_item_bg" />
+
+                    <RadioButton
+                        android:id="@+id/radioShizuku"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Shizuku"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="4dp"
+                        android:buttonTint="@color/brand_primary"
+                        android:background="@drawable/shape_radio_item_bg" />
+
+                </RadioGroup>
+
+                <!-- Status pill with dynamic background -->
+                <TextView
+                    android:id="@+id/shizukuStatusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Root mode active &amp; authorized!"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:textColor="@color/status_success_text"
+                    android:background="@drawable/shape_status_badge_success"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="6dp"
+                    android:layout_marginTop="12dp" />
+
+            </LinearLayout>
+
+            <!-- Card 2: Target SIM -->
+            <LinearLayout
+                android:id="@+id/targetSimCard"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/section_outline_bg"
+                android:padding="16dp"
+                android:layout_marginStart="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_smartphone"
+                        android:tint="@color/brand_primary"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="Phone" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Target SIM"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/card_border"
+                    android:layout_marginBottom="8dp" />
+
+                <RadioGroup
+                    android:id="@+id/targetSimRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radioSimAuto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Auto"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:paddingVertical="6dp"
+                        android:paddingHorizontal="4dp"
+                        android:layout_marginBottom="2dp"
+                        android:buttonTint="@color/brand_primary"
+                        android:background="@drawable/shape_radio_item_bg" />
+
+                    <RadioButton
+                        android:id="@+id/radioSim1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SIM 1"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:paddingVertical="6dp"
+                        android:paddingHorizontal="4dp"
+                        android:layout_marginBottom="2dp"
+                        android:buttonTint="@color/brand_primary"
+                        android:background="@drawable/shape_radio_item_bg" />
+
+                    <RadioButton
+                        android:id="@+id/radioSim2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SIM 2"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:paddingVertical="6dp"
+                        android:paddingHorizontal="4dp"
+                        android:buttonTint="@color/brand_primary"
+                        android:background="@drawable/shape_radio_item_bg" />
+
+                </RadioGroup>
+
+                <TextView
+                    android:id="@+id/autoSimWarningText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually."
+                    android:textSize="11sp"
+                    android:gravity="center"
+                    android:textColor="@color/status_error_text"
+                    android:background="@drawable/shape_status_badge_error"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="6dp"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Modernized Developer Profile Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/section_outline_bg"
+            android:padding="20dp"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/developerTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DEVELOPER"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/text_tertiary"
+                android:layout_marginBottom="12dp" />
+
+            <ImageView
+                android:id="@+id/developerPersonIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="10dp"
+                android:src="@drawable/ic_person"
+                android:tint="@color/brand_primary"
+                android:background="@drawable/social_icon_bg"
+                android:contentDescription="Developer"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/developerNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dhangofa"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:id="@+id/socialLinksRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/githubLink"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_github"
+                    android:tint="@color/text_primary"
+                    android:background="@drawable/social_icon_bg"
+                    android:contentDescription="GitHub"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="1dp" />
+
+                <ImageView
+                    android:id="@+id/telegramLink"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_telegram"
+                    android:tint="@color/text_primary"
+                    android:background="@drawable/social_icon_bg"
+                    android:contentDescription="Telegram"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
