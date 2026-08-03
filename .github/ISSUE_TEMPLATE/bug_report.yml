@@ -1,0 +1,219 @@
+name: App Bug / Issue
+description: Report a bug, crash, failed command, or incorrect network mode behavior
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue with NetToggle.
+
+        Please fill in all required fields. Network switching issues are often device-specific, so Android version, OEM skin, device model, SIM setup, Root/Shizuku mode, and logs are important.
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue type
+      description: What kind of issue are you reporting?
+      options:
+        - Quick Settings tile not working
+        - Network mode not changing
+        - Wrong SIM changed
+        - Auto SIM detection failed
+        - App crash
+        - Shizuku issue
+        - Root issue
+        - UI issue
+        - Incorrect tile state/cache
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: NetToggle version
+      description: Mention the version where the issue happened.
+      placeholder: "Example: 1.0.31"
+    validations:
+      required: true
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Android version
+      description: Mention your Android version.
+      placeholder: "Example: Android 13, Android 14, Android 15, Android 16"
+    validations:
+      required: true
+
+  - type: input
+    id: device_model
+    attributes:
+      label: Device name/model
+      description: Mention the exact device model.
+      placeholder: "Example: Galaxy S20 FE 5G, Redmi Note 12 Pro 5G, Pixel 6a"
+    validations:
+      required: true
+
+  - type: input
+    id: oem_skin
+    attributes:
+      label: OEM skin / ROM
+      description: Mention OEM skin and version, or custom ROM name.
+      placeholder: "Example: One UI 5.1, HyperOS, MIUI 14, OriginOS, AOSP, LineageOS 21"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sim_setup
+    attributes:
+      label: SIM setup
+      description: Select your SIM configuration.
+      options:
+        - Single SIM
+        - Dual SIM
+        - eSIM only
+        - Physical SIM + eSIM
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target_sim
+    attributes:
+      label: Target SIM setting in NetToggle
+      description: Which Target SIM option was selected?
+      options:
+        - Auto
+        - SIM 1
+        - SIM 2
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: execution_mode
+    attributes:
+      label: Execution mode
+      description: Which execution mode were you using?
+      options:
+        - Shizuku
+        - Root
+        - Not selected
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: shizuku_status
+    attributes:
+      label: Shizuku status
+      description: Fill this if you use Shizuku.
+      options:
+        - Shizuku running and permission granted
+        - Shizuku running but permission not granted
+        - Shizuku not running
+        - Not using Shizuku
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior
+      description: What is happening now?
+      placeholder: "Example: I tap the QS tile, it shows Switching..., then returns to Tap to Set 4G and the network mode does not change."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: "Example: The tile should switch the selected SIM to 4G Only."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List exact steps so the issue can be reproduced.
+      placeholder: |
+        1. Open NetToggle
+        2. Select Shizuku mode
+        3. Select Target SIM: Auto
+        4. Add QS tile
+        5. Tap tile
+        6. Observe issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_message
+    attributes:
+      label: Error message / Toast / app warning
+      description: Paste any visible error message from NetToggle.
+      placeholder: "Example: Unable to detect active data SIM automatically. Please choose SIM from the app."
+    validations:
+      required: false
+
+  - type: textarea
+    id: error_log
+    attributes:
+      label: Error log ed debug details
+      description: Paste any logcat output, copied error details, command output, or Shizuku/root error.
+      render: text
+      placeholder: |
+        Paste logs here.
+        If possible, include command output, exit code, stdout/stderr, or logcat.
+    validations:
+      required: false
+
+  - type: textarea
+    id: command_tests
+    attributes:
+      label: Manual command test results
+      description: If you tested any adb/root command manually, paste command and result here.
+      render: shell
+      placeholder: |
+        adb shell cmd phone get-allowed-network-types-for-users
+        adb shell cmd phone set-allowed-network-types-for-users -s 0 <value>
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or screen recording
+      description: Attach screenshots or a screen recording if useful.
+      placeholder: "Drag and drop screenshots here."
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra_context
+    attributes:
+      label: Extra context
+      description: Add anything else that may help debug the issue.
+      placeholder: "Example: This happens only after reboot, only on SIM 2, or only in Auto mode."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I am using the latest available NetToggle version.
+          required: true
+        - label: I provided Android version, device model, OEM skin/ROM, SIM setup, and execution mode.
+          required: true
+        - label: I checked whether Shizuku or Root is actually working.
+          required: true
+        - label: I understand that network mode support can depend on Android version, OEM skin, modem, carrier, and SIM setup.
+          required: true
