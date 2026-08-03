@@ -25,6 +25,9 @@ jobs:
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36"
 
+    - name: Make Gradle Wrapper executable
+      run: chmod +x ./gradlew
+      
     - name: Compile Release APK using Gradle Wrapper
       run: ./gradlew assembleRelease
 
