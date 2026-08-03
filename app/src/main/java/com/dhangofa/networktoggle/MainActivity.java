@@ -116,6 +116,7 @@ public class MainActivity extends Activity {
             android.widget.TextView versionText = new android.widget.TextView(this);
             versionText.setText("v" + getAppVersionName());
             versionText.setTextSize(12);
+			versionText.setTypeface(null, android.graphics.Typeface.BOLD);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 versionText.setTextColor(getColor(R.color.brand_on_primary_container));
             }
