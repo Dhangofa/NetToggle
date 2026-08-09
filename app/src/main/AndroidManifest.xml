@@ -12,7 +12,7 @@
         android:label="NetToggle"
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
-        android:theme="@android:style/Theme.DeviceDefault.DayNight"
+        android:theme="@style/Theme.NetToggle"
         android:supportsRtl="true">
 
         <receiver

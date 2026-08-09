@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/surface_background"
     android:fillViewport="true"
+    android:fitsSystemWindows="true"
     android:overScrollMode="never">
 
     <LinearLayout
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
-        android:paddingTop="12dp"
+        android:paddingTop="24dp"
         android:paddingBottom="32dp"
         android:gravity="center_horizontal">
 
@@ -23,33 +24,6 @@
             android:orientation="vertical"
             android:gravity="center"
             android:paddingVertical="8dp">
-
-            <FrameLayout
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/shape_pill_badge_bg"
-                android:layout_marginBottom="12dp">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_network_bars"
-                    android:tint="@color/brand_primary"
-                    android:contentDescription="NetToggle" />
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/appTitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="NetToggle"
-                android:textSize="24sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:letterSpacing="0.02"
-                android:layout_marginBottom="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -324,6 +298,101 @@
                     android:layout_marginTop="12dp" />
 
             </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Card 3: Cycling Mode -->
+        <LinearLayout
+            android:id="@+id/cyclingModeCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/section_outline_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_qs_network"
+                    android:tint="@color/brand_primary"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Cycle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cycling Mode"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/card_border"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/cycleModeRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioCycleAll"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="All"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="4dp"
+                    android:buttonTint="@color/brand_primary"
+                    android:background="@drawable/shape_radio_item_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <RadioButton
+                    android:id="@+id/radioCycle4G5G"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="4G/5G"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="4dp"
+                    android:buttonTint="@color/brand_primary"
+                    android:background="@drawable/shape_radio_item_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <RadioButton
+                    android:id="@+id/radioCyclePref"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pref"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="4dp"
+                    android:buttonTint="@color/brand_primary"
+                    android:background="@drawable/shape_radio_item_bg" />
+
+            </RadioGroup>
 
         </LinearLayout>
 

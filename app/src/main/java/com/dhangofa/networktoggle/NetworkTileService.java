@@ -30,10 +30,15 @@ public class NetworkTileService extends TileService {
     private static final String PREFS_NAME = "NetTogglePrefs";
     private static final String STATE_KEY = "net_state";
     private static final String EXEC_MODE_KEY = "exec_mode";
+	private static final String CYCLE_MODE_KEY = "cycle_mode";
 	
 	private static final int MODE_NONE = 0;
 	private static final int MODE_ROOT = 1;
 	private static final int MODE_SHIZUKU = 2;
+
+	private static final int CYCLE_ALL = 0;
+	private static final int CYCLE_4G_5G = 1;
+	private static final int CYCLE_PREF = 2;
 	
 	private static final int STATE_UNKNOWN = 0;
 	private static final int STATE_4G_ONLY = 1;
@@ -162,6 +167,26 @@ public class NetworkTileService extends TileService {
 	}
 	
 	private int getNextState(int currentState) {
+		SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		int cycleMode = prefs.getInt(CYCLE_MODE_KEY, CYCLE_ALL);
+
+		if (cycleMode == CYCLE_4G_5G) {
+			if (currentState == STATE_4G_ONLY) {
+				return STATE_5G_ONLY;
+			} else {
+				return STATE_4G_ONLY;
+			}
+		}
+
+		if (cycleMode == CYCLE_PREF) {
+			if (currentState == STATE_PREF_4G) {
+				return STATE_PREF_5G;
+			} else {
+				return STATE_PREF_4G;
+			}
+		}
+
+		// CYCLE_ALL or fallback
 		switch (currentState) {
 			case STATE_4G_ONLY:
 				return STATE_5G_ONLY;

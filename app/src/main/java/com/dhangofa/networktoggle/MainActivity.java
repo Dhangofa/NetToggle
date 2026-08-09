@@ -40,11 +40,17 @@ public class MainActivity extends Activity {
     private static final String EXEC_MODE_KEY = "exec_mode";
 	private static final String TARGET_SIM_KEY = "target_sim";
 	private static final String AUTO_SIM_ERROR_KEY = "auto_sim_error";
+	private static final String CYCLE_MODE_KEY = "cycle_mode";
 	private static final String STATE_KEY = "net_state";
 	
     private static final int MODE_NONE = 0;
     private static final int MODE_ROOT = 1;
     private static final int MODE_SHIZUKU = 2;
+	
+	private static final int CYCLE_ALL = 0;
+	private static final int CYCLE_4G_5G = 1;
+	private static final int CYCLE_PREF = 2;
+	
 	private static final int STATE_UNKNOWN = 0;
 	
 	private static final int TARGET_SIM_AUTO = 0;
@@ -63,6 +69,12 @@ public class MainActivity extends Activity {
 	private RadioButton radioSimAuto;
 	private RadioButton radioSim1;
 	private RadioButton radioSim2;
+	
+	private RadioGroup cycleModeRadioGroup;
+	private RadioButton radioCycleAll;
+	private RadioButton radioCycle4G5G;
+	private RadioButton radioCyclePref;
+	
 	private TextView autoSimWarningText;
 	
 	private volatile boolean activityDestroyed = false;
@@ -117,9 +129,9 @@ public class MainActivity extends Activity {
             android.widget.TextView versionText = new android.widget.TextView(this);
             versionText.setText("v" + getAppVersionName());
             versionText.setTextSize(12);
-			versionText.setTypeface(null, android.graphics.Typeface.BOLD);
+            versionText.setTypeface(null, android.graphics.Typeface.BOLD);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                versionText.setTextColor(getColor(R.color.brand_on_primary_container));
+                versionText.setTextColor(getColor(R.color.text_secondary));
             }
             versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
             int padX = (int) (10 * getResources().getDisplayMetrics().density);
@@ -169,6 +181,12 @@ public class MainActivity extends Activity {
 		radioSimAuto = findViewById(R.id.radioSimAuto);
 		radioSim1 = findViewById(R.id.radioSim1);
 		radioSim2 = findViewById(R.id.radioSim2);
+		
+		cycleModeRadioGroup = findViewById(R.id.cycleModeRadioGroup);
+		radioCycleAll = findViewById(R.id.radioCycleAll);
+		radioCycle4G5G = findViewById(R.id.radioCycle4G5G);
+		radioCyclePref = findViewById(R.id.radioCyclePref);
+		
 		autoSimWarningText = findViewById(R.id.autoSimWarningText);
 		
 		githubLink = findViewById(R.id.githubLink);
@@ -197,6 +215,7 @@ public class MainActivity extends Activity {
         }
 		
 		loadSavedTargetSimMode();
+		loadSavedCycleMode();
 		updateAutoSimWarning();
 
 		radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -235,6 +254,21 @@ public class MainActivity extends Activity {
 			editor.apply();
 
 			updateAutoSimWarning();
+		});
+
+		cycleModeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			SharedPreferences.Editor editor = prefs.edit();
+
+			if (checkedId == R.id.radioCycleAll) {
+				editor.putInt(CYCLE_MODE_KEY, CYCLE_ALL);
+			} else if (checkedId == R.id.radioCycle4G5G) {
+				editor.putInt(CYCLE_MODE_KEY, CYCLE_4G_5G);
+			} else if (checkedId == R.id.radioCyclePref) {
+				editor.putInt(CYCLE_MODE_KEY, CYCLE_PREF);
+			}
+
+			editor.putInt(STATE_KEY, STATE_UNKNOWN);
+			editor.apply();
 		});
     }
 
@@ -378,6 +412,18 @@ public class MainActivity extends Activity {
 			radioSim2.setChecked(true);
 		} else {
 			radioSimAuto.setChecked(true);
+		}
+	}
+
+	private void loadSavedCycleMode() {
+		int cycleMode = prefs.getInt(CYCLE_MODE_KEY, CYCLE_ALL);
+
+		if (cycleMode == CYCLE_4G_5G) {
+			radioCycle4G5G.setChecked(true);
+		} else if (cycleMode == CYCLE_PREF) {
+			radioCyclePref.setChecked(true);
+		} else {
+			radioCycleAll.setChecked(true);
 		}
 	}
 	

@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.NetToggle" parent="@android:style/Theme.Material.NoActionBar">
+    <style name="Theme.NetToggle" parent="@android:style/Theme.Material">
         <item name="android:colorPrimary">@color/brand_primary</item>
         <item name="android:statusBarColor">@color/surface_background</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/surface_background</item>
         <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:actionBarStyle">@style/Widget.NetToggle.ActionBar</item>
+    </style>
+
+    <style name="Widget.NetToggle.ActionBar" parent="@android:style/Widget.Material.ActionBar">
+        <item name="android:background">@color/surface_background</item>
+        <item name="android:titleTextStyle">@style/TextAppearance.NetToggle.ActionBar.Title</item>
+    </style>
+
+    <style name="TextAppearance.NetToggle.ActionBar.Title" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 </resources>
