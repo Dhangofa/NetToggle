@@ -326,6 +326,8 @@
             </LinearLayout>
 
         </LinearLayout>
+		
+		<include layout="@layout/view_tile_cycle_card" />
 
         <!-- Modernized Developer Profile Card -->
         <LinearLayout
