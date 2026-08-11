@@ -19,6 +19,7 @@ import com.dhangofa.networktoggle.model.NetworkMode;
 import com.dhangofa.networktoggle.telephony.NetworkModeController;
 import com.dhangofa.networktoggle.telephony.NetworkModeReader;
 import com.dhangofa.networktoggle.telephony.SimResolver;
+import com.dhangofa.networktoggle.cycle.TileCycleManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,12 +42,14 @@ public class NetworkTileService extends TileService {
     private AppPreferences appPreferences;
     private NetworkModeReader networkModeReader;
     private NetworkModeController networkModeController;
+	private TileCycleManager tileCycleManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         appPreferences = new AppPreferences(this);
+		tileCycleManager = new TileCycleManager(appPreferences);
         SimResolver simResolver = new SimResolver(appPreferences);
         networkModeReader = new NetworkModeReader(appPreferences, simResolver);
         networkModeController = new NetworkModeController(simResolver);
@@ -95,7 +98,7 @@ public class NetworkTileService extends TileService {
         }
 
         NetworkMode currentMode = appPreferences.getCachedNetworkMode();
-        NetworkMode nextMode = NetworkMode.nextInDefaultCycle(currentMode);
+        NetworkMode nextMode = tileCycleManager.getNextMode(currentMode);
         updateTileSwitchingUI();
 
         EXECUTOR.execute(() -> {
@@ -195,12 +198,14 @@ public class NetworkTileService extends TileService {
                 tile.setLabel("Setup Required");
             } else {
                 tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(mode.getTileLabel());
+                NetworkMode firstMode = tileCycleManager.getFirstMode();
+				tile.setLabel("Tap to Set " + firstMode.getTileLabel());
             }
             tile.setIcon(getCachedIcon("?"));
         } else {
             tile.setState(Tile.STATE_ACTIVE);
-            tile.setLabel(mode.getTileLabel());
+            NetworkMode firstMode = tileCycleManager.getFirstMode();
+			tile.setLabel("Tap to Set " + firstMode.getTileLabel());
             tile.setIcon(getCachedIcon(mode.getIconText()));
         }
 
