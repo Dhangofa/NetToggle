@@ -38,10 +38,14 @@ import android.widget.TextView;
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.model.TargetSim;
+import com.dhangofa.networktoggle.cycle.TileCycleManager;
+import com.dhangofa.networktoggle.ui.TileCycleUiController;
+
 
 import rikka.shizuku.Shizuku;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity {	
+	
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
@@ -56,6 +60,7 @@ public class MainActivity extends Activity {
     private TextView autoSimWarningText;
 
     private AppPreferences appPreferences;
+	private TileCycleUiController tileCycleUiController;	
     private volatile boolean activityDestroyed;
     private Thread rootCheckThread;
     private Process rootCheckProcess;
@@ -99,6 +104,9 @@ public class MainActivity extends Activity {
         appPreferences = new AppPreferences(this);
         bindViews();
         bindLinks();
+		TileCycleManager tileCycleManager = new TileCycleManager(appPreferences);
+		tileCycleUiController = new TileCycleUiController(this, tileCycleManager);
+		tileCycleUiController.initialize();
         registerShizukuListeners();
         loadSavedExecutionMode();
         loadSavedTargetSimMode();
