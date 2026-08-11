@@ -255,10 +255,24 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setStatus(String text, int color) {
-        statusText.setText(text);
-        statusText.setTextColor(color);
-    }
+	private void setStatus(String text, int color) {
+	    statusText.setText(text);
+	    statusText.setTextColor(color);
+	
+	    if (color == 0xFF1B873F) {
+	        statusText.setBackgroundResource(
+	                R.drawable.shape_status_badge_success
+	        );
+	    } else if (color == 0xFFFF5555) {
+	        statusText.setBackgroundResource(
+	                R.drawable.shape_status_badge_error
+	        );
+	    } else {
+	        statusText.setBackgroundResource(
+	                R.drawable.shape_pill_badge_bg
+	        );
+	    }
+	}
 
     private String getAppVersionName() {
         try {
