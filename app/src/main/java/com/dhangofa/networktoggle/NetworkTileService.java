@@ -42,14 +42,14 @@ public class NetworkTileService extends TileService {
     private AppPreferences appPreferences;
     private NetworkModeReader networkModeReader;
     private NetworkModeController networkModeController;
-	private TileCycleManager tileCycleManager;
+	  private TileCycleManager tileCycleManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         appPreferences = new AppPreferences(this);
-		tileCycleManager = new TileCycleManager(appPreferences);
+    		tileCycleManager = new TileCycleManager(appPreferences);
         SimResolver simResolver = new SimResolver(appPreferences);
         networkModeReader = new NetworkModeReader(appPreferences, simResolver);
         networkModeController = new NetworkModeController(simResolver);
@@ -67,26 +67,26 @@ public class NetworkTileService extends TileService {
             return;
         }
 
-		EXECUTOR.execute(() -> {
-			NetworkMode realMode = networkModeReader.readCurrentMode();
+      EXECUTOR.execute(() -> {
+        NetworkMode realMode = networkModeReader.readCurrentMode();
 
-			mainHandler.post(() -> {
-				/*
-				 * A tile click or another operation may have updated the state
-				 * while this asynchronous readback was running.
-				 */
-				if (appPreferences.getCachedNetworkMode()
-						!= NetworkMode.UNKNOWN) {
-					return;
-				}
+        mainHandler.post(() -> {
+          /*
+           * A tile click or another operation may have updated the state
+           * while this asynchronous readback was running.
+           */
+          if (appPreferences.getCachedNetworkMode()
+              != NetworkMode.UNKNOWN) {
+            return;
+          }
 
-				if (realMode != NetworkMode.UNKNOWN) {
-					appPreferences.setCachedNetworkMode(realMode);
-					updateTileUI(realMode);
-				}
-			});
-		});
-	}
+          if (realMode != NetworkMode.UNKNOWN) {
+            appPreferences.setCachedNetworkMode(realMode);
+            updateTileUI(realMode);
+          }
+        });
+      });
+    }
 
     @Override
     public void onClick() {
@@ -195,33 +195,33 @@ public class NetworkTileService extends TileService {
         tile.updateTile();
     }
 
-	private void updateTileUI(NetworkMode mode) {
-	    Tile tile = getQsTile();
-	
-	    if (tile == null) {
-	        return;
-	    }
-	
-	    if (mode == NetworkMode.UNKNOWN) {
-	        if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
-	            tile.setState(Tile.STATE_UNAVAILABLE);
-	            tile.setLabel("Setup Required");
-	        } else {
-	            NetworkMode firstMode = tileCycleManager.getFirstMode();
-	
-	            tile.setState(Tile.STATE_INACTIVE);
-	            tile.setLabel("Tap to Set " + firstMode.getTileLabel());
-	        }
-	
-	        tile.setIcon(getCachedIcon("?"));
-	    } else {
-	        tile.setState(Tile.STATE_ACTIVE);
-	        tile.setLabel(mode.getTileLabel());
-	        tile.setIcon(getCachedIcon(mode.getIconText()));
-	    }
-	
-	    tile.updateTile();
-	}
+    private void updateTileUI(NetworkMode mode) {
+        Tile tile = getQsTile();
+
+        if (tile == null) {
+            return;
+        }
+
+        if (mode == NetworkMode.UNKNOWN) {
+            if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
+                tile.setState(Tile.STATE_UNAVAILABLE);
+                tile.setLabel("Setup Required");
+            } else {
+                NetworkMode firstMode = tileCycleManager.getFirstMode();
+
+                tile.setState(Tile.STATE_INACTIVE);
+                tile.setLabel("Tap to Set " + firstMode.getTileLabel());
+            }
+
+            tile.setIcon(getCachedIcon("?"));
+        } else {
+            tile.setState(Tile.STATE_ACTIVE);
+            tile.setLabel(mode.getTileLabel());
+            tile.setIcon(getCachedIcon(mode.getIconText()));
+        }
+
+        tile.updateTile();
+    }
 
     private void showAutoSimErrorToast() {
         Toast.makeText(

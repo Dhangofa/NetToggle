@@ -1,0 +1,149 @@
+name: New Feature Request
+description: Suggest a new feature or improvement for NetToggle
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature for NetToggle.
+
+        Please provide as much detail as possible. Network mode behavior can depend on Android version, OEM skin, device model, SIM setup, carrier, Root/Shizuku mode, and ROM behavior.
+
+  - type: input
+    id: feature_name
+    attributes:
+      label: Feature name
+      description: Short name for the requested feature.
+      placeholder: "Example: Preferred 2G mode, custom QS tile cycle, per-SIM mode profiles"
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: Describe the feature
+      description: Explain what you want NetToggle to do.
+      placeholder: "Describe the feature clearly..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why is this feature needed?
+      description: Explain the real use case or problem this feature solves.
+      placeholder: "Example: I often switch to Preferred 2G in poor coverage areas to save battery..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature_area
+    attributes:
+      label: Feature area
+      description: Which part of NetToggle does this request affect?
+      options:
+        - Quick Settings tile
+        - Network mode support
+        - Target SIM handling
+        - Root/Shizuku execution
+        - App UI
+        - F-Droid/IzzyOnDroid metadata
+        - Documentation/README
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Android version
+      description: Mention the Android version where you want this feature.
+      placeholder: "Example: Android 14, Android 15, Android 16"
+    validations:
+      required: true
+
+  - type: input
+    id: device_model
+    attributes:
+      label: Device name/model
+      description: Mention the exact device model.
+      placeholder: "Example: Galaxy S20 FE 5G, Redmi Note 12 Pro 5G, Pixel 6a"
+    validations:
+      required: true
+
+  - type: input
+    id: oem_skin
+    attributes:
+      label: OEM skin / ROM
+      description: Mention OEM skin and version, or custom ROM name.
+      placeholder: "Example: One UI 5.1, HyperOS, MIUI 14, OriginOS, AOSP, LineageOS 21"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sim_setup
+    attributes:
+      label: SIM setup
+      description: Select your SIM configuration.
+      options:
+        - Single SIM
+        - Dual SIM
+        - eSIM only
+        - Physical SIM + eSIM
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: execution_mode
+    attributes:
+      label: Execution mode
+      description: Which mode do you use or plan to use?
+      options:
+        - Shizuku
+        - Root
+        - Both
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: Describe how the feature should work from a user point of view.
+      placeholder: "Example: I want to select only 5G Only, 4G Only, and Preferred 2G for the QS tile cycle."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you tried another app, manual command, Android setting, or workaround?
+      placeholder: "Example: I currently use the hiddennu, but it is slow..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra_context
+    attributes:
+      label: Extra context
+      description: Add screenshots, command outputs, links, or any additional information.
+      placeholder: "Paste extra details here..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked that this feature is not already available in the latest version.
+          required: true
+        - label: I understand that network mode support can depend on Android version, OEM skin, modem, carrier, and SIM setup.
+          required: true
+        - label: I have provided my Android version, device model, OEM skin/ROM, and SIM setup.
+          required: true
