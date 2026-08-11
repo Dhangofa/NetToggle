@@ -24,11 +24,9 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -38,13 +36,18 @@ import android.widget.TextView;
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.model.TargetSim;
+import com.dhangofa.networktoggle.cycle.TileCycleManager;
+import com.dhangofa.networktoggle.ui.TileCycleUiController;
+
 
 import rikka.shizuku.Shizuku;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity {	
+	
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
+	private TextView appVersionText;
     private TextView statusText;
     private ImageView githubLink;
     private ImageView telegramLink;
@@ -56,6 +59,7 @@ public class MainActivity extends Activity {
     private TextView autoSimWarningText;
 
     private AppPreferences appPreferences;
+	private TileCycleUiController tileCycleUiController;	
     private volatile boolean activityDestroyed;
     private Thread rootCheckThread;
     private Process rootCheckProcess;
@@ -92,53 +96,21 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
 
-        configureActionBar();
         configureStatusBar();
         setContentView(R.layout.activity_main);
 
         appPreferences = new AppPreferences(this);
         bindViews();
+		appVersionText.setText("v" + getAppVersionName());
         bindLinks();
+		TileCycleManager tileCycleManager = new TileCycleManager(appPreferences);
+		tileCycleUiController = new TileCycleUiController(this, tileCycleManager);
+		tileCycleUiController.initialize();
         registerShizukuListeners();
         loadSavedExecutionMode();
         loadSavedTargetSimMode();
         updateAutoSimWarning();
         bindSelectionListeners();
-    }
-
-    private void configureActionBar() {
-        if (getActionBar() == null) return;
-
-        getActionBar().setDisplayOptions(
-                android.app.ActionBar.DISPLAY_SHOW_TITLE
-                        | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-
-        TextView versionText = new TextView(this);
-        versionText.setText("v" + getAppVersionName());
-        versionText.setTextSize(12);
-        versionText.setTypeface(null, Typeface.BOLD);
-        versionText.setTextColor(getColor(R.color.brand_on_primary_container));
-        versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
-
-        float density = getResources().getDisplayMetrics().density;
-        versionText.setPadding((int) (10 * density), (int) (4 * density),
-                (int) (10 * density), (int) (4 * density));
-
-        android.app.ActionBar.LayoutParams params = new android.app.ActionBar.LayoutParams(
-                android.app.ActionBar.LayoutParams.WRAP_CONTENT,
-                android.app.ActionBar.LayoutParams.WRAP_CONTENT,
-                Gravity.END | Gravity.CENTER_VERTICAL);
-        params.setMarginEnd((int) (16 * density));
-
-        getActionBar().setCustomView(versionText, params);
-        getActionBar().setElevation(0);
-
-        try {
-            int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-            TextView titleText = findViewById(titleId);
-            if (titleText != null) titleText.setTypeface(null, Typeface.BOLD);
-        } catch (Exception ignored) {
-        }
     }
 
     private void configureStatusBar() {
@@ -156,6 +128,7 @@ public class MainActivity extends Activity {
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
         statusText = findViewById(R.id.shizukuStatusText);
+		appVersionText = findViewById(R.id.appVersionText);
         targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
         radioSimAuto = findViewById(R.id.radioSimAuto);
         radioSim1 = findViewById(R.id.radioSim1);
@@ -282,10 +255,24 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setStatus(String text, int color) {
-        statusText.setText(text);
-        statusText.setTextColor(color);
-    }
+	private void setStatus(String text, int color) {
+	    statusText.setText(text);
+	    statusText.setTextColor(color);
+	
+	    if (color == 0xFF1B873F) {
+	        statusText.setBackgroundResource(
+	                R.drawable.shape_status_badge_success
+	        );
+	    } else if (color == 0xFFFF5555) {
+	        statusText.setBackgroundResource(
+	                R.drawable.shape_status_badge_error
+	        );
+	    } else {
+	        statusText.setBackgroundResource(
+	                R.drawable.shape_pill_badge_bg
+	        );
+	    }
+	}
 
     private String getAppVersionName() {
         try {
