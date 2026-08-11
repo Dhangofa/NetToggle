@@ -7,12 +7,16 @@ import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.model.NetworkMode;
 import com.dhangofa.networktoggle.model.TargetSim;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class AppPreferences {
     private static final String PREFS_NAME = "NetTogglePrefs";
     private static final String KEY_EXEC_MODE = "exec_mode";
     private static final String KEY_TARGET_SIM = "target_sim";
     private static final String KEY_NETWORK_STATE = "net_state";
     private static final String KEY_AUTO_SIM_ERROR = "auto_sim_error";
+    private static final String KEY_TILE_CYCLE_MODES = "tile_cycle_modes";
 
     private final SharedPreferences preferences;
 
@@ -26,17 +30,9 @@ public final class AppPreferences {
                 preferences.getInt(KEY_EXEC_MODE, ExecutionMode.NONE.getValue()));
     }
 
-    public void setExecutionMode(ExecutionMode mode) {
-        preferences.edit().putInt(KEY_EXEC_MODE, mode.getValue()).apply();
-    }
-
     public TargetSim getTargetSim() {
         return TargetSim.fromValue(
                 preferences.getInt(KEY_TARGET_SIM, TargetSim.AUTO.getValue()));
-    }
-
-    public void setTargetSim(TargetSim targetSim) {
-        preferences.edit().putInt(KEY_TARGET_SIM, targetSim.getValue()).apply();
     }
 
     public NetworkMode getCachedNetworkMode() {
@@ -46,6 +42,10 @@ public final class AppPreferences {
 
     public void setCachedNetworkMode(NetworkMode mode) {
         preferences.edit().putInt(KEY_NETWORK_STATE, mode.getStateValue()).apply();
+    }
+
+    public void clearCachedNetworkMode() {
+        setCachedNetworkMode(NetworkMode.UNKNOWN);
     }
 
     public boolean hasAutoSimError() {
@@ -70,6 +70,31 @@ public final class AppPreferences {
                 .putInt(KEY_NETWORK_STATE, NetworkMode.UNKNOWN.getStateValue())
                 .putBoolean(KEY_AUTO_SIM_ERROR, false)
                 .apply();
+    }
+
+    public List<NetworkMode> getTileCycleModes() {
+        String saved = preferences.getString(KEY_TILE_CYCLE_MODES, "");
+        List<NetworkMode> modes = new ArrayList<>();
+        if (saved == null || saved.trim().isEmpty()) return modes;
+
+        String[] ids = saved.split(",");
+        for (String id : ids) {
+            try {
+                NetworkMode mode = NetworkMode.valueOf(id.trim());
+                if (mode != NetworkMode.UNKNOWN && !modes.contains(mode)) modes.add(mode);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return modes;
+    }
+
+    public void setTileCycleModes(List<NetworkMode> modes) {
+        StringBuilder value = new StringBuilder();
+        for (NetworkMode mode : modes) {
+            if (value.length() > 0) value.append(',');
+            value.append(mode.name());
+        }
+        preferences.edit().putString(KEY_TILE_CYCLE_MODES, value.toString()).apply();
     }
 
     public void clearTransientState() {
