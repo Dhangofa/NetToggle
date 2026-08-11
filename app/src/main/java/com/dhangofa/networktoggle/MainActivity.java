@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
+	private TextView appVersionText;
     private TextView statusText;
     private ImageView githubLink;
     private ImageView telegramLink;
@@ -100,6 +101,7 @@ public class MainActivity extends Activity {
 
         appPreferences = new AppPreferences(this);
         bindViews();
+		appVersionText.setText("v" + getAppVersionName());
         bindLinks();
 		TileCycleManager tileCycleManager = new TileCycleManager(appPreferences);
 		tileCycleUiController = new TileCycleUiController(this, tileCycleManager);
@@ -126,6 +128,7 @@ public class MainActivity extends Activity {
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
         statusText = findViewById(R.id.shizukuStatusText);
+		appVersionText = findViewById(R.id.appVersionText);
         targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
         radioSimAuto = findViewById(R.id.radioSimAuto);
         radioSim1 = findViewById(R.id.radioSim1);
