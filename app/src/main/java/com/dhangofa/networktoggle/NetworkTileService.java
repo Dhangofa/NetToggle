@@ -195,29 +195,33 @@ public class NetworkTileService extends TileService {
         tile.updateTile();
     }
 
-    private void updateTileUI(NetworkMode mode) {
-        Tile tile = getQsTile();
-        if (tile == null) return;
-
-        if (mode == NetworkMode.UNKNOWN) {
-            if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
-                tile.setState(Tile.STATE_UNAVAILABLE);
-                tile.setLabel("Setup Required");
-            } else {
-                tile.setState(Tile.STATE_INACTIVE);
-                NetworkMode firstMode = tileCycleManager.getFirstMode();
-				tile.setLabel("Tap to Set " + firstMode.getTileLabel());
-            }
-            tile.setIcon(getCachedIcon("?"));
-        } else {
-            tile.setState(Tile.STATE_ACTIVE);
-            NetworkMode firstMode = tileCycleManager.getFirstMode();
-			tile.setLabel("Tap to Set " + firstMode.getTileLabel());
-            tile.setIcon(getCachedIcon(mode.getIconText()));
-        }
-
-        tile.updateTile();
-    }
+	private void updateTileUI(NetworkMode mode) {
+	    Tile tile = getQsTile();
+	
+	    if (tile == null) {
+	        return;
+	    }
+	
+	    if (mode == NetworkMode.UNKNOWN) {
+	        if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
+	            tile.setState(Tile.STATE_UNAVAILABLE);
+	            tile.setLabel("Setup Required");
+	        } else {
+	            NetworkMode firstMode = tileCycleManager.getFirstMode();
+	
+	            tile.setState(Tile.STATE_INACTIVE);
+	            tile.setLabel("Tap to Set " + firstMode.getTileLabel());
+	        }
+	
+	        tile.setIcon(getCachedIcon("?"));
+	    } else {
+	        tile.setState(Tile.STATE_ACTIVE);
+	        tile.setLabel(mode.getTileLabel());
+	        tile.setIcon(getCachedIcon(mode.getIconText()));
+	    }
+	
+	    tile.updateTile();
+	}
 
     private void showAutoSimErrorToast() {
         Toast.makeText(
