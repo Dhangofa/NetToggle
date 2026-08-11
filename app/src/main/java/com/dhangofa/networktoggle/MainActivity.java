@@ -24,11 +24,9 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -97,7 +95,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
 
-        configureActionBar();
         configureStatusBar();
         setContentView(R.layout.activity_main);
 
@@ -112,41 +109,6 @@ public class MainActivity extends Activity {
         loadSavedTargetSimMode();
         updateAutoSimWarning();
         bindSelectionListeners();
-    }
-
-    private void configureActionBar() {
-        if (getActionBar() == null) return;
-
-        getActionBar().setDisplayOptions(
-                android.app.ActionBar.DISPLAY_SHOW_TITLE
-                        | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-
-        TextView versionText = new TextView(this);
-        versionText.setText("v" + getAppVersionName());
-        versionText.setTextSize(12);
-        versionText.setTypeface(null, Typeface.BOLD);
-        versionText.setTextColor(getColor(R.color.brand_on_primary_container));
-        versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
-
-        float density = getResources().getDisplayMetrics().density;
-        versionText.setPadding((int) (10 * density), (int) (4 * density),
-                (int) (10 * density), (int) (4 * density));
-
-        android.app.ActionBar.LayoutParams params = new android.app.ActionBar.LayoutParams(
-                android.app.ActionBar.LayoutParams.WRAP_CONTENT,
-                android.app.ActionBar.LayoutParams.WRAP_CONTENT,
-                Gravity.END | Gravity.CENTER_VERTICAL);
-        params.setMarginEnd((int) (16 * density));
-
-        getActionBar().setCustomView(versionText, params);
-        getActionBar().setElevation(0);
-
-        try {
-            int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-            TextView titleText = findViewById(titleId);
-            if (titleText != null) titleText.setTypeface(null, Typeface.BOLD);
-        } catch (Exception ignored) {
-        }
     }
 
     private void configureStatusBar() {
