@@ -24,4 +24,10 @@
     
     <!-- Controls -->
     <color name="social_button_bg">#F4EFF4</color>
+
+    <!-- Segmented controls -->
+    <color name="segmented_container">#F3EDF7</color>
+    <color name="segmented_selected">#EADDFF</color>
+    <color name="segmented_text_selected">#21005D</color>
+    <color name="segmented_text_unselected">#49454F</color>
 </resources>
