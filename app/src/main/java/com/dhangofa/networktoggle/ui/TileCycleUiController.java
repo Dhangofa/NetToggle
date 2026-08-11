@@ -82,3 +82,4 @@ public final class TileCycleUiController {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
     }
 }
+
