@@ -1,146 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tileCycleCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="20dp"
-    android:background="@drawable/section_outline_bg"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@drawable/section_outline_bg"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Quick Tile Cycle"
-            android:src="@drawable/ic_qs_network"
-            android:tint="@color/brand_primary" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-medium"
-            android:text="Quick Tile Cycle"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/cycleSelectedCount"
+        android:layout_marginBottom="12dp">
+        
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Selected: 3/3"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_refresh"
+                android:tint="@color/brand_primary"
+                android:layout_marginEnd="6dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quick Tile Cycle"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="3/3"
+            android:background="@drawable/shape_pill_badge_bg"
             android:textColor="@color/brand_primary"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp" />
+    </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Select 2 to 3 modes. Selection order becomes the tile cycle order."
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/card_border" />
-
+    <!-- 2x2 Grid for Cycle Options -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
-
+        android:orientation="vertical">
+        
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <CheckBox
-                android:id="@+id/cycle5gOnly"
-                android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="✓ 5G Only"
+                android:padding="10dp"
                 android:background="@drawable/shape_radio_item_bg"
-                android:buttonTint="@color/brand_primary"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="7dp"
-                android:text="5G Only"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp" />
-
-            <CheckBox
-                android:id="@+id/cyclePreferred5g"
-                android:layout_width="match_parent"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:layout_marginEnd="4dp"/>
+                
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:text="✓ Preferred 5G"
+                android:padding="10dp"
                 android:background="@drawable/shape_radio_item_bg"
-                android:buttonTint="@color/brand_primary"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="7dp"
-                android:text="Preferred 5G"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp" />
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:layout_marginStart="4dp"/>
         </LinearLayout>
 
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="1dp" />
-
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <CheckBox
-                android:id="@+id/cycle4gOnly"
-                android:layout_width="match_parent"
+            android:orientation="horizontal">
+            
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="✓ 4G Only"
+                android:padding="10dp"
                 android:background="@drawable/shape_radio_item_bg"
-                android:buttonTint="@color/brand_primary"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="7dp"
-                android:text="4G Only"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp" />
-
-            <CheckBox
-                android:id="@+id/cyclePreferred4g"
-                android:layout_width="match_parent"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:layout_marginEnd="4dp"/>
+                
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/shape_radio_item_bg"
-                android:buttonTint="@color/brand_primary"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="7dp"
-                android:text="Preferred 4G"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp" />
+                android:layout_weight="1"
+                android:text="○ Preferred 4G"
+                android:padding="10dp"
+                android:background="@drawable/shape_segmented_container"
+                android:textColor="#808080"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:layout_marginStart="4dp"/>
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/cycleOrderText"
+    <!-- Sequence Footer -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/shape_qs_hint_bg"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:padding="10dp"
-        android:text="Cycle: 5G Only → 4G Only → Preferred 5G"
-        android:textColor="@color/text_secondary"
-        android:textSize="11sp" />
+        android:background="@drawable/shape_segmented_container"
+        android:padding="8dp"
+        android:layout_marginTop="12dp">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5G Only"
+            android:textColor="#E2E8F0"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+            
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" → "
+            android:textColor="#808080"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="4dp" />
+            
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4G Only"
+            android:textColor="#E2E8F0"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+            
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" → "
+            android:textColor="#808080"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="4dp" />
+            
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preferred 5G"
+            android:textColor="#E2E8F0"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 </LinearLayout>
