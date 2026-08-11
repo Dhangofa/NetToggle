@@ -37,7 +37,7 @@ public class NetworkTileService extends TileService {
     private static final int INVALID_SUB_ID = -1;
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
     private static final AtomicBoolean IS_SWITCHING = new AtomicBoolean(false);
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("\d+");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
     private static Method shizukuNewProcessMethod;
 
     private static Icon icon4g;
