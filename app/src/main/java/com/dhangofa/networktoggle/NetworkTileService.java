@@ -67,19 +67,26 @@ public class NetworkTileService extends TileService {
             return;
         }
 
-        EXECUTOR.execute(() -> {
-            NetworkMode realMode = networkModeReader.readCurrentMode();
+		EXECUTOR.execute(() -> {
+			NetworkMode realMode = networkModeReader.readCurrentMode();
 
-            mainHandler.post(() -> {
-                if (realMode != NetworkMode.UNKNOWN) {
-                    appPreferences.setCachedNetworkMode(realMode);
-                    updateTileUI(realMode);
-                } else {
-                    updateTileUI(cachedMode);
-                }
-            });
-        });
-    }
+			mainHandler.post(() -> {
+				/*
+				 * A tile click or another operation may have updated the state
+				 * while this asynchronous readback was running.
+				 */
+				if (appPreferences.getCachedNetworkMode()
+						!= NetworkMode.UNKNOWN) {
+					return;
+				}
+
+				if (realMode != NetworkMode.UNKNOWN) {
+					appPreferences.setCachedNetworkMode(realMode);
+					updateTileUI(realMode);
+				}
+			});
+		});
+	}
 
     @Override
     public void onClick() {
