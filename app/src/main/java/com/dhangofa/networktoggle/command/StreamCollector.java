@@ -18,11 +18,14 @@ final class StreamCollector extends Thread {
     public void run() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
-            while ((line = reader.readLine()) != null) output.append(line).append('
-');
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append('\n');
+            }
         } catch (Exception ignored) {
         }
     }
 
-    String getOutput() { return output.toString().trim(); }
+    String getOutput() {
+        return output.toString().trim();
+    }
 }
