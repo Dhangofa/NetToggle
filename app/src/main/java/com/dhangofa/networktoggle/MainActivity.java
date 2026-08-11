@@ -21,381 +21,305 @@ package com.dhangofa.networktoggle;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.view.View;
+
+import com.dhangofa.networktoggle.config.AppPreferences;
+import com.dhangofa.networktoggle.model.ExecutionMode;
+import com.dhangofa.networktoggle.model.TargetSim;
 
 import rikka.shizuku.Shizuku;
 
 public class MainActivity extends Activity {
-
-    private static final String PREFS_NAME = "NetTogglePrefs";
-    private static final String EXEC_MODE_KEY = "exec_mode";
-	private static final String TARGET_SIM_KEY = "target_sim";
-	private static final String AUTO_SIM_ERROR_KEY = "auto_sim_error";
-	private static final String STATE_KEY = "net_state";
-	
-    private static final int MODE_NONE = 0;
-    private static final int MODE_ROOT = 1;
-    private static final int MODE_SHIZUKU = 2;
-	private static final int STATE_UNKNOWN = 0;
-	
-	private static final int TARGET_SIM_AUTO = 0;
-	private static final int TARGET_SIM_1 = 1;
-	private static final int TARGET_SIM_2 = 2;
-
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
     private RadioButton radioShizuku;
     private TextView statusText;
-	private ImageView githubLink;
-	private ImageView telegramLink;
-    private SharedPreferences prefs;
-	
-	private RadioGroup targetSimRadioGroup;
-	private RadioButton radioSimAuto;
-	private RadioButton radioSim1;
-	private RadioButton radioSim2;
-	private TextView autoSimWarningText;
-	
-	private volatile boolean activityDestroyed = false;
-	private Thread rootCheckThread;
-	private Process rootCheckProcess;
-	
-    // Wait for Shizuku Binder, then check permission only if Shizuku mode is selected.
-    private final Shizuku.OnBinderReceivedListener binderReceivedListener = () -> {
-	    runOnUiThread(() -> {
-	        if (!activityDestroyed
-	                && prefs != null
-	                && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
-	            checkShizukuPermission(false);
-	        }
-	    });
-	};
+    private ImageView githubLink;
+    private ImageView telegramLink;
 
-    // Handle Shizuku service death only when Shizuku mode is selected.
-    private final Shizuku.OnBinderDeadListener binderDeadListener = () -> {
-	    runOnUiThread(() -> {
-	        if (!activityDestroyed
-	                && prefs != null
-	                && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
-	            statusText.setText("Shizuku is not running.");
-	            statusText.setTextColor(0xFFFF5555);
-	        }
-	    });
-	};
+    private RadioGroup targetSimRadioGroup;
+    private RadioButton radioSimAuto;
+    private RadioButton radioSim1;
+    private RadioButton radioSim2;
+    private TextView autoSimWarningText;
 
+    private AppPreferences appPreferences;
+    private volatile boolean activityDestroyed;
+    private Thread rootCheckThread;
+    private Process rootCheckProcess;
 
-    // React when the user grants or denies Shizuku permission.
-    private final Shizuku.OnRequestPermissionResultListener permissionResultListener = (requestCode, grantResult) -> {
-	    runOnUiThread(() -> {
-	        if (!activityDestroyed
-	                && prefs != null
-	                && prefs.getInt(EXEC_MODE_KEY, MODE_NONE) == MODE_SHIZUKU) {
-	            checkShizukuPermission(false);
-	        }
-	    });
-	};
+    private final Shizuku.OnBinderReceivedListener binderReceivedListener = () ->
+            runOnUiThread(() -> {
+                if (!activityDestroyed
+                        && appPreferences != null
+                        && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                    checkShizukuPermission(false);
+                }
+            });
+
+    private final Shizuku.OnBinderDeadListener binderDeadListener = () ->
+            runOnUiThread(() -> {
+                if (!activityDestroyed
+                        && appPreferences != null
+                        && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                    setStatus("Shizuku is not running.", 0xFFFF5555);
+                }
+            });
+
+    private final Shizuku.OnRequestPermissionResultListener permissionResultListener =
+            (requestCode, grantResult) -> runOnUiThread(() -> {
+                if (!activityDestroyed
+                        && appPreferences != null
+                        && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                    checkShizukuPermission(false);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
-		
-		// Inject custom version pill into the default Action Bar
-        if (getActionBar() != null) {
-            getActionBar().setDisplayOptions(
-                    android.app.ActionBar.DISPLAY_SHOW_TITLE | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-            
-            android.widget.TextView versionText = new android.widget.TextView(this);
-            versionText.setText("v" + getAppVersionName());
-            versionText.setTextSize(12);
-			versionText.setTypeface(null, android.graphics.Typeface.BOLD);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                versionText.setTextColor(getColor(R.color.brand_on_primary_container));
-            }
-            versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
-            int padX = (int) (10 * getResources().getDisplayMetrics().density);
-            int padY = (int) (4 * getResources().getDisplayMetrics().density);
-            versionText.setPadding(padX, padY, padX, padY);
-            
-            android.app.ActionBar.LayoutParams layoutParams = new android.app.ActionBar.LayoutParams(
-                    android.app.ActionBar.LayoutParams.WRAP_CONTENT,
-                    android.app.ActionBar.LayoutParams.WRAP_CONTENT,
-                    android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
-            layoutParams.setMarginEnd((int) (16 * getResources().getDisplayMetrics().density));
-            
-            getActionBar().setCustomView(versionText, layoutParams);
-            getActionBar().setElevation(0);
-			// Try to make the default Action Bar title bold
-            try {
-                int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-                android.widget.TextView titleText = findViewById(titleId);
-                if (titleText != null) {
-                    titleText.setTypeface(null, android.graphics.Typeface.BOLD);
-                }
-            } catch (Exception ignored) {}
-        }
-		
-		// Keep status bar icon contrast readable in light and dark themes
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            boolean isNight = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-            getWindow().setStatusBarColor(getColor(R.color.surface_background));
-            View decor = getWindow().getDecorView();
-            if (!isNight) {
-                decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            } else {
-                decor.setSystemUiVisibility(0);
-            }
-        }
 
-		setContentView(R.layout.activity_main);
+        configureActionBar();
+        configureStatusBar();
+        setContentView(R.layout.activity_main);
 
-        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        
+        appPreferences = new AppPreferences(this);
+        bindViews();
+        bindLinks();
+        registerShizukuListeners();
+        loadSavedExecutionMode();
+        loadSavedTargetSimMode();
+        updateAutoSimWarning();
+        bindSelectionListeners();
+    }
+
+    private void configureActionBar() {
+        if (getActionBar() == null) return;
+
+        getActionBar().setDisplayOptions(
+                android.app.ActionBar.DISPLAY_SHOW_TITLE
+                        | android.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+
+        TextView versionText = new TextView(this);
+        versionText.setText("v" + getAppVersionName());
+        versionText.setTextSize(12);
+        versionText.setTypeface(null, Typeface.BOLD);
+        versionText.setTextColor(getColor(R.color.brand_on_primary_container));
+        versionText.setBackgroundResource(R.drawable.shape_pill_badge_bg);
+
+        float density = getResources().getDisplayMetrics().density;
+        versionText.setPadding((int) (10 * density), (int) (4 * density),
+                (int) (10 * density), (int) (4 * density));
+
+        android.app.ActionBar.LayoutParams params = new android.app.ActionBar.LayoutParams(
+                android.app.ActionBar.LayoutParams.WRAP_CONTENT,
+                android.app.ActionBar.LayoutParams.WRAP_CONTENT,
+                Gravity.END | Gravity.CENTER_VERTICAL);
+        params.setMarginEnd((int) (16 * density));
+
+        getActionBar().setCustomView(versionText, params);
+        getActionBar().setElevation(0);
+
+        try {
+            int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+            TextView titleText = findViewById(titleId);
+            if (titleText != null) titleText.setTypeface(null, Typeface.BOLD);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void configureStatusBar() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+
+        boolean isNight = (getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        getWindow().setStatusBarColor(getColor(R.color.surface_background));
+        getWindow().getDecorView().setSystemUiVisibility(
+                isNight ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+    }
+
+    private void bindViews() {
         radioGroup = findViewById(R.id.modeRadioGroup);
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
         statusText = findViewById(R.id.shizukuStatusText);
-		
-		targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
-		radioSimAuto = findViewById(R.id.radioSimAuto);
-		radioSim1 = findViewById(R.id.radioSim1);
-		radioSim2 = findViewById(R.id.radioSim2);
-		autoSimWarningText = findViewById(R.id.autoSimWarningText);
-		
-		githubLink = findViewById(R.id.githubLink);
-		telegramLink = findViewById(R.id.telegramLink);
+        targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
+        radioSimAuto = findViewById(R.id.radioSimAuto);
+        radioSim1 = findViewById(R.id.radioSim1);
+        radioSim2 = findViewById(R.id.radioSim2);
+        autoSimWarningText = findViewById(R.id.autoSimWarningText);
+        githubLink = findViewById(R.id.githubLink);
+        telegramLink = findViewById(R.id.telegramLink);
+    }
 
-		githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
-		telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofa"));
+    private void bindLinks() {
+        githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
+        telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofa"));
+    }
 
-        // Register the lifecycle listeners
+    private void registerShizukuListeners() {
         Shizuku.addBinderReceivedListener(binderReceivedListener);
         Shizuku.addBinderDeadListener(binderDeadListener);
         Shizuku.addRequestPermissionResultListener(permissionResultListener);
+    }
 
-        // Load saved mode (Default =0, Root = 1, Shizuku = 2)
-        int savedMode = prefs.getInt(EXEC_MODE_KEY, MODE_NONE);
-        if (savedMode == MODE_ROOT) {
+    private void loadSavedExecutionMode() {
+        ExecutionMode savedMode = appPreferences.getExecutionMode();
+        if (savedMode == ExecutionMode.ROOT) {
             radioRoot.setChecked(true);
             checkRootPermission();
-        } else if (savedMode == MODE_SHIZUKU) {
+        } else if (savedMode == ExecutionMode.SHIZUKU) {
             radioShizuku.setChecked(true);
             checkShizukuPermission(false);
         } else {
             radioGroup.clearCheck();
-            statusText.setText("Select Root or Shizuku mode.");
-            statusText.setTextColor(0xFFFFB300);
+            setStatus("Select Root or Shizuku mode.", 0xFFFFB300);
         }
-		
-		loadSavedTargetSimMode();
-		updateAutoSimWarning();
-
-		radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-			if (checkedId == R.id.radioRoot) {
-				prefs.edit()
-						.putInt(EXEC_MODE_KEY, MODE_ROOT)
-						.putInt(STATE_KEY, STATE_UNKNOWN)
-						.putBoolean(AUTO_SIM_ERROR_KEY, false)
-						.apply();
-
-				checkRootPermission();
-			} else if (checkedId == R.id.radioShizuku) {
-				prefs.edit()
-						.putInt(EXEC_MODE_KEY, MODE_SHIZUKU)
-						.putInt(STATE_KEY, STATE_UNKNOWN)
-						.putBoolean(AUTO_SIM_ERROR_KEY, false)
-						.apply();
-
-				checkShizukuPermission(true);
-			}
-		});
-		
-		targetSimRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-			SharedPreferences.Editor editor = prefs.edit();
-
-			if (checkedId == R.id.radioSimAuto) {
-				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
-			} else if (checkedId == R.id.radioSim1) {
-				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_1);
-			} else if (checkedId == R.id.radioSim2) {
-				editor.putInt(TARGET_SIM_KEY, TARGET_SIM_2);
-			}
-
-			editor.putInt(STATE_KEY, STATE_UNKNOWN);
-			editor.putBoolean(AUTO_SIM_ERROR_KEY, false);
-			editor.apply();
-
-			updateAutoSimWarning();
-		});
     }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+    private void bindSelectionListeners() {
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.radioRoot) {
+                appPreferences.onExecutionModeChanged(ExecutionMode.ROOT);
+                checkRootPermission();
+            } else if (checkedId == R.id.radioShizuku) {
+                appPreferences.onExecutionModeChanged(ExecutionMode.SHIZUKU);
+                checkShizukuPermission(true);
+            }
+        });
 
-		if (prefs != null) {
-			updateAutoSimWarning();
-		}
-	}
+        targetSimRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            TargetSim target = TargetSim.AUTO;
+            if (checkedId == R.id.radioSim1) target = TargetSim.SIM_1;
+            else if (checkedId == R.id.radioSim2) target = TargetSim.SIM_2;
+            appPreferences.onTargetSimChanged(target);
+            updateAutoSimWarning();
+        });
+    }
 
-   @Override
-	protected void onDestroy() {
-	    activityDestroyed = true;
-	
-	    // Prevent memory leaks by destroying Shizuku listeners when the app closes
-	    Shizuku.removeBinderReceivedListener(binderReceivedListener);
-	    Shizuku.removeBinderDeadListener(binderDeadListener);
-	    Shizuku.removeRequestPermissionResultListener(permissionResultListener);
-	
-	    // Stop any running root permission check process
-	    if (rootCheckProcess != null) {
-	        rootCheckProcess.destroy();
-	        rootCheckProcess = null;
-	    }
-	
-	    // Interrupt root check thread if it is still active
-	    if (rootCheckThread != null && rootCheckThread.isAlive()) {
-	        rootCheckThread.interrupt();
-	        rootCheckThread = null;
-	    }
-	
-	    super.onDestroy();
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (appPreferences != null) updateAutoSimWarning();
+    }
+
+    @Override
+    protected void onDestroy() {
+        activityDestroyed = true;
+        Shizuku.removeBinderReceivedListener(binderReceivedListener);
+        Shizuku.removeBinderDeadListener(binderDeadListener);
+        Shizuku.removeRequestPermissionResultListener(permissionResultListener);
+
+        if (rootCheckProcess != null) {
+            rootCheckProcess.destroy();
+            rootCheckProcess = null;
+        }
+        if (rootCheckThread != null && rootCheckThread.isAlive()) {
+            rootCheckThread.interrupt();
+            rootCheckThread = null;
+        }
+        super.onDestroy();
+    }
 
     private void checkRootPermission() {
-	    statusText.setText("Checking root permission...");
-	    statusText.setTextColor(0xFFFFB300);
-	
-	    rootCheckThread = new Thread(() -> {
-	        boolean granted = false;
-	        Process process = null;
-	
-	        try {
-	            process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
-	            rootCheckProcess = process;
-	
-	            int exitCode = process.waitFor();
-	            granted = exitCode == 0;
-	        } catch (Exception ignored) {
-	            granted = false;
-	        } finally {
-	            if (process != null) {
-	                process.destroy();
-	            }
-	
-	            if (rootCheckProcess == process) {
-	                rootCheckProcess = null;
-	            }
-	        }
-	
-	        boolean finalGranted = granted;
-	
-	        runOnUiThread(() -> {
-	            if (activityDestroyed) {
-	                return;
-	            }
-	
-	            if (prefs == null || prefs.getInt(EXEC_MODE_KEY, MODE_NONE) != MODE_ROOT) {
-	                return;
-	            }
-	
-	            if (finalGranted) {
-	                statusText.setText("Root mode active & authorized!");
-	                statusText.setTextColor(0xFF1B873F);
-	            } else {
-	                statusText.setText("Root permission denied or unavailable.");
-	                statusText.setTextColor(0xFFFF5555);
-	            }
-	        });
-	    });
-	
-	    rootCheckThread.start();
-	}
-    
+        setStatus("Checking root permission...", 0xFFFFB300);
+        rootCheckThread = new Thread(() -> {
+            boolean granted = false;
+            Process process = null;
+            try {
+                process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
+                rootCheckProcess = process;
+                granted = process.waitFor() == 0;
+            } catch (Exception ignored) {
+                granted = false;
+            } finally {
+                if (process != null) process.destroy();
+                if (rootCheckProcess == process) rootCheckProcess = null;
+            }
+
+            boolean finalGranted = granted;
+            runOnUiThread(() -> {
+                if (activityDestroyed || appPreferences == null
+                        || appPreferences.getExecutionMode() != ExecutionMode.ROOT) return;
+                if (finalGranted) setStatus("Root mode active & authorized!", 0xFF1B873F);
+                else setStatus("Root permission denied or unavailable.", 0xFFFF5555);
+            });
+        });
+        rootCheckThread.start();
+    }
+
     private void checkShizukuPermission(boolean requestIfNeeded) {
-		if (activityDestroyed) {
-		    return;
-		}
-		try {
-			if (!Shizuku.pingBinder()) {
-				statusText.setText("Shizuku is not running.");
-				statusText.setTextColor(0xFFFF5555);
-				return;
-			}
+        if (activityDestroyed) return;
+        try {
+            if (!Shizuku.pingBinder()) {
+                setStatus("Shizuku is not running.", 0xFFFF5555);
+                return;
+            }
+            if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                setStatus("Shizuku mode active & authorized!", 0xFF1B873F);
+                return;
+            }
+            setStatus("Shizuku permission not granted.", 0xFFFFB300);
+            if (requestIfNeeded) {
+                setStatus("Requesting Shizuku permission...", 0xFFFFB300);
+                Shizuku.requestPermission(0);
+            }
+        } catch (Exception e) {
+            setStatus("Shizuku check failed.", 0xFFFF5555);
+        }
+    }
 
-			if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-				statusText.setText("Shizuku mode active & authorized!");
-				statusText.setTextColor(0xFF1B873F);
-				return;
-			}
+    private void setStatus(String text, int color) {
+        statusText.setText(text);
+        statusText.setTextColor(color);
+    }
 
-			statusText.setText("Shizuku permission not granted.");
-			statusText.setTextColor(0xFFFFB300);
+    private String getAppVersionName() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return info.versionName;
+        } catch (Exception e) {
+            return "unknown";
+        }
+    }
 
-			if (requestIfNeeded) {
-				statusText.setText("Requesting Shizuku permission...");
-				statusText.setTextColor(0xFFFFB300);
-				Shizuku.requestPermission(0);
-			}
-		} catch (Exception e) {
-			statusText.setText("Shizuku check failed.");
-			statusText.setTextColor(0xFFFF5555);
-		}
-	}
-	
-	private String getAppVersionName() {
-		try {
-			PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-			return packageInfo.versionName;
-		} catch (Exception e) {
-			return "unknown";
-		}
-	}
+    private void openUrl(String url) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (Exception ignored) {
+        }
+    }
 
-	private void openUrl(String url) {
-		try {
-			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-			startActivity(intent);
-		} catch (Exception ignored) {
-		}
-	}
-	
-	private void loadSavedTargetSimMode() {
-		int targetSim = prefs.getInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
+    private void loadSavedTargetSimMode() {
+        TargetSim target = appPreferences.getTargetSim();
+        if (target == TargetSim.SIM_1) radioSim1.setChecked(true);
+        else if (target == TargetSim.SIM_2) radioSim2.setChecked(true);
+        else radioSimAuto.setChecked(true);
+    }
 
-		if (targetSim == TARGET_SIM_1) {
-			radioSim1.setChecked(true);
-		} else if (targetSim == TARGET_SIM_2) {
-			radioSim2.setChecked(true);
-		} else {
-			radioSimAuto.setChecked(true);
-		}
-	}
-	
-	private void updateAutoSimWarning() {
-		if (autoSimWarningText == null || prefs == null) {
-			return;
-		}
-
-		boolean hasAutoSimError = prefs.getBoolean(AUTO_SIM_ERROR_KEY, false);
-		int targetSim = prefs.getInt(TARGET_SIM_KEY, TARGET_SIM_AUTO);
-
-		if (hasAutoSimError && targetSim == TARGET_SIM_AUTO) {
-			autoSimWarningText.setVisibility(View.VISIBLE);
-			autoSimWarningText.setText("Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually.");
-			autoSimWarningText.setTextColor(0xFFFF5555);
-		} else {
-			autoSimWarningText.setVisibility(View.GONE);
-		}
-	}
-	
+    private void updateAutoSimWarning() {
+        if (autoSimWarningText == null || appPreferences == null) return;
+        boolean show = appPreferences.hasAutoSimError()
+                && appPreferences.getTargetSim() == TargetSim.AUTO;
+        autoSimWarningText.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (show) {
+            autoSimWarningText.setText(
+                    "Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually.");
+            autoSimWarningText.setTextColor(0xFFFF5555);
+        }
+    }
 }
+
