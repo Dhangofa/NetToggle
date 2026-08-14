@@ -128,7 +128,7 @@ cd NetToggle
 For project-related questions, issue follow-up, or contact verification:
 
 - [Github issues](https://github.com/Dhangofa/NetToggle/issues)
-- [Telegram](https://t.me/dhangofa)
+- [Telegram](https://t.me/dhangofas_project/2)
 
 
 For bugs or feature requests, please use GitHub Issues when possible so device details, logs, and discussions stay trackable.
