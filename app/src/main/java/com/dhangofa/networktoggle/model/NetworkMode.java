@@ -5,8 +5,8 @@ public enum NetworkMode {
     FOUR_G_ONLY(1, "4G Only", "4G Only", "4G", "1000000000000"),
     FIVE_G_ONLY(2, "5G Only", "5G Only", "5G", "10000000000000000000"),
     PREFERRED_5G(3, "Preferred 5G", "Pref 5G", "P5G", "11011111101111111111"),
-    PREFERRED_4G(4, "Preferred 4G", "Pref 4G", "P4G", "1001101001111110111"),
-    PREFERRED_3G(5, "Preferred 3G", "Pref 3G", "P3G", "1001100001111110111"),
+    PREFERRED_4G(4, "Preferred 4G", "Pref 4G", "P4G", "1011111101111111111"),
+    PREFERRED_3G(5, "Preferred 3G", "Pref 3G", "P3G", "11110101111111111"),
     TWO_G_ONLY(6, "2G Only", "2G Only", "2G", "1000000000000011");
 
     private final int stateValue;
