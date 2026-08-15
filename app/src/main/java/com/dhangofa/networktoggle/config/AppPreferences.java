@@ -17,6 +17,11 @@ public final class AppPreferences {
     private static final String KEY_NETWORK_STATE = "net_state";
     private static final String KEY_AUTO_SIM_ERROR = "auto_sim_error";
     private static final String KEY_TILE_CYCLE_MODES = "tile_cycle_modes";
+    
+    // New keys for capabilities caching
+    private static final String KEY_DEVICE_CAPS_PREFIX = "device_cap_";
+    private static final String KEY_SLOT_SUBID_PREFIX = "slot_subid_";
+    private static final String KEY_SLOT_CAPS_PREFIX = "slot_cap_";
 
     private final SharedPreferences preferences;
 
@@ -101,6 +106,84 @@ public final class AppPreferences {
         preferences.edit()
                 .putInt(KEY_NETWORK_STATE, NetworkMode.UNKNOWN.getStateValue())
                 .putBoolean(KEY_AUTO_SIM_ERROR, false)
+                .apply();
+    }
+
+    // --- CAPABILITY CACHING LOGIC ---
+
+    public static class NetworkCapabilities {
+        public final boolean supports2g;
+        public final boolean supports3g;
+        public final boolean supports4g;
+        public final boolean supports5g;
+
+        public NetworkCapabilities(boolean supports2g, boolean supports3g, boolean supports4g, boolean supports5g) {
+            this.supports2g = supports2g;
+            this.supports3g = supports3g;
+            this.supports4g = supports4g;
+            this.supports5g = supports5g;
+        }
+
+        // Failsafe fallback: Assume everything is supported if we can't fetch it
+        public static NetworkCapabilities assumeAll() {
+            return new NetworkCapabilities(true, true, true, true);
+        }
+    }
+
+    public void saveDeviceCapabilities(NetworkCapabilities caps) {
+        preferences.edit()
+                .putBoolean(KEY_DEVICE_CAPS_PREFIX + "2g", caps.supports2g)
+                .putBoolean(KEY_DEVICE_CAPS_PREFIX + "3g", caps.supports3g)
+                .putBoolean(KEY_DEVICE_CAPS_PREFIX + "4g", caps.supports4g)
+                .putBoolean(KEY_DEVICE_CAPS_PREFIX + "5g", caps.supports5g)
+                .apply();
+    }
+
+    public NetworkCapabilities getDeviceCapabilities() {
+        if (!preferences.contains(KEY_DEVICE_CAPS_PREFIX + "5g")) {
+            return null; // Return null so the resolver knows it needs to fetch them
+        }
+        return new NetworkCapabilities(
+                preferences.getBoolean(KEY_DEVICE_CAPS_PREFIX + "2g", true),
+                preferences.getBoolean(KEY_DEVICE_CAPS_PREFIX + "3g", true),
+                preferences.getBoolean(KEY_DEVICE_CAPS_PREFIX + "4g", true),
+                preferences.getBoolean(KEY_DEVICE_CAPS_PREFIX + "5g", true)
+        );
+    }
+
+    public void saveSlotCapabilities(int slotIndex, int subId, NetworkCapabilities caps) {
+        preferences.edit()
+                .putInt(KEY_SLOT_SUBID_PREFIX + slotIndex, subId)
+                .putBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_2g", caps.supports2g)
+                .putBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_3g", caps.supports3g)
+                .putBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_4g", caps.supports4g)
+                .putBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_5g", caps.supports5g)
+                .apply();
+    }
+
+    public int getCachedSubIdForSlot(int slotIndex) {
+        return preferences.getInt(KEY_SLOT_SUBID_PREFIX + slotIndex, -1);
+    }
+
+    public NetworkCapabilities getSlotCapabilities(int slotIndex) {
+        if (!preferences.contains(KEY_SLOT_CAPS_PREFIX + slotIndex + "_5g")) {
+            return null;
+        }
+        return new NetworkCapabilities(
+                preferences.getBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_2g", true),
+                preferences.getBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_3g", true),
+                preferences.getBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_4g", true),
+                preferences.getBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_5g", true)
+        );
+    }
+    
+    public void invalidateSlotCache(int slotIndex) {
+        preferences.edit()
+                .remove(KEY_SLOT_SUBID_PREFIX + slotIndex)
+                .remove(KEY_SLOT_CAPS_PREFIX + slotIndex + "_2g")
+                .remove(KEY_SLOT_CAPS_PREFIX + slotIndex + "_3g")
+                .remove(KEY_SLOT_CAPS_PREFIX + slotIndex + "_4g")
+                .remove(KEY_SLOT_CAPS_PREFIX + slotIndex + "_5g")
                 .apply();
     }
 }
