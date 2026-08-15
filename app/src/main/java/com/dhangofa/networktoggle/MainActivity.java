@@ -57,6 +57,10 @@ public class MainActivity extends Activity {
     private RadioButton radioSim1;
     private RadioButton radioSim2;
     private TextView autoSimWarningText;
+	
+	private View separatorRootShizuku;
+    private View separatorAutoSim1;
+    private View separatorSim1Sim2;
 
     private AppPreferences appPreferences;
 	private TileCycleUiController tileCycleUiController;	
@@ -111,6 +115,7 @@ public class MainActivity extends Activity {
         loadSavedTargetSimMode();
         updateAutoSimWarning();
         bindSelectionListeners();
+		updateSeparatorVisibility();
     }
 
     private void configureStatusBar() {
@@ -118,7 +123,7 @@ public class MainActivity extends Activity {
 
         boolean isNight = (getResources().getConfiguration().uiMode
                 & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-        getWindow().setStatusBarColor(getColor(R.color.surface_background));
+        getWindow().setStatusBarColor(getColor(R.color.card_surface));
         getWindow().getDecorView().setSystemUiVisibility(
                 isNight ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
@@ -136,11 +141,40 @@ public class MainActivity extends Activity {
         autoSimWarningText = findViewById(R.id.autoSimWarningText);
         githubLink = findViewById(R.id.githubLink);
         telegramLink = findViewById(R.id.telegramLink);
+		separatorRootShizuku = findViewById(R.id.separatorRootShizuku);
+        separatorAutoSim1 = findViewById(R.id.separatorAutoSim1);
+        separatorSim1Sim2 = findViewById(R.id.separatorSim1Sim2);
     }
 
     private void bindLinks() {
         githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
-        telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofa"));
+        telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofas_projects_chat"));
+    }
+	
+	private void updateSeparatorVisibility() {
+        // Execution Mode Separator
+        int modeId = radioGroup.getCheckedRadioButtonId();
+        if (modeId == -1) {
+            separatorRootShizuku.setVisibility(View.VISIBLE);
+        } else {
+            separatorRootShizuku.setVisibility(View.INVISIBLE);
+        }
+
+        // Target SIM Separators
+        int simId = targetSimRadioGroup.getCheckedRadioButtonId();
+        if (simId == -1) {
+            separatorAutoSim1.setVisibility(View.VISIBLE);
+            separatorSim1Sim2.setVisibility(View.VISIBLE);
+        } else if (simId == R.id.radioSimAuto) {
+            separatorAutoSim1.setVisibility(View.INVISIBLE);
+            separatorSim1Sim2.setVisibility(View.VISIBLE);
+        } else if (simId == R.id.radioSim1) {
+            separatorAutoSim1.setVisibility(View.INVISIBLE);
+            separatorSim1Sim2.setVisibility(View.INVISIBLE);
+        } else if (simId == R.id.radioSim2) {
+            separatorAutoSim1.setVisibility(View.VISIBLE);
+            separatorSim1Sim2.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void registerShizukuListeners() {
@@ -165,6 +199,7 @@ public class MainActivity extends Activity {
 
     private void bindSelectionListeners() {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			updateSeparatorVisibility();
             if (checkedId == R.id.radioRoot) {
                 appPreferences.onExecutionModeChanged(ExecutionMode.ROOT);
                 checkRootPermission();
@@ -175,6 +210,7 @@ public class MainActivity extends Activity {
         });
 
         targetSimRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			updateSeparatorVisibility();
             TargetSim target = TargetSim.AUTO;
             if (checkedId == R.id.radioSim1) target = TargetSim.SIM_1;
             else if (checkedId == R.id.radioSim2) target = TargetSim.SIM_2;
