@@ -35,6 +35,8 @@ public class NetworkTileService extends TileService {
     private static Icon icon5g;
     private static Icon iconP5g;
     private static Icon iconP4g;
+    private static Icon iconP3g;
+    private static Icon icon2g;
     private static Icon iconUnknown;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -42,14 +44,14 @@ public class NetworkTileService extends TileService {
     private AppPreferences appPreferences;
     private NetworkModeReader networkModeReader;
     private NetworkModeController networkModeController;
-	  private TileCycleManager tileCycleManager;
+    private TileCycleManager tileCycleManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         appPreferences = new AppPreferences(this);
-    		tileCycleManager = new TileCycleManager(appPreferences);
+        tileCycleManager = new TileCycleManager(appPreferences);
         SimResolver simResolver = new SimResolver(appPreferences);
         networkModeReader = new NetworkModeReader(appPreferences, simResolver);
         networkModeController = new NetworkModeController(simResolver);
@@ -67,25 +69,25 @@ public class NetworkTileService extends TileService {
             return;
         }
 
-      EXECUTOR.execute(() -> {
-        NetworkMode realMode = networkModeReader.readCurrentMode();
+        EXECUTOR.execute(() -> {
+            NetworkMode realMode = networkModeReader.readCurrentMode();
 
-        mainHandler.post(() -> {
-          /*
-           * A tile click or another operation may have updated the state
-           * while this asynchronous readback was running.
-           */
-          if (appPreferences.getCachedNetworkMode()
-              != NetworkMode.UNKNOWN) {
-            return;
-          }
+            mainHandler.post(() -> {
+                /*
+                 * A tile click or another operation may have updated the state
+                 * while this asynchronous readback was running.
+                 */
+                if (appPreferences.getCachedNetworkMode()
+                        != NetworkMode.UNKNOWN) {
+                    return;
+                }
 
-          if (realMode != NetworkMode.UNKNOWN) {
-            appPreferences.setCachedNetworkMode(realMode);
-            updateTileUI(realMode);
-          }
+                if (realMode != NetworkMode.UNKNOWN) {
+                    appPreferences.setCachedNetworkMode(realMode);
+                    updateTileUI(realMode);
+                }
+            });
         });
-      });
     }
 
     @Override
@@ -177,6 +179,12 @@ public class NetworkTileService extends TileService {
             case "P4G":
                 if (iconP4g == null) iconP4g = createTextOnlyIcon("P4G");
                 return iconP4g;
+            case "P3G":
+                if (iconP3g == null) iconP3g = createTextOnlyIcon("P3G");
+                return iconP3g;
+            case "2G":
+                if (icon2g == null) icon2g = createTextOnlyIcon("2G");
+                return icon2g;
             default:
                 if (iconUnknown == null) {
                     iconUnknown = createTextOnlyIcon("?");
