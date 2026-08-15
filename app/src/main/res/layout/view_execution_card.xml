@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/shape_exec_card_bg"
+    android:elevation="8dp"
+    android:padding="12dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+        
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_shield"
+                android:tint="@color/exec_accent"
+                android:layout_marginEnd="6dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Execution Mode"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/shizukuStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Authorized"
+            android:background="@drawable/shape_status_badge_success"
+            android:textColor="#4ADE80"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp" />
+    </RelativeLayout>
+
+    <!-- Segmented Control for Execution Mode -->
+    <RadioGroup
+        android:id="@+id/modeRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/shape_segmented_container"
+        android:padding="4dp">
+        
+        <RadioButton
+            android:id="@+id/radioRoot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Root"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_exec"
+            android:textColor="@color/color_segmented_text_exec"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View 
+            android:id="@+id/separatorRootShizuku"
+            android:layout_width="1dp" 
+            android:layout_height="match_parent" 
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
+
+        <RadioButton
+            android:id="@+id/radioShizuku"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Shizuku"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_exec"
+            android:textColor="@color/color_segmented_text_exec"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RadioGroup>
+
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shape_small_divider" />
+
+    <!-- Target SIM Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_smartphone"
+                android:tint="@color/exec_accent"
+                android:layout_marginEnd="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Target SIM"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/autoSimWarningText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Auto failed"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:textColor="@color/status_error_text"
+            android:background="@drawable/shape_status_badge_error"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="4dp"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
+    </RelativeLayout> 
+
+    <!-- Segmented Control for Target SIM -->
+    <RadioGroup
+        android:id="@+id/targetSimRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/shape_segmented_container"
+        android:padding="4dp">
+        
+        <RadioButton
+            android:id="@+id/radioSimAuto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Auto"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_exec"
+            android:textColor="@color/color_segmented_text_exec"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View 
+            android:id="@+id/separatorAutoSim1"
+            android:layout_width="1dp" 
+            android:layout_height="match_parent" 
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
+
+        <RadioButton
+            android:id="@+id/radioSim1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SIM 1"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_exec"
+            android:textColor="@color/color_segmented_text_exec"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View 
+            android:id="@+id/separatorSim1Sim2"
+            android:layout_width="1dp" 
+            android:layout_height="match_parent" 
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
+
+        <RadioButton
+            android:id="@+id/radioSim2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SIM 2"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_exec"
+            android:textColor="@color/color_segmented_text_exec"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RadioGroup>
+</LinearLayout>
