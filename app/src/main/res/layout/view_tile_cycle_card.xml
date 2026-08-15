@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    android:background="@drawable/section_outline_bg"
+    android:background="@drawable/shape_cycle_card_bg"
+    android:elevation="8dp"
     android:orientation="vertical"
     android:padding="12dp">
 
@@ -20,12 +20,12 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginEnd="6dp"
                 android:contentDescription="Quick Tile Cycle"
                 android:src="@drawable/ic_refresh"
-                android:tint="@color/brand_primary" />
+                android:tint="@color/accent_orange" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="Quick Tile Cycle"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -42,11 +42,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/shape_pill_badge_bg"
+            android:background="@drawable/shape_cycle_order_badge"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:text="3/3"
-            android:textColor="@color/brand_primary"
+            android:textColor="@color/accent_orange"
             android:textSize="10sp"
             android:textStyle="bold" />
     </RelativeLayout>
@@ -62,40 +62,69 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <CheckBox
-            android:id="@+id/cycle5gOnly"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            android:background="@drawable/shape_radio_item_bg"
-            android:buttonTint="@color/brand_primary"
-            android:fontFamily="sans-serif-medium"
-            android:minHeight="44dp"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="8dp"
-            android:text="5G Only"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:background="@drawable/shape_segmented_container_rect"
+        android:padding="4dp">
 
         <CheckBox
             android:id="@+id/cyclePreferred5g"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:background="@drawable/shape_radio_item_bg"
-            android:buttonTint="@color/brand_primary"
-            android:fontFamily="sans-serif-medium"
-            android:minHeight="44dp"
-            android:paddingHorizontal="6dp"
+            android:background="@drawable/selector_segmented_tab_cycle"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Preferred 5G"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"
+            android:text="Pref 5G"
+            android:textColor="@color/color_segmented_text_cycle"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/separatorCyclePref1"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
+
+        <CheckBox
+            android:id="@+id/cyclePreferred4g"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/selector_segmented_tab_cycle"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:text="Pref 4G"
+            android:textColor="@color/color_segmented_text_cycle"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/separatorCyclePref2"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
+
+        <CheckBox
+            android:id="@+id/cyclePreferred3g"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/selector_segmented_tab_cycle"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:text="Pref 3G"
+            android:textColor="@color/color_segmented_text_cycle"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -103,40 +132,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/shape_segmented_container_rect"
+        android:padding="4dp">
+
+        <CheckBox
+            android:id="@+id/cycle5gOnly"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/selector_segmented_tab_cycle"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:text="5G Only"
+            android:textColor="@color/color_segmented_text_cycle"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/separatorCycleOnly1"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
 
         <CheckBox
             android:id="@+id/cycle4gOnly"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:background="@drawable/shape_radio_item_bg"
-            android:buttonTint="@color/brand_primary"
-            android:fontFamily="sans-serif-medium"
-            android:minHeight="44dp"
-            android:paddingHorizontal="6dp"
+            android:background="@drawable/selector_segmented_tab_cycle"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
             android:paddingVertical="8dp"
             android:text="4G Only"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"
+            android:textColor="@color/color_segmented_text_cycle"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
+        <View
+            android:id="@+id/separatorCycleOnly2"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/segmented_separator" />
+
         <CheckBox
-            android:id="@+id/cyclePreferred4g"
+            android:id="@+id/cycle2gOnly"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:background="@drawable/shape_radio_item_bg"
-            android:buttonTint="@color/brand_primary"
-            android:fontFamily="sans-serif-medium"
-            android:minHeight="44dp"
-            android:paddingHorizontal="6dp"
+            android:background="@drawable/selector_segmented_tab_cycle"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Preferred 4G"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"
+            android:text="2G Only"
+            android:textColor="@color/color_segmented_text_cycle"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -145,12 +203,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@drawable/shape_segmented_container"
+        android:background="@drawable/shape_cycle_order_badge"
         android:gravity="center"
-        android:padding="8dp"
+        android:padding="10dp"
         android:text="Cycle: 5G Only → 4G Only → Preferred 5G"
-        android:textColor="@color/text_secondary"
-        android:textSize="10sp"
+        android:textColor="@color/accent_orange"
+        android:textSize="11sp"
         android:textStyle="bold" />
 
 </LinearLayout>
