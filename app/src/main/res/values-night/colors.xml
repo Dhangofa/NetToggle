@@ -2,13 +2,13 @@
 <resources>
     <!-- Brand Primary Accents -->
     <color name="brand_primary">#D0BCFF</color>
-    <color name="brand_primary_container">#4F378B</color>
+    <color name="brand_primary_container">#23212A</color>
     <color name="brand_on_primary_container">#EADDFF</color>
 
     <!-- Surfaces & Backgrounds -->
-    <color name="surface_background">#141218</color>
-    <color name="card_surface">#211F26</color>
-    <color name="card_border">#36343B</color>
+    <color name="surface_background">#000000</color>
+    <color name="card_surface">#141218</color>
+    <color name="card_border">#2B2930</color>
     <color name="qs_hint_bg">#2B2930</color>
 
     <!-- Typography -->
@@ -18,7 +18,6 @@
 
     <!-- Status Alerts -->
     <color name="status_success_bg">#1A3822</color>
-    <color name="status_success_text">#A8F2B2</color>
     <color name="status_error_bg">#3E1A19</color>
     <color name="status_error_text">#F2B8B5</color>
 
@@ -26,8 +25,26 @@
     <color name="social_button_bg">#2B2930</color>
 
     <!-- Segmented controls -->
+    <color name="segmented_separator">#49454F</color>
     <color name="segmented_container">#1B1A20</color>
     <color name="segmented_selected">#36323F</color>
     <color name="segmented_text_selected">#EADDFF</color>
     <color name="segmented_text_unselected">#938F96</color>
+
+    <!-- Colorful Accents -->
+    <color name="accent_green">#61D48A</color>
+    <color name="accent_orange">#FFB782</color>
+    <color name="accent_pink">#F48FB1</color>
+
+    <!-- Cycle Card Custom Tones -->
+    <color name="cycle_card_surface">#1A130F</color>
+    <color name="cycle_segmented_selected">#3D210F</color>
+    <color name="cycle_badge_bg">#1B1A20</color>
+    <color name="cycle_segmented_text_selected">#FFB782</color>
+
+    <!-- Exec Card Custom Tones -->
+    <color name="exec_accent">#57AFFF</color>
+    <color name="exec_card_surface">#11161A</color>
+    <color name="exec_segmented_selected">#1A364F</color>
+    <color name="exec_segmented_text_selected">#8ECCFF</color>
 </resources>
