@@ -36,7 +36,12 @@ public final class NetworkCapabilityResolver {
         int cachedSubId = appPreferences.getCachedSubIdForSlot(slotIndex);
         NetworkCapabilities cachedCaps = appPreferences.getSlotCapabilities(slotIndex);
 
-        if (cachedSubId == subId && cachedCaps != null) return cachedCaps;
+        if (cachedSubId == subId && cachedCaps != null) {
+            if (LteAndAboveCarrierRegistry.isLteAndAboveOnly(carrierName)) {
+                return new NetworkCapabilities(false, false, cachedCaps.supports4g, cachedCaps.supports5g);
+            }
+            return cachedCaps;
+        }
 
         // Invalidate cache and fetch
         appPreferences.invalidateSlotCache(slotIndex);
@@ -55,7 +60,13 @@ public final class NetworkCapabilityResolver {
                 deviceCaps.supports5g && carrierCaps.supports5g
         );
 
-        appPreferences.saveSlotCapabilities(slotIndex, subId, finalCaps);
+        CommandExecutor executor = CommandExecutorFactory.forMode(mode);
+        if (executor != null) {
+             CommandResult pingResult = executor.execute("echo test");
+             if (pingResult.isSuccess()) {
+                 appPreferences.saveSlotCapabilities(slotIndex, subId, finalCaps);
+             }
+        }
         return finalCaps;
     }
 
@@ -64,6 +75,7 @@ public final class NetworkCapabilityResolver {
         if (cachedDevice != null) return cachedDevice;
 
         boolean supports5g = false;
+        boolean canCache = true;
 
         // Stage 1: Android Version Check (Android 11 / API 30+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -71,23 +83,31 @@ public final class NetworkCapabilityResolver {
             if (executor != null) {
                 // Stage 2: Hardware Ceiling Check
                 CommandResult result = executor.execute("getprop ro.telephony.default_network");
-                if (result.isSuccess() && !result.getStdout().trim().isEmpty()) {
-                    String[] values = result.getStdout().trim().split(",");
-                    
-                    // Check if ANY value globally supports 5G (>= 23)
-                    for (String val : values) {
-                        Integer parsed = ShellValueParser.extractFirstInt(val);
-                        if (parsed != null && parsed >= 23) {
-                            supports5g = true;
-                            break;
+                if (result.isSuccess()) {
+                    if (!result.getStdout().trim().isEmpty()) {
+                        String[] values = result.getStdout().trim().split(",");
+                        
+                        // Check if ANY value globally supports 5G (>= 23)
+                        for (String val : values) {
+                            Integer parsed = ShellValueParser.extractFirstInt(val);
+                            if (parsed != null && parsed >= 23) {
+                                supports5g = true;
+                                break;
+                            }
                         }
                     }
+                } else {
+                    canCache = false;
                 }
+            } else {
+                canCache = false;
             }
         }
 
         NetworkCapabilities deviceCaps = new NetworkCapabilities(true, true, true, supports5g);
-        appPreferences.saveDeviceCapabilities(deviceCaps);
+        if (canCache) {
+            appPreferences.saveDeviceCapabilities(deviceCaps);
+        }
         return deviceCaps;
     }
 
