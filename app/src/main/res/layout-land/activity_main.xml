@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/surface_background">
+
+    <!-- Landscape Header: Top Action Bar Merged with Developer Section -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/card_surface"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:elevation="6dp"
+        android:outlineProvider="bounds"
+        android:gravity="center_vertical">
+
+        <!-- App Brand Left Group -->
+        <LinearLayout
+            android:id="@+id/brandGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- App Icon -->
+            <FrameLayout
+                android:id="@+id/appIconFrame"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_app_icon_bg">
+                
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:tint="@color/brand_on_primary_container"
+                    android:contentDescription="NetToggle" />
+            </FrameLayout>
+
+            <!-- App Title -->
+            <TextView
+                android:id="@+id/appTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NetToggle"
+                android:textSize="22sp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/text_primary"
+                android:letterSpacing="-0.02" />
+
+            <!-- App Version Badge -->
+            <TextView
+                android:id="@+id/appVersionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/shape_pill_badge_bg"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:minHeight="22dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:text="v0.0.0"
+                android:textColor="@color/brand_on_primary_container"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Developer Action Group on Right -->
+        <LinearLayout
+            android:id="@+id/developerTopGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/developerPersonIcon"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:padding="7dp"
+                android:src="@drawable/ic_person"
+                android:tint="@color/accent_pink"
+                android:background="@drawable/social_icon_bg"
+                android:contentDescription="Developer"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/developerNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dhangofa"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginEnd="12dp" />
+
+            <ImageView
+                android:id="@+id/githubLink"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:padding="7dp"
+                android:src="@drawable/ic_github"
+                android:tint="@color/text_primary"
+                android:background="@drawable/social_icon_bg"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <ImageView
+                android:id="@+id/telegramLink"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:padding="7dp"
+                android:src="@drawable/ic_telegram"
+                android:tint="@color/text_primary"
+                android:background="@drawable/social_icon_bg"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Scrollable Content in Landscape -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="36dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!-- Description Text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginBottom="10dp"
+                android:text="Switch between 5G, 4G, 3G, 2G, and Preferred network modes directly from Quick Settings."
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <!-- Integrated Quick Settings Ready Header Banner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/shape_qs_hint_bg"
+                android:padding="12dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/shape_pill_badge_bg"
+                    android:layout_marginEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_network_bars"
+                        android:tint="@color/brand_primary"
+                        android:contentDescription="QS Tile" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quick Settings Ready"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add NetToggle tile to your Control Center or Quick Settings"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </LinearLayout>
+            
+            <include layout="@layout/view_error_banner" />
+
+            <!-- Parallel 2-Column Cards Row in Landscape -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingVertical="8dp">
+
+                <!-- Left Column: Execution Mode + Target SIM Card -->
+                <include 
+                    layout="@layout/view_execution_card"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Right Column: Quick Tile Cycle Card (Equal match_parent height) -->
+                <include 
+                    layout="@layout/view_tile_cycle_card"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

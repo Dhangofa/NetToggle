@@ -5,7 +5,9 @@ public enum NetworkMode {
     FOUR_G_ONLY(1, "4G Only", "4G Only", "4G", "1000000000000"),
     FIVE_G_ONLY(2, "5G Only", "5G Only", "5G", "10000000000000000000"),
     PREFERRED_5G(3, "Preferred 5G", "Pref 5G", "P5G", "11011111101111111111"),
-    PREFERRED_4G(4, "Preferred 4G", "Pref 4G", "P4G", "1001101001110000111");
+    PREFERRED_4G(4, "Preferred 4G", "Pref 4G", "P4G", "1011111101111111111"),
+    PREFERRED_3G(5, "Preferred 3G", "Pref 3G", "P3G", "11110101111111111"),
+    TWO_G_ONLY(6, "2G Only", "2G Only", "2G", "1000000000000011");
 
     private final int stateValue;
     private final String displayName;
@@ -40,6 +42,8 @@ public enum NetworkMode {
             case FIVE_G_ONLY: return PREFERRED_5G;
             case PREFERRED_5G: return PREFERRED_4G;
             case PREFERRED_4G:
+            case PREFERRED_3G:
+            case TWO_G_ONLY:
             case UNKNOWN:
             default: return FOUR_G_ONLY;
         }
@@ -48,6 +52,21 @@ public enum NetworkMode {
     public static NetworkMode fromLegacyMode(Integer legacyMode) {
         if (legacyMode == null) return UNKNOWN;
         switch (legacyMode) {
+            case 1:
+            case 16:
+                return TWO_G_ONLY;
+            case 0:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 13:
+            case 14:
+            case 18:
+            case 21: // Global 3G (CDMA+EVDO+GSM+WCDMA)
+                return PREFERRED_3G;
             case 11: return FOUR_G_ONLY;
             case 23: return FIVE_G_ONLY;
             case 33: return PREFERRED_5G;
@@ -59,7 +78,7 @@ public enum NetworkMode {
             case 17:
             case 19:
             case 20:
-            case 22:
+            case 22: // Global 4G (LTE+CDMA+EVDO+GSM+WCDMA)
                 return PREFERRED_4G;
             default:
                 if (legacyMode >= 24 && legacyMode <= 32) return PREFERRED_5G;

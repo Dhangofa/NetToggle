@@ -1,405 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_background"
-    android:fillViewport="true"
-    android:overScrollMode="never">
+    android:orientation="vertical"
+    android:background="@color/surface_background">
 
-    <LinearLayout
+    <!-- Header Section: Custom Action Bar (Matches Status Bar Color) -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:background="@color/card_surface"
         android:paddingHorizontal="16dp"
-		android:paddingTop="16dp"
-		android:paddingBottom="20dp"
-        android:gravity="center_horizontal">
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:elevation="6dp"
+        android:outlineProvider="bounds"
+        android:gravity="center_vertical">
 
-        <!-- Header Section: Integrated Hero Branding -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-			android:gravity="center_horizontal"
-			android:paddingTop="4dp"
-			android:paddingBottom="12dp">
-
-            <FrameLayout
-				android:layout_width="56dp"
-				android:layout_height="56dp"
-				android:layout_marginBottom="10dp"
-				android:background="@drawable/shape_pill_badge_bg">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_network_bars"
-                    android:tint="@color/brand_primary"
-                    android:contentDescription="NetToggle" />
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/appTitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="NetToggle"
-                android:textSize="24sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:letterSpacing="0.02"
-                android:layout_marginBottom="4dp" />
-			<TextView
-				android:id="@+id/appVersionText"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="8dp"
-				android:background="@drawable/shape_pill_badge_bg"
-				android:fontFamily="sans-serif-medium"
-				android:gravity="center"
-				android:minHeight="24dp"
-				android:paddingHorizontal="10dp"
-				android:paddingVertical="3dp"
-				android:text="v0.0.0"
-				android:textColor="@color/brand_on_primary_container"
-				android:textSize="11sp"
-				android:textStyle="bold" />
-            <TextView
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:fontFamily="sans-serif"
-				android:gravity="center"
-				android:lineSpacingExtra="1dp"
-				android:paddingHorizontal="8dp"
-				android:text="Switch Network between 5G, 4G, Preferred 5G and Preferred 4G from Quick Settings."
-				android:textColor="@color/text_secondary"
-				android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Quick Settings Tile Hint Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/shape_qs_hint_bg"
-            android:padding="12dp"
-            android:gravity="center_vertical"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="12dp">
-
-            <FrameLayout
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:background="@drawable/shape_pill_badge_bg"
-                android:layout_marginEnd="10dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_network_bars"
-                    android:tint="@color/brand_primary"
-                    android:contentDescription="QS Tile" />
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Quick Settings Ready"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add NetToggle tile to your Control Center or Quick Settings"
-                    android:textSize="11sp"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Card 1: Execution Mode -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/section_outline_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp">
-                
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_shield"
-                        android:tint="@color/brand_primary"
-                        android:layout_marginEnd="6dp" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Execution Mode"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/shizukuStatusText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="Authorized"
-                    android:background="@drawable/shape_status_badge_success"
-                    android:textColor="#4ADE80"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp" />
-            </RelativeLayout>
-
-            <!-- Segmented Control for Execution Mode -->
-            <RadioGroup
-                android:id="@+id/modeRadioGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/shape_segmented_container"
-                android:padding="4dp">
-                
-                <RadioButton
-                    android:id="@+id/radioRoot"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Root"
-                    android:button="@null"
-                    android:gravity="center"
-					android:minHeight="40dp"
-                    android:paddingVertical="8dp"
-                    android:background="@drawable/selector_segmented_tab"
-                    android:textColor="@color/color_segmented_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/radioShizuku"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Shizuku"
-                    android:button="@null"
-                    android:gravity="center"
-					android:minHeight="40dp"
-                    android:paddingVertical="8dp"
-                    android:background="@drawable/selector_segmented_tab"
-                    android:textColor="@color/color_segmented_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </RadioGroup>
-        </LinearLayout>
-
-        <!-- Card 2: Target SIM -->
-        <LinearLayout
-            android:id="@+id/targetSimCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/section_outline_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_smartphone"
-                    android:tint="@color/brand_primary"
-                    android:layout_marginEnd="6dp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Target SIM"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-            </LinearLayout>
-
-            <!-- Segmented Control for Target SIM -->
-            <RadioGroup
-                android:id="@+id/targetSimRadioGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/shape_segmented_container"
-                android:padding="4dp">
-                
-                <RadioButton
-                    android:id="@+id/radioSimAuto"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Auto"
-                    android:button="@null"
-                    android:gravity="center"
-					android:minHeight="40dp"
-                    android:paddingVertical="8dp"
-                    android:background="@drawable/selector_segmented_tab"
-                    android:textColor="@color/color_segmented_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/radioSim1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="SIM 1"
-                    android:button="@null"
-                    android:gravity="center"
-					android:minHeight="40dp"
-                    android:paddingVertical="8dp"
-                    android:background="@drawable/selector_segmented_tab"
-                    android:textColor="@color/color_segmented_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/radioSim2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="SIM 2"
-                    android:button="@null"
-                    android:gravity="center"
-					android:minHeight="40dp"
-                    android:paddingVertical="8dp"
-                    android:background="@drawable/selector_segmented_tab"
-                    android:textColor="@color/color_segmented_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </RadioGroup>
-
-            <TextView
-                android:id="@+id/autoSimWarningText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Auto failed"
-                android:textSize="11sp"
-                android:gravity="center"
-                android:textColor="@color/status_error_text"
-                android:background="@drawable/shape_status_badge_error"
-                android:paddingHorizontal="6dp"
-                android:paddingVertical="4dp"
-                android:visibility="gone"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
-        
-        <!-- Tile Cycle Card Include -->
-        <include layout="@layout/view_tile_cycle_card" />
-
-        <!-- Developer Profile Card Include -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/section_outline_bg"
-            android:padding="12dp"
-            android:gravity="center_vertical"
-            android:layout_marginTop="0dp">
+        <!-- App Icon -->
+        <FrameLayout
+            android:id="@+id/appIconFrame"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/shape_app_icon_bg">
             
             <ImageView
-                android:id="@+id/developerPersonIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_person"
-                android:tint="@color/brand_primary"
-                android:background="@drawable/social_icon_bg"
-                android:contentDescription="Developer"
-                android:layout_marginEnd="12dp" />
+                android:layout_width="47dp"
+                android:layout_height="47dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_launcher_foreground"
+                android:tint="@color/brand_on_primary_container"
+                android:contentDescription="NetToggle" />
+        </FrameLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
+        <!-- App Title -->
+        <TextView
+            android:id="@+id/appTitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/appIconFrame"
+            android:layout_centerVertical="true"
+            android:text="NetToggle"
+            android:textSize="26sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/text_primary"
+            android:letterSpacing="-0.03" />
+
+        <!-- App Version Badge -->
+        <TextView
+            android:id="@+id/appVersionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/shape_pill_badge_bg"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:minHeight="24dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:text="v0.0.0"
+            android:textColor="@color/brand_on_primary_container"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- Scrollable Content -->
+		<ScrollView
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="1"
+			android:fillViewport="true"
+			android:clipToPadding="false"
+			android:paddingBottom="24dp"
+			android:overScrollMode="never">
+	
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:paddingHorizontal="16dp"
+				android:paddingTop="16dp"
+				android:paddingBottom="20dp"
+				android:clipToPadding="false"
+				android:gravity="center_horizontal">
+	
+				<!-- Description Text -->
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:fontFamily="sans-serif"
+					android:lineSpacingExtra="3dp"
+					android:layout_marginBottom="16dp"
+					android:text="Switch between 5G, 4G, 3G, 2G, and Preferred network modes directly from Quick Settings."
+					android:textColor="@color/text_secondary"
+					android:textSize="13sp" />
+	
+				<!-- Quick Settings Tile Hint Card -->
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:background="@drawable/shape_qs_hint_bg"
+				android:padding="12dp"
+				android:gravity="center_vertical"
+				android:layout_marginTop="0dp"
+				android:layout_marginBottom="12dp">
+	
+				<FrameLayout
+					android:layout_width="38dp"
+					android:layout_height="38dp"
+					android:background="@drawable/shape_pill_badge_bg"
+					android:layout_marginEnd="10dp">
+	
+					<ImageView
+						android:layout_width="20dp"
+						android:layout_height="20dp"
+						android:layout_gravity="center"
+						android:src="@drawable/ic_network_bars"
+						android:tint="@color/brand_primary"
+						android:contentDescription="QS Tile" />
+				</FrameLayout>
+	
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:orientation="vertical">
+	
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Quick Settings Ready"
+						android:textSize="13sp"
+						android:fontFamily="sans-serif-medium"
+						android:textStyle="bold"
+						android:textColor="@color/text_primary" />
+	
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Add NetToggle tile to your Control Center or Quick Settings"
+						android:textSize="11sp"
+						android:textColor="@color/text_secondary" />
+				</LinearLayout>
+			</LinearLayout>
+	
+            <!-- Error Banner Include -->
+            <include 
+				android:id="@+id/cardErrorBanner"
+				layout="@layout/view_error_banner"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="12dp"
+				android:visibility="gone" />
+
+            <!-- Execution Mode Card Include -->
+            <include 
+                android:id="@+id/cardExecutionAndTarget"
+                layout="@layout/view_execution_card"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:layout_marginBottom="12dp" />
+			
+			<!-- Tile Cycle Card Include -->
+			<include 
+			    android:id="@+id/cardTileCycle"
+				layout="@layout/view_tile_cycle_card"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="12dp" />
+	
+		</LinearLayout>
+	</ScrollView>
 
-                <TextView
-                    android:id="@+id/developerTitleText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="DEVELOPER"
-                    android:textSize="10sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.08"
-                    android:textColor="@color/text_tertiary" />
+	<!-- Developer Profile Card Include -->
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_margin="16dp"
+		android:layout_marginBottom="24dp"
+		android:orientation="horizontal"
+		android:background="@drawable/shape_floating_footer"
+		android:paddingHorizontal="20dp"
+		android:paddingVertical="12dp"
+		android:gravity="center_vertical"
+		android:elevation="12dp">
+		
+		<ImageView
+			android:id="@+id/developerPersonIcon"
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			android:padding="8dp"
+			android:src="@drawable/ic_person"
+			android:tint="@color/accent_pink"
+			android:background="@drawable/social_icon_bg"
+			android:contentDescription="Developer"
+			android:layout_marginEnd="12dp" />
 
-                <TextView
-                    android:id="@+id/developerNameText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Dhangofa"
-                    android:textSize="15sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-            </LinearLayout>
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/socialLinksRow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+			<TextView
+				android:id="@+id/developerTitleText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="DEVELOPER"
+				android:textSize="10sp"
+				android:fontFamily="sans-serif-medium"
+				android:textStyle="bold"
+				android:letterSpacing="0.08"
+				android:textColor="@color/text_tertiary" />
 
-                <ImageView
-                    android:id="@+id/githubLink"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_github"
-                    android:tint="@color/text_primary"
-                    android:background="@drawable/social_icon_bg"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true" />
+			<TextView
+				android:id="@+id/developerNameText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Dhangofa"
+				android:textSize="15sp"
+				android:fontFamily="sans-serif-medium"
+				android:textStyle="bold"
+				android:textColor="@color/text_primary" />
+		</LinearLayout>
 
-                <ImageView
-                    android:id="@+id/telegramLink"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_telegram"
-                    android:tint="@color/text_primary"
-                    android:background="@drawable/social_icon_bg"
-                    android:clickable="true"
-                    android:focusable="true" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+		<LinearLayout
+			android:id="@+id/socialLinksRow"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<ImageView
+				android:id="@+id/githubLink"
+				android:layout_width="36dp"
+				android:layout_height="36dp"
+				android:padding="8dp"
+				android:src="@drawable/ic_github"
+				android:tint="@color/text_primary"
+				android:background="@drawable/social_icon_bg"
+				android:layout_marginEnd="8dp"
+				android:clickable="true"
+				android:focusable="true" />
+
+			<ImageView
+				android:id="@+id/telegramLink"
+				android:layout_width="36dp"
+				android:layout_height="36dp"
+				android:padding="8dp"
+				android:src="@drawable/ic_telegram"
+				android:tint="@color/text_primary"
+				android:background="@drawable/social_icon_bg"
+				android:clickable="true"
+				android:focusable="true" />
+		</LinearLayout>
+	</LinearLayout>
+</LinearLayout>

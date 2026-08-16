@@ -2,11 +2,11 @@
 <resources>
     <!-- Brand Primary Accents -->
     <color name="brand_primary">#6750A4</color>
-    <color name="brand_primary_container">#EADDFF</color>
+    <color name="brand_primary_container">#F3EDF7</color>
     <color name="brand_on_primary_container">#21005D</color>
 
     <!-- Surfaces & Backgrounds -->
-    <color name="surface_background">#FAF8F5</color>
+    <color name="surface_background">#FDFBFF</color>
     <color name="card_surface">#FFFFFF</color>
     <color name="card_border">#E7E0EC</color>
     <color name="qs_hint_bg">#F3EDF7</color>
@@ -18,7 +18,6 @@
 
     <!-- Status Alerts -->
     <color name="status_success_bg">#E8F5E9</color>
-    <color name="status_success_text">#1E4620</color>
     <color name="status_error_bg">#FFEDEA</color>
     <color name="status_error_text">#8C1D18</color>
     
@@ -26,8 +25,26 @@
     <color name="social_button_bg">#F4EFF4</color>
 
     <!-- Segmented controls -->
+    <color name="segmented_separator">#CAC4D0</color>
     <color name="segmented_container">#F3EDF7</color>
     <color name="segmented_selected">#EADDFF</color>
     <color name="segmented_text_selected">#21005D</color>
     <color name="segmented_text_unselected">#49454F</color>
+
+    <!-- Colorful Accents -->
+    <color name="accent_green">#198754</color>
+    <color name="accent_orange">#D96509</color>
+    <color name="accent_pink">#C2185B</color>
+
+    <!-- Cycle Card Custom Tones -->
+    <color name="cycle_card_surface">#FFF8F3</color>
+    <color name="cycle_segmented_selected">#FFE0C2</color>
+    <color name="cycle_badge_bg">#F3EDF7</color>
+    <color name="cycle_segmented_text_selected">#7A3600</color>
+
+    <!-- Exec Card Custom Tones -->
+    <color name="exec_accent">#005B9F</color>
+    <color name="exec_card_surface">#F2F8FF</color>
+    <color name="exec_segmented_selected">#D6EBFF</color>
+    <color name="exec_segmented_text_selected">#004275</color>
 </resources>

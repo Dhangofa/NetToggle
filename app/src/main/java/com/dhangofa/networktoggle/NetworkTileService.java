@@ -1,4 +1,5 @@
 package com.dhangofa.networktoggle;
+import android.os.Build;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +11,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+import android.content.Intent;
+import android.app.PendingIntent;
+import rikka.shizuku.Shizuku;
+import android.content.pm.PackageManager;
 import android.widget.Toast;
 
 import com.dhangofa.networktoggle.config.AppPreferences;
@@ -35,6 +40,8 @@ public class NetworkTileService extends TileService {
     private static Icon icon5g;
     private static Icon iconP5g;
     private static Icon iconP4g;
+    private static Icon iconP3g;
+    private static Icon icon2g;
     private static Icon iconUnknown;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -42,22 +49,41 @@ public class NetworkTileService extends TileService {
     private AppPreferences appPreferences;
     private NetworkModeReader networkModeReader;
     private NetworkModeController networkModeController;
-	  private TileCycleManager tileCycleManager;
+    private TileCycleManager tileCycleManager;
+    private com.dhangofa.networktoggle.telephony.SimResolver simResolver;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        // Init dependencies
         appPreferences = new AppPreferences(this);
-    		tileCycleManager = new TileCycleManager(appPreferences);
-        SimResolver simResolver = new SimResolver(appPreferences);
-        networkModeReader = new NetworkModeReader(appPreferences, simResolver);
+        tileCycleManager = new TileCycleManager(appPreferences);
+        simResolver = new com.dhangofa.networktoggle.telephony.SimResolver(this, appPreferences);
+        networkModeReader = new com.dhangofa.networktoggle.telephony.NetworkModeReader(this, appPreferences, simResolver);
         networkModeController = new NetworkModeController(simResolver);
     }
 
     @Override
     public void onStartListening() {
         super.onStartListening();
+        
+        // Passive Shizuku Check
+        if (appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+            boolean isShizukuOk = false;
+            try {
+                isShizukuOk = rikka.shizuku.Shizuku.pingBinder() && rikka.shizuku.Shizuku.checkSelfPermission() == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            } catch (Throwable t) {
+                isShizukuOk = false;
+            }
+        
+            int currentError = appPreferences.getTileErrorState();
+            if (!isShizukuOk && currentError != AppPreferences.TILE_ERROR_SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+            } else if (isShizukuOk && currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+            }
+        }
 
         NetworkMode cachedMode = appPreferences.getCachedNetworkMode();
         updateTileUI(cachedMode);
@@ -67,25 +93,25 @@ public class NetworkTileService extends TileService {
             return;
         }
 
-      EXECUTOR.execute(() -> {
-        NetworkMode realMode = networkModeReader.readCurrentMode();
+        EXECUTOR.execute(() -> {
+            NetworkMode realMode = networkModeReader.readCurrentMode();
 
-        mainHandler.post(() -> {
-          /*
-           * A tile click or another operation may have updated the state
-           * while this asynchronous readback was running.
-           */
-          if (appPreferences.getCachedNetworkMode()
-              != NetworkMode.UNKNOWN) {
-            return;
-          }
+            mainHandler.post(() -> {
+                /*
+                 * A tile click or another operation may have updated the state
+                 * while this asynchronous readback was running.
+                 */
+                if (appPreferences.getCachedNetworkMode()
+                        != NetworkMode.UNKNOWN) {
+                    return;
+                }
 
-          if (realMode != NetworkMode.UNKNOWN) {
-            appPreferences.setCachedNetworkMode(realMode);
-            updateTileUI(realMode);
-          }
+                if (realMode != NetworkMode.UNKNOWN) {
+                    appPreferences.setCachedNetworkMode(realMode);
+                    updateTileUI(realMode);
+                }
+            });
         });
-      });
     }
 
     @Override
@@ -109,27 +135,70 @@ public class NetworkTileService extends TileService {
         updateTileSwitchingUI();
 
         EXECUTOR.execute(() -> {
+            int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
+            if (!simResolver.isValidSlotIndex(slotIndex)) {
+                mainHandler.post(() -> {
+                    Toast.makeText(getApplicationContext(), "No SIM card found in target slot.", Toast.LENGTH_SHORT).show();
+                    appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
+                    updateTileUI(appPreferences.getCachedNetworkMode());
+                    IS_SWITCHING.set(false);
+                });
+                return;
+            }
+
             CommandResult result = networkModeController.apply(
                     nextMode,
                     executionMode
             );
 
-            mainHandler.post(() -> {
-                try {
-                    if (result.isSuccess()) {
-                        appPreferences.setCachedNetworkMode(nextMode);
-                        appPreferences.setAutoSimError(false);
-                        updateTileUI(nextMode);
-                    } else {
-                        updateTileUI(currentMode);
-                        if (appPreferences.hasAutoSimError()) {
-                            showAutoSimErrorToast();
-                        }
-                    }
-                } finally {
+            if (result.isSuccess()) {
+                appPreferences.setCachedNetworkMode(nextMode);
+                appPreferences.setAutoSimError(false);
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                mainHandler.post(() -> {
+                    updateTileUI(nextMode);
                     IS_SWITCHING.set(false);
+                });
+            } else {
+                // Command failed! Check for permission failures first.
+                boolean isAuthError = false;
+                if (executionMode == ExecutionMode.SHIZUKU) {
+                    try {
+                        if (!Shizuku.pingBinder() || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+                            isAuthError = true;
+                            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                        }
+                    } catch (Throwable t) {
+                        isAuthError = true;
+                        appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                    }
+                } else if (executionMode == ExecutionMode.ROOT) {
+                    try {
+                        Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", "true"});
+                        int exitCode = p.waitFor();
+                        if (exitCode != 0) {
+                            isAuthError = true;
+                            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
+                        }
+                    } catch (Exception e) {
+                        isAuthError = true;
+                        appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
+                    }
                 }
-            });
+
+                if (!isAuthError) {
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
+                    appPreferences.setLastError(result.getCommand(), result.getStderr());
+                }
+
+                mainHandler.post(() -> {
+                    updateTileUI(currentMode);
+                    if (appPreferences.hasAutoSimError()) {
+                        showAutoSimErrorToast();
+                    }
+                    IS_SWITCHING.set(false);
+                });
+            }
         });
     }
 
@@ -177,6 +246,12 @@ public class NetworkTileService extends TileService {
             case "P4G":
                 if (iconP4g == null) iconP4g = createTextOnlyIcon("P4G");
                 return iconP4g;
+            case "P3G":
+                if (iconP3g == null) iconP3g = createTextOnlyIcon("P3G");
+                return iconP3g;
+            case "2G":
+                if (icon2g == null) icon2g = createTextOnlyIcon("2G");
+                return icon2g;
             default:
                 if (iconUnknown == null) {
                     iconUnknown = createTextOnlyIcon("?");
@@ -202,6 +277,27 @@ public class NetworkTileService extends TileService {
             return;
         }
 
+        int errorState = appPreferences.getTileErrorState();
+        if (errorState == AppPreferences.TILE_ERROR_SHIZUKU) {
+            tile.setState(Tile.STATE_UNAVAILABLE);
+            tile.setLabel("Shizuku Unavailable");
+            tile.setIcon(getCachedIcon("?"));
+            tile.updateTile();
+            return;
+        } else if (errorState == AppPreferences.TILE_ERROR_ROOT) {
+            tile.setState(Tile.STATE_UNAVAILABLE);
+            tile.setLabel("Root Unavailable");
+            tile.setIcon(getCachedIcon("?"));
+            tile.updateTile();
+            return;
+        } else if (errorState == AppPreferences.TILE_ERROR_CMD) {
+            tile.setState(Tile.STATE_INACTIVE);
+            tile.setLabel("Error Check App");
+            tile.setIcon(getCachedIcon("?"));
+            tile.updateTile();
+            return;
+        }
+
         if (mode == NetworkMode.UNKNOWN) {
             if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
                 tile.setState(Tile.STATE_UNAVAILABLE);
@@ -222,6 +318,8 @@ public class NetworkTileService extends TileService {
 
         tile.updateTile();
     }
+
+
 
     private void showAutoSimErrorToast() {
         Toast.makeText(

@@ -71,8 +71,37 @@ public final class TileCycleManager {
         }
 
         appPreferences.setTileCycleModes(cycle);
-        appPreferences.clearCachedNetworkMode();
+        // Cache is purposefully kept alive so UI changes can sync network state
         return ChangeResult.CHANGED;
+    }
+
+    public boolean forceRemoveUnsupportedAndAutoFill(AppPreferences.NetworkCapabilities caps) {
+        List<NetworkMode> cycle = getCycle();
+        boolean changed = false;
+
+        if (!caps.supports5g) { 
+            changed |= cycle.remove(NetworkMode.PREFERRED_5G); 
+            changed |= cycle.remove(NetworkMode.FIVE_G_ONLY); 
+        }
+        if (!caps.supports3g) { 
+            changed |= cycle.remove(NetworkMode.PREFERRED_3G); 
+        }
+        if (!caps.supports2g) { 
+            changed |= cycle.remove(NetworkMode.TWO_G_ONLY); 
+        }
+
+        if (changed) {
+            // Auto fill to reach MIN_MODES
+            if (cycle.size() < MIN_MODES) {
+                if (!cycle.contains(NetworkMode.PREFERRED_4G)) cycle.add(NetworkMode.PREFERRED_4G);
+                if (cycle.size() < MIN_MODES && caps.supports5g && !cycle.contains(NetworkMode.PREFERRED_5G)) cycle.add(NetworkMode.PREFERRED_5G);
+                if (cycle.size() < MIN_MODES && !cycle.contains(NetworkMode.FOUR_G_ONLY)) cycle.add(NetworkMode.FOUR_G_ONLY);
+            }
+            appPreferences.setTileCycleModes(cycle);
+            // Cache is purposefully kept alive so UI changes can sync network state
+            return true;
+        }
+        return false;
     }
 
     public boolean isValid(List<NetworkMode> cycle) {
