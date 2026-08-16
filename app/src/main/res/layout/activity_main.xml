@@ -149,8 +149,18 @@
 				</LinearLayout>
 			</LinearLayout>
 	
+            <!-- Error Banner Include -->
+            <include 
+				android:id="@+id/cardErrorBanner"
+				layout="@layout/view_error_banner"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="12dp"
+				android:visibility="gone" />
+
             <!-- Execution Mode Card Include -->
             <include 
+                android:id="@+id/cardExecutionAndTarget"
                 layout="@layout/view_execution_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -158,6 +168,7 @@
 			
 			<!-- Tile Cycle Card Include -->
 			<include 
+			    android:id="@+id/cardTileCycle"
 				layout="@layout/view_tile_cycle_card"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
