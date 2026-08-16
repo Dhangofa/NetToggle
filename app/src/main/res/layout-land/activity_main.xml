@@ -208,6 +208,8 @@
                         android:textColor="@color/text_secondary" />
                 </LinearLayout>
             </LinearLayout>
+            
+            <include layout="@layout/view_error_banner" />
 
             <!-- Parallel 2-Column Cards Row in Landscape -->
             <LinearLayout
