@@ -105,6 +105,7 @@
 
     <!-- Target SIM Header -->
     <RelativeLayout
+        android:id="@+id/targetSimHeaderContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp">
