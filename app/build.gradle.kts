@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.core:core:1.12.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
