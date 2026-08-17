@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DiagnosticReporter {
-
     public static String generateReport(AppPreferences prefs, SimResolver simResolver) {
         DiagnosticError error = prefs.getLastError();
         if (error == null) {
@@ -33,16 +32,26 @@ public class DiagnosticReporter {
         sb.append("[APP STATE]\n");
         sb.append("Execution Mode: ").append(prefs.getExecutionMode().name()).append("\n");
         sb.append("Target SIM Setting: ").append(prefs.getTargetSim().name()).append("\n");
-        
+
         int slotIndex = simResolver.resolveTargetSlotIndex(prefs.getExecutionMode());
         sb.append("Resolved Slot Index: ").append(slotIndex).append("\n\n");
 
         sb.append("[ERROR DETAILS]\n");
         sb.append("Command Attempted:\n").append(error.command).append("\n\n");
-        sb.append("Standard Error (stderr):\n").append(error.stderr).append("\n\n");
-        
-        sb.append("--- END OF REPORT ---");
 
+        sb.append("Exit Code: ").append(error.exitCode).append("\n\n");
+
+        if (error.exceptionMessage != null && !error.exceptionMessage.isEmpty()) {
+            sb.append("Exception Message:\n").append(error.exceptionMessage).append("\n\n");
+        }
+
+        if (error.stdout != null && !error.stdout.isEmpty()) {
+            sb.append("Standard Output (stdout):\n").append(error.stdout).append("\n\n");
+        }
+
+        sb.append("Standard Error (stderr):\n").append(error.stderr != null && !error.stderr.isEmpty() ? error.stderr : "(empty)").append("\n\n");
+
+        sb.append("--- END OF REPORT ---");
         return sb.toString();
     }
 }
