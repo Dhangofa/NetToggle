@@ -13,16 +13,22 @@
         android:layout_marginBottom="10dp">
         
         <LinearLayout
+            android:id="@+id/execModeTitleGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp">
+
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_shield"
                 android:tint="@color/exec_accent"
                 android:layout_marginEnd="6dp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -33,18 +39,28 @@
                 android:textColor="@color/text_primary" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/shizukuStatusText"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="Authorized"
-            android:background="@drawable/shape_status_badge_success"
-            android:textColor="#4ADE80"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp" />
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/execModeTitleGroup"
+            android:gravity="end|center_vertical">
+            
+            <TextView
+                android:id="@+id/shizukuStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Authorized"
+                android:background="@drawable/shape_status_badge_success"
+                android:textColor="#4ADE80"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
+        </LinearLayout>
+
     </RelativeLayout>
 
     <!-- Segmented Control for Execution Mode -->
@@ -109,18 +125,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp">
+
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/targetSimTitleGroup"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="10dp">
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="8dp">
+
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:src="@drawable/ic_smartphone"
                 android:tint="@color/exec_accent"
                 android:layout_marginEnd="8dp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -130,21 +152,25 @@
                 android:textStyle="bold"
                 android:textColor="@color/text_primary" />
         </LinearLayout>
+
         <TextView
             android:id="@+id/autoSimWarningText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/targetSimTitleGroup"
             android:text="Auto failed"
             android:textSize="11sp"
-            android:gravity="center"
+            android:gravity="end|center_vertical"
             android:textColor="@color/status_error_text"
             android:background="@drawable/shape_status_badge_error"
             android:paddingHorizontal="6dp"
             android:paddingVertical="4dp"
-            android:visibility="gone"
-            android:layout_marginTop="8dp" />
-    </RelativeLayout> 
+            android:visibility="gone" />
 
+    </RelativeLayout>
+    
     <!-- Segmented Control for Target SIM -->
     <RadioGroup
         android:id="@+id/targetSimRadioGroup"
@@ -215,4 +241,5 @@
             android:textSize="14sp"
             android:textStyle="bold" />
     </RadioGroup>
+
 </LinearLayout>
