@@ -36,6 +36,12 @@
     <color name="accent_orange">#FFB782</color>
     <color name="accent_pink">#F48FB1</color>
 
+    <!-- Carousel Page -->
+    <color name="first_pg_bg">#11161A</color>
+    <color name="second_pg_bg">#1A130F</color>
+    <color name="third_pg_bg">#160309</color>
+    <color name="view_guide_button_bg">#2B2930</color>
+
     <!-- Cycle Card Custom Tones -->
     <color name="cycle_card_surface">#1A130F</color>
     <color name="cycle_segmented_selected">#3D210F</color>

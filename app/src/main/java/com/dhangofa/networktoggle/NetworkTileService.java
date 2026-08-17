@@ -188,7 +188,7 @@ public class NetworkTileService extends TileService {
 
                 if (!isAuthError) {
                     appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
-                    appPreferences.setLastError(result.getCommand(), result.getStderr());
+                    appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), result.getExceptionMessage());
                 }
 
                 mainHandler.post(() -> {

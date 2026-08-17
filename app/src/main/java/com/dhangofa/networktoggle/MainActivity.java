@@ -29,9 +29,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import androidx.viewpager2.widget.ViewPager2;
+import com.dhangofa.networktoggle.ui.SetupCarouselAdapter;
+import java.util.ArrayList;
+import java.util.List;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.ExecutionMode;
@@ -72,6 +79,10 @@ public class MainActivity extends Activity implements android.content.SharedPref
     private RadioButton radioSim1;
     private RadioButton radioSim2;
     private TextView autoSimWarningText;
+    private ViewPager2 setupCarouselPager;
+    private android.widget.LinearLayout setupCarouselContainer;
+    private LinearLayout carouselIndicators;
+    private ImageView faqLink;
 	
 	private View separatorRootShizuku;
     private View separatorAutoSim1;
@@ -166,6 +177,84 @@ public class MainActivity extends Activity implements android.content.SharedPref
 		updateSeparatorVisibility();
     }
 
+    private void setupCarousel() {
+        List<SetupCarouselAdapter.SetupItem> carouselItems = new ArrayList<>();
+        carouselItems.add(new SetupCarouselAdapter.SetupItem("New to NetToggle?", "Learn how to set up Execution Modes", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/1.-Execution-Mode-Configuration", R.drawable.ic_terminal, R.color.first_pg_bg, R.color.exec_accent, R.color.view_guide_button_bg));
+        carouselItems.add(new SetupCarouselAdapter.SetupItem("Target SIM & Cycle", "Learn how to configure your modes", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/2.-Target-SIM-Setup-&-Quick-Tile-Cycle-Guide", R.drawable.ic_sim_card, R.color.second_pg_bg, R.color.accent_orange, R.color.view_guide_button_bg));
+        carouselItems.add(new SetupCarouselAdapter.SetupItem("Quick Settings Ready", "Add the tile to your Control Center", "View Guide", "https://github.com/Dhangofa/NetToggle/wiki/3.-Adding-the-Tile-to-Quick-Settings", R.drawable.ic_network_bars, R.color.third_pg_bg, R.color.accent_pink, R.color.view_guide_button_bg));
+
+        if (setupCarouselContainer != null) {
+            setupCarouselContainer.removeAllViews();
+            for (int i = 0; i < carouselItems.size(); i++) {
+                SetupCarouselAdapter.SetupItem item = carouselItems.get(i);
+                View view = getLayoutInflater().inflate(R.layout.item_setup_carousel, setupCarouselContainer, false);
+                android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+                if (i > 0) params.setMarginStart(12);
+                if (i < carouselItems.size() - 1) params.setMarginEnd(12);
+                view.setLayoutParams(params);
+                
+                ((TextView) view.findViewById(R.id.carouselTitle)).setText(item.title);
+                ((TextView) view.findViewById(R.id.carouselDesc)).setText(item.description);
+                ((TextView) view.findViewById(R.id.carouselButtonText)).setText(item.buttonText);
+                ((TextView) view.findViewById(R.id.carouselButtonText)).setTextColor(getColor(item.accentColorRes));
+                
+                ImageView icon = view.findViewById(R.id.carouselIcon);
+                icon.setImageResource(item.iconRes);
+                icon.setColorFilter(getColor(item.accentColorRes));
+                
+                ImageView btnIcon = view.findViewById(R.id.carouselButtonIcon);
+                btnIcon.setColorFilter(getColor(item.accentColorRes));
+                
+                view.findViewById(R.id.carouselBackground).setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.bgColorRes)));
+                view.findViewById(R.id.carouselButton).setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.btnBgColorRes)));
+                view.findViewById(R.id.carouselIconContainer).setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.btnBgColorRes)));
+                
+                view.findViewById(R.id.carouselButton).setOnClickListener(v -> {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(item.url))); } catch (Exception e) {}
+                });
+                
+                setupCarouselContainer.addView(view);
+            }
+        } else if (setupCarouselPager != null) {
+            SetupCarouselAdapter adapter = new SetupCarouselAdapter(this, carouselItems);
+            setupCarouselPager.setAdapter(adapter);
+            setupCarouselIndicators(carouselItems.size());
+            setupCarouselPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    updateCarouselIndicators(position);
+                }
+            });
+        }
+    }
+
+
+    private void setupCarouselIndicators(int count) {
+        if (carouselIndicators == null) return;
+        carouselIndicators.removeAllViews();
+        for (int i = 0; i < count; i++) {
+            android.widget.ImageView dot = new android.widget.ImageView(this);
+            dot.setImageDrawable(getDrawable(R.drawable.shape_dot_inactive));
+            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(16, 16);
+            params.setMargins(8, 0, 8, 0);
+            dot.setLayoutParams(params);
+            carouselIndicators.addView(dot);
+        }
+    }
+
+    private void updateCarouselIndicators(int position) {
+        if (carouselIndicators == null) return;
+        for (int i = 0; i < carouselIndicators.getChildCount(); i++) {
+            android.widget.ImageView dot = (android.widget.ImageView) carouselIndicators.getChildAt(i);
+            if (i == position) {
+                dot.setImageDrawable(getDrawable(R.drawable.shape_dot_active));
+            } else {
+                dot.setImageDrawable(getDrawable(R.drawable.shape_dot_inactive));
+            }
+        }
+    }
+
     private void configureStatusBar() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
 
@@ -177,6 +266,11 @@ public class MainActivity extends Activity implements android.content.SharedPref
     }
 
     private void bindViews() {
+        setupCarouselPager = findViewById(R.id.setupCarouselPager);
+        setupCarouselContainer = findViewById(R.id.setupCarouselContainer);
+        carouselIndicators = findViewById(R.id.carouselIndicators);
+        faqLink = findViewById(R.id.faqLink);
+        setupCarousel();
         radioGroup = findViewById(R.id.modeRadioGroup);
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
@@ -202,6 +296,12 @@ public class MainActivity extends Activity implements android.content.SharedPref
     }
 
     private void bindLinks() {
+        if (faqLink != null) {
+            faqLink.setOnClickListener(v -> {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Dhangofa/NetToggle/wiki/Frequently-Asked-Questions-(FAQ)"));
+                try { startActivity(browserIntent); } catch (Exception e) { android.widget.Toast.makeText(MainActivity.this, "No web browser installed to open this link.", android.widget.Toast.LENGTH_SHORT).show(); }
+            });
+        }
         githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
         telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofas_projects_chat"));
     }
@@ -551,6 +651,9 @@ public class MainActivity extends Activity implements android.content.SharedPref
 	
 	private boolean isUIAuthorized = true;
 	private void updateAuthorizationUI(boolean authorized) {
+        if (setupCarouselPager != null) {
+            setupCarouselPager.setCurrentItem(authorized ? 2 : 0, true);
+        }
 	    if (isUIAuthorized == authorized) return;
 	    isUIAuthorized = authorized;
 	    
@@ -587,6 +690,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         } catch (Exception ignored) {
+            android.widget.Toast.makeText(MainActivity.this, "No web browser installed to open this link.", android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
