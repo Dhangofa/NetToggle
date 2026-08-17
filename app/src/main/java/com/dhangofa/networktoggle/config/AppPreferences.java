@@ -87,10 +87,15 @@ public final class AppPreferences {
         preferences.edit().putBoolean(KEY_AUTO_SIM_ERROR, hasError).apply();
     }
 
-    public void setLastError(String command, String stderr) {
+    public void setLastError(String command, int exitCode, String stdout, String stderr, String exceptionMsg) {
         preferences.edit()
                 .putString(KEY_LAST_ERROR_CMD, command)
+                .putInt("last_error_exit_code", exitCode)
+                .putString("last_error_stdout", stdout)
+                
                 .putString(KEY_LAST_ERROR_STDERR, stderr)
+                .putString("last_error_exception", exceptionMsg)
+                
                 .putLong(KEY_LAST_ERROR_TIMESTAMP, System.currentTimeMillis())
                 .apply();
     }
@@ -98,10 +103,13 @@ public final class AppPreferences {
     public com.dhangofa.networktoggle.model.DiagnosticError getLastError() {
         String cmd = preferences.getString(KEY_LAST_ERROR_CMD, null);
         String stderr = preferences.getString(KEY_LAST_ERROR_STDERR, null);
+        int exitCode = preferences.getInt("last_error_exit_code", -1);
+        String stdout = preferences.getString("last_error_stdout", "");
+        String exceptionMsg = preferences.getString("last_error_exception", "");
         long time = preferences.getLong(KEY_LAST_ERROR_TIMESTAMP, 0);
         
         if (cmd == null && stderr == null) return null;
-        return new com.dhangofa.networktoggle.model.DiagnosticError(cmd, stderr, time);
+        return new com.dhangofa.networktoggle.model.DiagnosticError(cmd, exitCode, stdout, stderr, exceptionMsg, time);
     }
 
     public void clearLastError() {
