@@ -99,64 +99,30 @@
 					android:textColor="@color/text_secondary"
 					android:textSize="13sp" />
 	
-				<!-- Quick Settings Tile Hint Card -->
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal"
-				android:background="@drawable/shape_qs_hint_bg"
-				android:padding="12dp"
-				android:gravity="center_vertical"
-				android:layout_marginTop="0dp"
-				android:layout_marginBottom="12dp">
-	
-				<FrameLayout
-					android:layout_width="38dp"
-					android:layout_height="38dp"
-					android:background="@drawable/shape_pill_badge_bg"
-					android:layout_marginEnd="10dp">
-	
-					<ImageView
-						android:layout_width="20dp"
-						android:layout_height="20dp"
-						android:layout_gravity="center"
-						android:src="@drawable/ic_network_bars"
-						android:tint="@color/brand_primary"
-						android:contentDescription="QS Tile" />
-				</FrameLayout>
-	
-				<LinearLayout
-					android:layout_width="0dp"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:orientation="vertical">
-	
-					<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="Quick Settings Ready"
-						android:textSize="13sp"
-						android:fontFamily="sans-serif-medium"
-						android:textStyle="bold"
-						android:textColor="@color/text_primary" />
-	
-					<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="Add NetToggle tile to your Control Center or Quick Settings"
-						android:textSize="11sp"
-						android:textColor="@color/text_secondary" />
-				</LinearLayout>
-			</LinearLayout>
+            <!-- Setup Guide Carousel -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="12dp">
+                
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/setupCarouselPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp" />
+                
+                <LinearLayout
+                    android:id="@+id/carouselIndicators"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
 	
             <!-- Error Banner Include -->
-            <include 
-				android:id="@+id/cardErrorBanner"
-				layout="@layout/view_error_banner"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="12dp"
-				android:visibility="gone" />
+            <include android:id="@+id/cardErrorBanner" layout="@layout/view_error_banner" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:visibility="gone" />
 
             <!-- Execution Mode Card Include -->
             <include 
@@ -257,6 +223,17 @@
 				android:background="@drawable/social_icon_bg"
 				android:clickable="true"
 				android:focusable="true" />
-		</LinearLayout>
+            <ImageView
+                android:id="@+id/faqLink"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_help_outline"
+                android:tint="@color/text_primary"
+                android:background="@drawable/social_icon_bg"
+                android:layout_marginStart="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
 	</LinearLayout>
 </LinearLayout>
