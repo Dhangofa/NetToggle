@@ -57,37 +57,47 @@ public final class LteAndAboveCarrierRegistry {
         if (carrierName == null || carrierName.trim().isEmpty()) {
             return false;
         }
-        
         String normalized = carrierName.toLowerCase().trim();
-
-        for (String name : INDIA_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
+        return matchesCarrier(normalized, INDIA_LTE_AND_ABOVE) ||
+               matchesCarrier(normalized, USA_LTE_AND_ABOVE) ||
+               matchesCarrier(normalized, JAPAN_LTE_AND_ABOVE) ||
+               matchesCarrier(normalized, AUSTRALIA_LTE_AND_ABOVE) ||
+               matchesCarrier(normalized, TAIWAN_LTE_AND_ABOVE) ||
+               matchesCarrier(normalized, SINGAPORE_LTE_AND_ABOVE) ||
+               matchesCarrier(normalized, SOUTHKOREA_LTE_AND_ABOVE);
+    }
+    private static boolean matchesCarrier(String carrierName, List<String> carrierAliases) {
+        for (String alias : carrierAliases) {
+            String normalizedAlias = alias.toLowerCase().trim();
+    
+            if (carrierName.equals(normalizedAlias)) {
+                return true;
+            }
+            // Short aliases must match exactly.
+            if (normalizedAlias.length() <= 3) {
+                continue;
+            }
+            // Longer aliases can match inside an extended carrier label.
+            if (containsWholePhrase(carrierName, normalizedAlias)) {
+                return true;
+            }
         }
-        
-        for (String name : USA_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
-        }
-
-        for (String name : JAPAN_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
-        }
-
-        for (String name : AUSTRALIA_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
-        }
-
-        for (String name : TAIWAN_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
-        }
-
-        for (String name : SINGAPORE_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
-        }
-
-        for (String name : SOUTHKOREA_LTE_AND_ABOVE) {
-            if (normalized.equals(name) || normalized.contains(name)) return true;
-        }
-
+    
         return false;
+    }
+    
+    private static boolean containsWholePhrase(String carrierName, String alias) {
+        String normalizedCarrier = normalizeSeparators(carrierName);
+        String normalizedAlias = normalizeSeparators(alias);
+    
+        return (" " + normalizedCarrier + " ")
+                .contains(" " + normalizedAlias + " ");
+    }
+    
+    private static String normalizeSeparators(String value) {
+        return value.replace('-', ' ')
+                .replace('_', ' ')
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 }
