@@ -27,12 +27,9 @@
     <!-- Segmented controls -->
     <color name="segmented_separator">#49454F</color>
     <color name="segmented_container">#1B1A20</color>
-    <color name="segmented_selected">#36323F</color>
-    <color name="segmented_text_selected">#EADDFF</color>
     <color name="segmented_text_unselected">#938F96</color>
 
     <!-- Colorful Accents -->
-    <color name="accent_green">#61D48A</color>
     <color name="accent_orange">#FFB782</color>
     <color name="accent_pink">#F48FB1</color>
 
@@ -45,7 +42,6 @@
     <!-- Cycle Card Custom Tones -->
     <color name="cycle_card_surface">#1A130F</color>
     <color name="cycle_segmented_selected">#3D210F</color>
-    <color name="cycle_badge_bg">#1B1A20</color>
     <color name="cycle_segmented_text_selected">#FFB782</color>
 
     <!-- Exec Card Custom Tones -->

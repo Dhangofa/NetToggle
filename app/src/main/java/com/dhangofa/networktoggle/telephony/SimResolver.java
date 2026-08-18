@@ -14,13 +14,14 @@ import com.dhangofa.networktoggle.model.CommandResult;
 import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.model.TargetSim;
 
+import java.util.List;
+
 public final class SimResolver {
     public static final int INVALID_SLOT_INDEX = -1;
     public static final int INVALID_SUB_ID = -1;
 
     private final Context context;
     private final AppPreferences appPreferences;
-
     // Data class to hold all extracted variables in one place
     public static class SimInfo {
         public final int subId;
@@ -39,17 +40,15 @@ public final class SimResolver {
         this.appPreferences = appPreferences;
     }
 
-    /**
-     * Resolves IDs using Native APIs first.
-     * Silently falls back to Shell commands if permission is denied or device is too old.
-     */
+    Context getContext() {
+        return context;
+    }
+    
     public SimInfo resolveTargetSimInfo(ExecutionMode executionMode) {
         TargetSim targetSim = appPreferences.getTargetSim();
-        
         int targetSubId = INVALID_SUB_ID;
         int targetSlotIndex = INVALID_SLOT_INDEX;
         String carrierName = "";
-
         // 1. Safe Native APIs (No permission required)
         if (targetSim.isAuto()) {
             targetSubId = SubscriptionManager.getDefaultDataSubscriptionId();
@@ -62,10 +61,10 @@ public final class SimResolver {
         } else {
             targetSlotIndex = targetSim.getManualSlotIndex();
         }
-
         // 2. Protected Native APIs (Requires READ_PHONE_STATE)
-        boolean hasPermission = context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
-        
+        boolean hasPermission = context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED;
+
         if (hasPermission) {
             SubscriptionManager sm = context.getSystemService(SubscriptionManager.class);
             if (sm != null) {
@@ -77,23 +76,25 @@ public final class SimResolver {
                             if (!isValidSlotIndex(targetSlotIndex)) targetSlotIndex = info.getSimSlotIndex();
                         }
                     } else if (isValidSlotIndex(targetSlotIndex)) {
-                        for (SubscriptionInfo info : sm.getActiveSubscriptionInfoList()) {
-                            if (info.getSimSlotIndex() == targetSlotIndex) {
-                                targetSubId = info.getSubscriptionId();
-                                if (info.getCarrierName() != null) carrierName = info.getCarrierName().toString();
-                                break;
+                        List<SubscriptionInfo> infos = sm.getActiveSubscriptionInfoList();
+                        if (infos != null) {
+                            for (SubscriptionInfo info : infos) {
+                                if (info.getSimSlotIndex() == targetSlotIndex) {
+                                    targetSubId = info.getSubscriptionId();
+                                    if (info.getCarrierName() != null) carrierName = info.getCarrierName().toString();
+                                    break;
+                                }
                             }
                         }
                     }
                 } catch (Exception ignored) {}
             }
         }
-
         // 3. Shell Fallback (If missing permission, or older Android OS failed to map)
         if (!isValidSubId(targetSubId) || !isValidSlotIndex(targetSlotIndex) || carrierName.isEmpty()) {
             String command = "dumpsys isub | grep -E \"\\{id=[0-9]+ .*simSlotIndex=\"";
             CommandExecutor executor = CommandExecutorFactory.forMode(executionMode);
-            
+
             if (executor != null) {
                 CommandResult result = executor.execute(command);
                 if (result.isSuccess() && !result.getStdout().trim().isEmpty()) {
@@ -118,7 +119,6 @@ public final class SimResolver {
                 }
             }
         }
-
         // 4. Final Validation
         if (isValidSubId(targetSubId) && isValidSlotIndex(targetSlotIndex)) {
             if (targetSim.isAuto()) appPreferences.setAutoSimError(false);
@@ -128,7 +128,6 @@ public final class SimResolver {
         if (targetSim.isAuto()) appPreferences.setAutoSimError(true);
         return null;
     }
-
     // Keeping backwards compatibility for existing app logic
     public int resolveTargetSlotIndex(ExecutionMode executionMode) {
         SimInfo info = resolveTargetSimInfo(executionMode);
