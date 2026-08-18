@@ -70,45 +70,95 @@ public final class NetworkCapabilityResolver {
         return finalCaps;
     }
 
-    private NetworkCapabilities fetchDeviceCapabilities(ExecutionMode mode) {
-        NetworkCapabilities cachedDevice = appPreferences.getDeviceCapabilities();
-        if (cachedDevice != null) return cachedDevice;
-
+    private NetworkCapabilities fetchDeviceCapabilities(
+            ExecutionMode mode
+    ) {
+        NetworkCapabilities cachedDevice =
+                appPreferences.getDeviceCapabilities();
+    
+        if (cachedDevice != null) {
+            return cachedDevice;
+        }
+    
+        // 5G capability detection starts from Android 11.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            NetworkCapabilities legacyCapabilities =
+                    new NetworkCapabilities(
+                            true,
+                            true,
+                            true,
+                            false
+                    );
+    
+            appPreferences.saveDeviceCapabilities(
+                    legacyCapabilities
+            );
+    
+            return legacyCapabilities;
+        }
+    
+        CommandExecutor executor =
+                CommandExecutorFactory.forMode(mode);
+    
+        if (executor == null) {
+            return NetworkCapabilities.assumeAll();
+        }
+    
+        CommandResult result = executor.execute(
+                "getprop ro.telephony.default_network"
+        );
+    
+        if (!result.isSuccess()) {
+            return NetworkCapabilities.assumeAll();
+        }
+    
+        String output = result.getStdout();
+    
+        // Empty output does not prove that 5G is unsupported.
+        if (output == null || output.trim().isEmpty()) {
+            return NetworkCapabilities.assumeAll();
+        }
+    
+        boolean foundValidProfile = false;
         boolean supports5g = false;
-        boolean canCache = true;
-
-        // Stage 1: Android Version Check (Android 11 / API 30+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            CommandExecutor executor = CommandExecutorFactory.forMode(mode);
-            if (executor != null) {
-                // Stage 2: Hardware Ceiling Check
-                CommandResult result = executor.execute("getprop ro.telephony.default_network");
-                if (result.isSuccess()) {
-                    if (!result.getStdout().trim().isEmpty()) {
-                        String[] values = result.getStdout().trim().split(",");
-                        
-                        // Check if ANY value globally supports 5G (>= 23)
-                        for (String val : values) {
-                            Integer parsed = ShellValueParser.extractFirstInt(val);
-                            if (parsed != null && parsed >= 23) {
-                                supports5g = true;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    canCache = false;
-                }
-            } else {
-                canCache = false;
+    
+        String[] values = output.trim().split(",");
+    
+        for (String value : values) {
+            Integer parsed =
+                    ShellValueParser.extractFirstInt(value);
+    
+            if (parsed == null) {
+                continue;
+            }
+    
+            foundValidProfile = true;
+    
+            // Profile 23 and higher means 5G or newer capability.
+            if (parsed >= 23) {
+                supports5g = true;
+                break;
             }
         }
-
-        NetworkCapabilities deviceCaps = new NetworkCapabilities(true, true, true, supports5g);
-        if (canCache) {
-            appPreferences.saveDeviceCapabilities(deviceCaps);
+    
+        // Do not cache an unverified negative result.
+        if (!foundValidProfile) {
+            return NetworkCapabilities.assumeAll();
         }
-        return deviceCaps;
+    
+        NetworkCapabilities deviceCapabilities =
+                new NetworkCapabilities(
+                        true,
+                        true,
+                        true,
+                        supports5g
+                );
+    
+        appPreferences.saveDeviceCapabilities(
+                deviceCapabilities
+        );
+    
+        return deviceCapabilities;
     }
 
     private NetworkCapabilities fetchCarrierCapabilities(ExecutionMode mode, int slotIndex, String carrierName) {
