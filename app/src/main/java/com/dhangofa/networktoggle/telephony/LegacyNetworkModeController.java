@@ -11,7 +11,6 @@ import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.model.NetworkMode;
 
 final class LegacyNetworkModeController {
-    private static final int MODEM_RESTART_DELAY_SECONDS = 2;
 
     private final Context context;
     private final SimResolver simResolver;
@@ -133,9 +132,8 @@ final class LegacyNetworkModeController {
                 + "settings put global preferred_network_mode " + combinedModes
                 + " || exit 22; "
                 + "cmd connectivity airplane-mode enable || exit 23; "
-                + "sleep " + MODEM_RESTART_DELAY_SECONDS + "; "
+                + "sleep 1; "
                 + "cmd connectivity airplane-mode disable || exit 24; "
-                + "sleep " + MODEM_RESTART_DELAY_SECONDS + "; "
                 + restoreRadios + " || exit 25; "
                 + "trap - EXIT INT TERM; "
                 + "exit 0";
