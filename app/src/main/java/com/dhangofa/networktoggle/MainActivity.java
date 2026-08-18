@@ -33,12 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import androidx.viewpager2.widget.ViewPager2;
-import com.dhangofa.networktoggle.ui.SetupCarouselAdapter;
-import java.util.ArrayList;
-import java.util.List;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.ExecutionMode;
@@ -79,10 +73,32 @@ public class MainActivity extends Activity implements android.content.SharedPref
     private RadioButton radioSim1;
     private RadioButton radioSim2;
     private TextView autoSimWarningText;
-    private ViewPager2 setupCarouselPager;
-    private android.widget.LinearLayout setupCarouselContainer;
-    private LinearLayout carouselIndicators;
+
     private ImageView faqLink;
+    
+    // Morphing View Carousel
+    private View carouselBackground;
+    private TextView carouselTitle;
+    private TextView carouselDesc;
+    private TextView carouselButtonText;
+    private ImageView carouselIcon;
+    private ImageView carouselButtonIcon;
+    private View carouselButton;
+    private View carouselIconContainer;
+    private LinearLayout carouselIndicators;
+    
+    private int currentCarouselIndex = 0;
+    private float touchStartX = 0f;
+    private CarouselItem[] carouselItems;
+    
+    private static class CarouselItem {
+        String title, desc, btnText, url;
+        int iconRes, bgColor, accentColor, btnBgColor;
+        CarouselItem(String title, String desc, String btnText, String url, int iconRes, int bgColor, int accentColor, int btnBgColor) {
+            this.title = title; this.desc = desc; this.btnText = btnText; this.url = url;
+            this.iconRes = iconRes; this.bgColor = bgColor; this.accentColor = accentColor; this.btnBgColor = btnBgColor;
+        }
+    }
 	
 	private View separatorRootShizuku;
     private View separatorAutoSim1;
@@ -175,60 +191,167 @@ public class MainActivity extends Activity implements android.content.SharedPref
         updateAutoSimWarning();
         bindSelectionListeners();
 		updateSeparatorVisibility();
+        setupCarousel();
     }
+
+    private void configureStatusBar() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+
+        boolean isNight = (getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        getWindow().setStatusBarColor(getColor(R.color.card_surface));
+        getWindow().getDecorView().setSystemUiVisibility(
+                isNight ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+    }
+
+    private void bindViews() {
+        radioGroup = findViewById(R.id.modeRadioGroup);
+        radioRoot = findViewById(R.id.radioRoot);
+        radioShizuku = findViewById(R.id.radioShizuku);
+        statusText = findViewById(R.id.shizukuStatusText);
+		appVersionText = findViewById(R.id.appVersionText);
+        targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
+        radioSimAuto = findViewById(R.id.radioSimAuto);
+        radioSim1 = findViewById(R.id.radioSim1);
+        radioSim2 = findViewById(R.id.radioSim2);
+        autoSimWarningText = findViewById(R.id.autoSimWarningText);
+        githubLink = findViewById(R.id.githubLink);
+        telegramLink = findViewById(R.id.telegramLink);
+
+        faqLink = findViewById(R.id.faqLink);
+        carouselBackground = findViewById(R.id.carouselBackground);
+        carouselTitle = findViewById(R.id.carouselTitle);
+        carouselDesc = findViewById(R.id.carouselDesc);
+        carouselButtonText = findViewById(R.id.carouselButtonText);
+        carouselIcon = findViewById(R.id.carouselIcon);
+        carouselButtonIcon = findViewById(R.id.carouselButtonIcon);
+        carouselButton = findViewById(R.id.carouselButton);
+        carouselIconContainer = findViewById(R.id.carouselIconContainer);
+        carouselIndicators = findViewById(R.id.carouselIndicators);
+		separatorRootShizuku = findViewById(R.id.separatorRootShizuku);
+        separatorAutoSim1 = findViewById(R.id.separatorAutoSim1);
+        separatorSim1Sim2 = findViewById(R.id.separatorSim1Sim2);
+
+        errorBannerContainer = findViewById(R.id.cardErrorBanner);
+        if (errorBannerContainer != null) {
+            errorBannerContainer.setOnClickListener(v -> showDiagnosticDialog());
+        }
+        
+        
+    }
+
+    private void bindLinks() {
+        githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
+        telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofas_projects_chat"));
+        if (faqLink != null) faqLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle/wiki"));
+    }
+	
 
     private void setupCarousel() {
-        List<SetupCarouselAdapter.SetupItem> carouselItems = new ArrayList<>();
-        carouselItems.add(new SetupCarouselAdapter.SetupItem("New to NetToggle?", "Learn how to set up Execution Modes", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/1.-Execution-Mode-Configuration", R.drawable.ic_terminal, R.color.first_pg_bg, R.color.exec_accent, R.color.view_guide_button_bg));
-        carouselItems.add(new SetupCarouselAdapter.SetupItem("Target SIM & Cycle", "Learn how to configure your modes", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/2.-Target-SIM-Setup-&-Quick-Tile-Cycle-Guide", R.drawable.ic_sim_card, R.color.second_pg_bg, R.color.accent_orange, R.color.view_guide_button_bg));
-        carouselItems.add(new SetupCarouselAdapter.SetupItem("Quick Settings Ready", "Add the tile to your Control Center", "View Guide", "https://github.com/Dhangofa/NetToggle/wiki/3.-Adding-the-Tile-to-Quick-Settings", R.drawable.ic_network_bars, R.color.third_pg_bg, R.color.accent_pink, R.color.view_guide_button_bg));
-
-        if (setupCarouselContainer != null) {
-            setupCarouselContainer.removeAllViews();
-            for (int i = 0; i < carouselItems.size(); i++) {
-                SetupCarouselAdapter.SetupItem item = carouselItems.get(i);
-                View view = getLayoutInflater().inflate(R.layout.item_setup_carousel, setupCarouselContainer, false);
-                android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-                if (i > 0) params.setMarginStart(12);
-                if (i < carouselItems.size() - 1) params.setMarginEnd(12);
-                view.setLayoutParams(params);
-                
-                ((TextView) view.findViewById(R.id.carouselTitle)).setText(item.title);
-                ((TextView) view.findViewById(R.id.carouselDesc)).setText(item.description);
-                ((TextView) view.findViewById(R.id.carouselButtonText)).setText(item.buttonText);
-                ((TextView) view.findViewById(R.id.carouselButtonText)).setTextColor(getColor(item.accentColorRes));
-                
-                ImageView icon = view.findViewById(R.id.carouselIcon);
-                icon.setImageResource(item.iconRes);
-                icon.setColorFilter(getColor(item.accentColorRes));
-                
-                ImageView btnIcon = view.findViewById(R.id.carouselButtonIcon);
-                btnIcon.setColorFilter(getColor(item.accentColorRes));
-                
-                view.findViewById(R.id.carouselBackground).setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.bgColorRes)));
-                view.findViewById(R.id.carouselButton).setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.btnBgColorRes)));
-                view.findViewById(R.id.carouselIconContainer).setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.btnBgColorRes)));
-                
-                view.findViewById(R.id.carouselButton).setOnClickListener(v -> {
-                    try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(item.url))); } catch (Exception e) {}
-                });
-                
-                setupCarouselContainer.addView(view);
+        if (carouselBackground == null) return;
+        carouselItems = new CarouselItem[]{
+            new CarouselItem("New to NetToggle?", "Learn how to set up Execution Modes", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/1.-Execution-Mode-Configuration", R.drawable.ic_terminal, R.color.first_pg_bg, R.color.exec_accent, R.color.view_guide_button_bg),
+            new CarouselItem("Target SIM & Cycle", "Learn how to configure your modes", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/2.-Target-SIM-Setup-&-Quick-Tile-Cycle-Guide", R.drawable.ic_sim_card, R.color.second_pg_bg, R.color.accent_orange, R.color.view_guide_button_bg),
+            new CarouselItem("Quick Settings Ready", "Add the tile to your Control Center", "Read Guide", "https://github.com/Dhangofa/NetToggle/wiki/3.-Adding-the-Tile-to-Quick-Settings", R.drawable.ic_network_bars, R.color.third_pg_bg, R.color.accent_pink, R.color.view_guide_button_bg)
+        };
+        
+        setupCarouselIndicators(carouselItems.length);
+        // Start state depends on initial auth state. 
+        // We defer to updateCarouselContext which will be triggered by loadSavedExecutionMode -> setStatus -> updateAuthorizationUI
+        // But let's set a default page just in case
+        renderCarouselPage(isUIAuthorized ? 1 : 0, false, 0);
+        
+        carouselBackground.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    touchStartX = event.getX();
+                    return true;
+                case android.view.MotionEvent.ACTION_UP:
+                case android.view.MotionEvent.ACTION_CANCEL:
+                    float deltaX = event.getX() - touchStartX;
+                    if (Math.abs(deltaX) > 100) { 
+                        carouselHandler.removeCallbacks(carouselAutoRunnable);
+                        if (deltaX > 0 && currentCarouselIndex > 0) {
+                            currentCarouselIndex--;
+                            renderCarouselPage(currentCarouselIndex, true, -1);
+                        } else if (deltaX < 0 && currentCarouselIndex < carouselItems.length - 1) {
+                            currentCarouselIndex++;
+                            renderCarouselPage(currentCarouselIndex, true, 1);
+                        }
+                        // Resume after 10 seconds of inactivity
+                        carouselHandler.postDelayed(carouselAutoRunnable, 10000);
+                    } else if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                        v.performClick();
+                    }
+                    return true;
             }
-        } else if (setupCarouselPager != null) {
-            SetupCarouselAdapter adapter = new SetupCarouselAdapter(this, carouselItems);
-            setupCarouselPager.setAdapter(adapter);
-            setupCarouselIndicators(carouselItems.size());
-            setupCarouselPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                @Override
-                public void onPageSelected(int position) {
-                    super.onPageSelected(position);
-                    updateCarouselIndicators(position);
-                }
-            });
-        }
+            return false;
+        });
+        
+        carouselBackground.setOnClickListener(v -> {
+            // Needed to ensure ripple works when performClick is called
+        });
     }
 
+    private void renderCarouselPage(int index, boolean animate, int direction) {
+        CarouselItem item = carouselItems[index];
+        Runnable updateViews = () -> {
+            carouselTitle.setText(item.title);
+            carouselDesc.setText(item.desc);
+            carouselButtonText.setText(item.btnText);
+            carouselButtonText.setTextColor(getColor(item.accentColor));
+            
+            carouselIcon.setImageResource(item.iconRes);
+            carouselIcon.setColorFilter(getColor(item.accentColor));
+            carouselButtonIcon.setColorFilter(getColor(item.accentColor));
+            
+            carouselBackground.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.bgColor)));
+            carouselButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.btnBgColor)));
+            carouselIconContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(item.btnBgColor)));
+            
+            carouselButton.setOnClickListener(v -> {
+                try { startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(item.url))); } catch (Exception e) {}
+            });
+            updateCarouselIndicators(index);
+        };
+
+        if (animate) {
+            float moveOutX = direction * -100f; // Swipe left (next) -> content moves left (-100).
+            float moveInX = direction * 100f; // Swipe left -> new content comes from right (+100).
+            long duration = 200;
+
+            // Animate background color smoothly
+            android.animation.ValueAnimator colorAnim = android.animation.ValueAnimator.ofObject(
+                new android.animation.ArgbEvaluator(),
+                carouselBackground.getBackgroundTintList().getDefaultColor(),
+                getColor(item.bgColor)
+            );
+            colorAnim.setDuration(duration);
+            colorAnim.addUpdateListener(animator -> {
+                carouselBackground.setBackgroundTintList(android.content.res.ColorStateList.valueOf((int) animator.getAnimatedValue()));
+            });
+            colorAnim.start();
+
+            // Animate content out
+            android.view.View[] viewsToAnimate = {carouselTitle, carouselDesc, carouselButton, carouselIconContainer};
+            for (android.view.View view : viewsToAnimate) {
+                view.animate().translationX(moveOutX).alpha(0f).setDuration(duration / 2)
+                    .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                    .withEndAction(() -> {
+                        // Once out, swap data
+                        if (view == carouselTitle) updateViews.run();
+                        
+                        // Prepare for animate in
+                        view.setTranslationX(moveInX);
+                        view.animate().translationX(0f).alpha(1f).setDuration(duration)
+                            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                            .start();
+                    }).start();
+            }
+        } else {
+            updateViews.run();
+        }
+    }
 
     private void setupCarouselIndicators(int count) {
         if (carouselIndicators == null) return;
@@ -254,58 +377,6 @@ public class MainActivity extends Activity implements android.content.SharedPref
             }
         }
     }
-
-    private void configureStatusBar() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
-
-        boolean isNight = (getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-        getWindow().setStatusBarColor(getColor(R.color.card_surface));
-        getWindow().getDecorView().setSystemUiVisibility(
-                isNight ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-    }
-
-    private void bindViews() {
-        setupCarouselPager = findViewById(R.id.setupCarouselPager);
-        setupCarouselContainer = findViewById(R.id.setupCarouselContainer);
-        carouselIndicators = findViewById(R.id.carouselIndicators);
-        faqLink = findViewById(R.id.faqLink);
-        setupCarousel();
-        radioGroup = findViewById(R.id.modeRadioGroup);
-        radioRoot = findViewById(R.id.radioRoot);
-        radioShizuku = findViewById(R.id.radioShizuku);
-        statusText = findViewById(R.id.shizukuStatusText);
-		appVersionText = findViewById(R.id.appVersionText);
-        targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
-        radioSimAuto = findViewById(R.id.radioSimAuto);
-        radioSim1 = findViewById(R.id.radioSim1);
-        radioSim2 = findViewById(R.id.radioSim2);
-        autoSimWarningText = findViewById(R.id.autoSimWarningText);
-        githubLink = findViewById(R.id.githubLink);
-        telegramLink = findViewById(R.id.telegramLink);
-		separatorRootShizuku = findViewById(R.id.separatorRootShizuku);
-        separatorAutoSim1 = findViewById(R.id.separatorAutoSim1);
-        separatorSim1Sim2 = findViewById(R.id.separatorSim1Sim2);
-
-        errorBannerContainer = findViewById(R.id.cardErrorBanner);
-        if (errorBannerContainer != null) {
-            errorBannerContainer.setOnClickListener(v -> showDiagnosticDialog());
-        }
-        
-        
-    }
-
-    private void bindLinks() {
-        if (faqLink != null) {
-            faqLink.setOnClickListener(v -> {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Dhangofa/NetToggle/wiki/Frequently-Asked-Questions-(FAQ)"));
-                try { startActivity(browserIntent); } catch (Exception e) { android.widget.Toast.makeText(MainActivity.this, "No web browser installed to open this link.", android.widget.Toast.LENGTH_SHORT).show(); }
-            });
-        }
-        githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
-        telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofas_projects_chat"));
-    }
-	
 	private void updateSeparatorVisibility() {
         // Execution Mode Separator
         int modeId = radioGroup.getCheckedRadioButtonId();
@@ -421,6 +492,18 @@ public class MainActivity extends Activity implements android.content.SharedPref
         checkAndRequestPermission();
         updateErrorBanner();
         updateCapabilities();
+        if (carouselHandler != null && carouselAutoRunnable != null) {
+            carouselHandler.removeCallbacks(carouselAutoRunnable);
+            carouselHandler.postDelayed(carouselAutoRunnable, 5000);
+        }
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (carouselHandler != null && carouselAutoRunnable != null) {
+            carouselHandler.removeCallbacks(carouselAutoRunnable);
+        }
     }
 
     private void checkAndRequestPermission() {
@@ -649,11 +732,55 @@ public class MainActivity extends Activity implements android.content.SharedPref
 	    updateAuthorizationUI(color == 0xFF1B873F);
 	}
 	
-	private boolean isUIAuthorized = true;
-	private void updateAuthorizationUI(boolean authorized) {
-        if (setupCarouselPager != null) {
-            setupCarouselPager.setCurrentItem(authorized ? 2 : 0, true);
+	
+    private android.os.Handler carouselHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    
+    private Runnable carouselAutoRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (carouselItems == null) return;
+            
+            int nextIndex;
+            if (!isUIAuthorized) {
+                // If unauthorized but user manually swiped away, bring them back to 0 eventually
+                nextIndex = 0;
+            } else {
+                // If authorized, cycle through logically
+                nextIndex = (currentCarouselIndex == 2) ? 1 : (currentCarouselIndex + 1);
+            }
+            
+            if (nextIndex != currentCarouselIndex) {
+                int direction = (nextIndex > currentCarouselIndex) ? 1 : -1;
+                currentCarouselIndex = nextIndex;
+                renderCarouselPage(currentCarouselIndex, true, direction);
+            }
+            carouselHandler.postDelayed(this, 5000);
         }
+    };
+    
+    private void updateCarouselContext(boolean authorized) {
+        if (carouselBackground == null || carouselItems == null) return;
+        carouselHandler.removeCallbacks(carouselAutoRunnable);
+
+        if (!authorized) {
+            if (currentCarouselIndex != 0) {
+                currentCarouselIndex = 0;
+                renderCarouselPage(0, true, -1);
+            }
+            // Will auto-correct to 0 every 5 seconds if user swipes away while unauthorized
+            carouselHandler.postDelayed(carouselAutoRunnable, 5000);
+        } else {
+            if (currentCarouselIndex == 0) {
+                currentCarouselIndex = 1;
+                renderCarouselPage(1, true, 1);
+            }
+            carouselHandler.postDelayed(carouselAutoRunnable, 5000);
+        }
+    }
+
+    private boolean isUIAuthorized = false;
+	private void updateAuthorizationUI(boolean authorized) {
+	    updateCarouselContext(authorized);
 	    if (isUIAuthorized == authorized) return;
 	    isUIAuthorized = authorized;
 	    
@@ -690,7 +817,6 @@ public class MainActivity extends Activity implements android.content.SharedPref
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         } catch (Exception ignored) {
-            android.widget.Toast.makeText(MainActivity.this, "No web browser installed to open this link.", android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
