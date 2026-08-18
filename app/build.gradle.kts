@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-    implementation("androidx.viewpager2:viewpager2:1.0.0")
 
     // Shizuku API
     implementation("dev.rikka.shizuku:api:13.1.5")
