@@ -192,6 +192,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
         bindSelectionListeners();
 		updateSeparatorVisibility();
         setupCarousel();
+        setupStaticLandscapeCards();
     }
 
     private void configureStatusBar() {
@@ -247,6 +248,21 @@ public class MainActivity extends Activity implements android.content.SharedPref
     }
 	
 
+        private void setupStaticLandscapeCards() {
+        View btn1 = findViewById(R.id.staticCardButton1);
+        if (btn1 != null) {
+            btn1.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle/wiki/1.-Execution-Mode-Configuration"));
+        }
+        View btn2 = findViewById(R.id.staticCardButton2);
+        if (btn2 != null) {
+            btn2.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle/wiki/2.-Target-SIM-Setup-&-Quick-Tile-Cycle-Guide"));
+        }
+        View btn3 = findViewById(R.id.staticCardButton3);
+        if (btn3 != null) {
+            btn3.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle/wiki/3.-Adding-the-Tile-to-Quick-Settings"));
+        }
+    }
+
     private void setupCarousel() {
         if (carouselBackground == null) return;
         carouselItems = new CarouselItem[]{
@@ -270,16 +286,17 @@ public class MainActivity extends Activity implements android.content.SharedPref
                 case android.view.MotionEvent.ACTION_CANCEL:
                     float deltaX = event.getX() - touchStartX;
                     if (Math.abs(deltaX) > 100) { 
-                        carouselHandler.removeCallbacks(carouselAutoRunnable);
-                        if (deltaX > 0 && currentCarouselIndex > 0) {
-                            currentCarouselIndex--;
+                        if (deltaX > 0) {
+                            // Swipe right (previous page)
+                            currentCarouselIndex = (currentCarouselIndex - 1 + carouselItems.length) % carouselItems.length;
                             renderCarouselPage(currentCarouselIndex, true, -1);
-                        } else if (deltaX < 0 && currentCarouselIndex < carouselItems.length - 1) {
-                            currentCarouselIndex++;
+                        } else if (deltaX < 0) {
+                            // Swipe left (next page)
+                            currentCarouselIndex = (currentCarouselIndex + 1) % carouselItems.length;
                             renderCarouselPage(currentCarouselIndex, true, 1);
                         }
-                        // Resume after 10 seconds of inactivity
-                        carouselHandler.postDelayed(carouselAutoRunnable, 10000);
+                        
+
                     } else if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
                         v.performClick();
                     }
@@ -343,7 +360,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
                         
                         // Prepare for animate in
                         view.setTranslationX(moveInX);
-                        view.animate().translationX(0f).alpha(1f).setDuration(duration)
+                        view.animate().translationX(0f).alpha(1f).setDuration(duration / 2)
                             .setInterpolator(new android.view.animation.DecelerateInterpolator())
                             .start();
                     }).start();
@@ -488,22 +505,17 @@ public class MainActivity extends Activity implements android.content.SharedPref
     @Override
     protected void onResume() {
         super.onResume();
+
         if (appPreferences != null) updateAutoSimWarning();
         checkAndRequestPermission();
         updateErrorBanner();
         updateCapabilities();
-        if (carouselHandler != null && carouselAutoRunnable != null) {
-            carouselHandler.removeCallbacks(carouselAutoRunnable);
-            carouselHandler.postDelayed(carouselAutoRunnable, 5000);
-        }
+
     }
     
     @Override
     protected void onPause() {
         super.onPause();
-        if (carouselHandler != null && carouselAutoRunnable != null) {
-            carouselHandler.removeCallbacks(carouselAutoRunnable);
-        }
     }
 
     private void checkAndRequestPermission() {
@@ -733,56 +745,40 @@ public class MainActivity extends Activity implements android.content.SharedPref
 	}
 	
 	
-    private android.os.Handler carouselHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     
-    private Runnable carouselAutoRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (carouselItems == null) return;
-            
-            int nextIndex;
-            if (!isUIAuthorized) {
-                // If unauthorized but user manually swiped away, bring them back to 0 eventually
-                nextIndex = 0;
-            } else {
-                // If authorized, cycle through logically
-                nextIndex = (currentCarouselIndex == 2) ? 1 : (currentCarouselIndex + 1);
-            }
-            
-            if (nextIndex != currentCarouselIndex) {
-                int direction = (nextIndex > currentCarouselIndex) ? 1 : -1;
-                currentCarouselIndex = nextIndex;
-                renderCarouselPage(currentCarouselIndex, true, direction);
-            }
-            carouselHandler.postDelayed(this, 5000);
-        }
-    };
+
+
+    
+    
     
     private void updateCarouselContext(boolean authorized) {
         if (carouselBackground == null || carouselItems == null) return;
-        carouselHandler.removeCallbacks(carouselAutoRunnable);
+
+        boolean animate = !isFirstCarouselRender;
+        isFirstCarouselRender = false;
 
         if (!authorized) {
-            if (currentCarouselIndex != 0) {
+            if (currentCarouselIndex != 0 || !animate) {
                 currentCarouselIndex = 0;
-                renderCarouselPage(0, true, -1);
+                renderCarouselPage(0, animate, -1);
             }
-            // Will auto-correct to 0 every 5 seconds if user swipes away while unauthorized
-            carouselHandler.postDelayed(carouselAutoRunnable, 5000);
         } else {
-            if (currentCarouselIndex == 0) {
+            // Always start at 2nd page (index 1) on auth transition
+            if (currentCarouselIndex != 1 || !animate) {
                 currentCarouselIndex = 1;
-                renderCarouselPage(1, true, 1);
+                renderCarouselPage(1, animate, 1);
             }
-            carouselHandler.postDelayed(carouselAutoRunnable, 5000);
         }
     }
 
     private boolean isUIAuthorized = false;
+    private boolean isFirstCarouselRender = true;
+    
+    
 	private void updateAuthorizationUI(boolean authorized) {
-	    updateCarouselContext(authorized);
 	    if (isUIAuthorized == authorized) return;
 	    isUIAuthorized = authorized;
+	    updateCarouselContext(authorized);
 	    
 	    float alpha = authorized ? 1.0f : 0.4f;
 	    View targetSimCard = findViewById(R.id.targetSimRadioGroup);

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -35,10 +36,10 @@
                 android:background="@drawable/shape_app_icon_bg">
                 
                 <ImageView
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="39dp"
+                    android:layout_height="39dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_launcher_foreground"
+                    android:src="@drawable/ic_logo_ui"
                     android:tint="@color/brand_on_primary_container"
                     android:contentDescription="NetToggle" />
             </FrameLayout>
@@ -174,109 +175,240 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
-            <!-- Setup Guide Morphing View (Landscape) -->
+            <!-- Setup Guide Static Cards (Landscape) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="12dp">
-                
-<LinearLayout android:id="@+id/carouselBackground" android:clickable="true" android:focusable="true" android:background="@drawable/shape_qs_hint_bg"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="10dp"
-    android:clipChildren="false"
-    android:clipToPadding="false"
-    android:gravity="center_vertical">
-        
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:orientation="vertical">
-            
-        <TextView
-            android:id="@+id/carouselTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:text="New to NetToggle?" />
-                
-        <TextView
-            android:id="@+id/carouselDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            android:layout_marginTop="4dp"
-            android:text="Learn how to set up Execution Modes" />
-                
-        <LinearLayout
-            android:id="@+id/carouselButton"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:clipToPadding="false"
+                android:baselineAligned="false"
+                android:paddingBottom="4dp">
+                    
+                    <!-- Card 1 -->
+                    <LinearLayout
+                        android:id="@+id/staticCard1"
+                        android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="@drawable/shape_qs_hint_bg"
+                        android:backgroundTint="@color/first_pg_bg"
+                        android:padding="16dp"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
+                        
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:text="New to NetToggle?" />
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/shape_pill_badge_bg"
+                                android:backgroundTint="@color/card_surface">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_terminal"
+                                    android:tint="@color/exec_accent" />
+                            </FrameLayout>
+                        </LinearLayout>
+                        
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"
+                            android:text="Learn how to set up Execution Modes" />
+                            
+                        <LinearLayout
+                            android:id="@+id/staticCardButton1"
                             android:foreground="@drawable/ripple_pill_mask"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/shape_pill_badge_bg"
-            android:backgroundTint="@color/card_surface"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:elevation="2dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="4dp"
-            android:clickable="true"
-            android:focusable="true">
-            <TextView
-                android:id="@+id/carouselButtonText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/exec_accent"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:text="Read Guide" />
-            <ImageView
-                android:id="@+id/carouselButtonIcon"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_open_in_new"
-                android:layout_marginStart="4dp"
-                android:tint="@color/exec_accent" />
-        </LinearLayout>
-    </LinearLayout>
-        
-    <FrameLayout
-        android:id="@+id/carouselIconContainer"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/shape_pill_badge_bg"
-        android:backgroundTint="@color/card_surface"
-        android:layout_marginStart="16dp">
-        <ImageView
-            android:id="@+id/carouselIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_terminal"
-            android:tint="@color/exec_accent" />
-    </FrameLayout>
-</LinearLayout>
-                
-                <LinearLayout
-                    android:id="@+id/carouselIndicators"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="8dp" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/shape_pill_badge_bg"
+                            android:backgroundTint="@color/card_surface"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:layout_marginTop="12dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/exec_accent"
+                                android:textStyle="bold"
+                                android:textSize="12sp"
+                                android:text="Read Guide" />
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_open_in_new"
+                                android:layout_marginStart="4dp"
+                                android:tint="@color/exec_accent" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Card 2 -->
+                    <LinearLayout
+                        android:id="@+id/staticCard2"
+                        android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="@drawable/shape_qs_hint_bg"
+                        android:backgroundTint="@color/second_pg_bg"
+                        android:padding="16dp"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
+                        
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:text="Target SIM &amp; Cycle" />
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/shape_pill_badge_bg"
+                                android:backgroundTint="@color/card_surface">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_sim_card"
+                                    android:tint="@color/accent_orange" />
+                            </FrameLayout>
+                        </LinearLayout>
+                        
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"
+                            android:text="Learn how to configure your modes" />
+                            
+                        <LinearLayout
+                            android:id="@+id/staticCardButton2"
+                            android:foreground="@drawable/ripple_pill_mask"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/shape_pill_badge_bg"
+                            android:backgroundTint="@color/card_surface"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:layout_marginTop="12dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/accent_orange"
+                                android:textStyle="bold"
+                                android:textSize="12sp"
+                                android:text="Read Guide" />
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_open_in_new"
+                                android:layout_marginStart="4dp"
+                                android:tint="@color/accent_orange" />
+                        </LinearLayout>
+                    </LinearLayout>
+                    
+                    <!-- Card 3 -->
+                    <LinearLayout
+                        android:id="@+id/staticCard3"
+                        android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="@drawable/shape_qs_hint_bg"
+                        android:backgroundTint="@color/third_pg_bg"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+                        
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:text="Quick Settings Ready" />
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/shape_pill_badge_bg"
+                                android:backgroundTint="@color/card_surface">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_network_bars"
+                                    android:tint="@color/accent_pink" />
+                            </FrameLayout>
+                        </LinearLayout>
+                        
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"
+                            android:text="Add the tile to your Control Center" />
+                            
+                        <LinearLayout
+                            android:id="@+id/staticCardButton3"
+                            android:foreground="@drawable/ripple_pill_mask"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/shape_pill_badge_bg"
+                            android:backgroundTint="@color/card_surface"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:layout_marginTop="12dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/accent_pink"
+                                android:textStyle="bold"
+                                android:textSize="12sp"
+                                android:text="Read Guide" />
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_open_in_new"
+                                android:layout_marginStart="4dp"
+                                android:tint="@color/accent_pink" />
+                        </LinearLayout>
+                    </LinearLayout>
+
             </LinearLayout>
             
             <include android:id="@+id/cardErrorBanner" layout="@layout/view_error_banner" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:visibility="gone" />
