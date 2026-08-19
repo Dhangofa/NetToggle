@@ -1,41 +1,37 @@
 NetToggle is a lightweight Android Quick Settings (QS) tile app for switching cellular network modes directly from Quick Settings. Many phones and carrier configurations hide or limit advanced network mode options, especially strict 5G/4G switching. NetToggle uses privileged shell access through Root or Shizuku to run Android telephony commands and apply selected network modes where supported by the device, ROM, modem, and carrier.<br><br>
 
-<b>━━ ⚙️ NETWORK MODES ━━</b><br><br>
+<b>⚙️ NETWORK MODES</b><br>
+<b>5G Only</b> Attempts to keep the selected SIM on 5G-only mode where supported.<br>
+<b>4G Only</b>: Attempts to keep the selected SIM on 4G/LTE-only mode where supported.<br>
+<b>Preferred 5G</b>: Sets 5G as the preferred network type with fallback behavior controlled by the device and carrier.<br>
+<b>Preferred 4G</b>: Sets 4G/LTE as the preferred network type with fallback behavior controlled by the device and carrier.<br>
+<b>Preferred 3G</b>: Sets 3G (WCDMA/UMTS) as the preferred network type for legacy connectivity.<br>
+<b>2G Only</b>: Locks the device to 2G (GSM) for maximum battery savings where legacy networks still exist.<br><br>
 
-<b>5G Only</b> — attempts to keep the selected SIM on 5G-only mode where supported.<br>
-<b>4G Only</b> — attempts to keep the selected SIM on 4G/LTE-only mode where supported.<br>
-<b>Preferred 5G</b> — sets 5G as the preferred network type with fallback behavior controlled by the device and carrier.<br>
-<b>Preferred 4G</b> — sets 4G/LTE as the preferred network type with fallback behavior controlled by the device and carrier.<br><br>
+<b>🔄 QUICK TILE CYCLE</b><br>
+<b>Configurable Sequence</b>: Completely customize your QS tile behavior. Pick a cycle of 2 or 3 of your most-used network modes.<br>
+<b>Dynamic Filtering</b>: NetToggle's smart capability resolver automatically evaluates your hardware and global carrier configurations. It dynamically hides 2G or 3G options if your carrier has sunset those legacy networks (utilizing a built-in global LTE-and-above registry covering the USA, Japan, Australia, Taiwan, Singapore, and South Korea).<br><br>
 
-<b>━━ 📱 TARGET SIM ━━</b><br><br>
+<b>📱 TARGET SIM</b><br>
+<b>Auto</b>: Uses native API fast-paths to instantly resolve your active data subscription and map it to the correct physical SIM slot.<br>
+<b>SIM 1 & SIM 2</b>: Manually bypass auto-detection and apply network mode changes explicitly to physical slot 1 or 2.<br><br>
 
-<b>Auto</b> — detects the active data subscription and maps it to the correct physical SIM slot.<br>
-<b>SIM 1</b> — applies network mode changes to physical SIM slot 1.<br>
-<b>SIM 2</b> — applies network mode changes to physical SIM slot 2.<br><br>
+<b>🔌 REQUIREMENTS</b><br>
+<b>Root Mode</b>: Uses su access from solutions such as Magisk, APatch, or KernelSU.<br>
+<b>Shizuku Mode</b>: Uses Shizuku's ADB shell permission path without requiring full system root, complete with passive background binder checks.<br><br>
 
-<b>━━ 🔌 REQUIREMENTS ━━</b><br><br>
+<b>🛠️ DESIGN & FEATURES></b><br>
+<b>Modern UI Overhaul</b>: A lightweight, single-screen interface built with a native morphing carousel, edge-to-edge layout, adaptive 3D icons (API 26+), and pill-shaped segmented controls. No heavy bloat.<br>
+<b>Interactive Setup Guide</b>: A visually polished onboarding carousel guides you through Execution Modes, Target SIMs & Tile Cycle, and QS tile setup.<br>
+<b>Deep Diagnostic Engine</b>: Instantly troubleshoot failures. NetToggle now captures deep telemetry (exit codes, stdout, stderr, exceptions) when a Root or Shizuku command fails, viewable in a copyable diagnostic dialog.<br>
+<b>Lightweight Operation</b>: No background polling and no continuous service.<br><br>
 
-<b>Root Mode</b> — uses su access from solutions such as Magisk, APatch, or KernelSU.<br>
-<b>Shizuku Mode</b> — uses Shizuku's ADB shell permission path without requiring full system root.<br><br>
-
-<b>━━ 🛠️ DESIGN ━━</b><br><br>
-
-<b>Modern UI</b> — clean single-screen interface with light/dark theme support, card-based controls, and clear SIM/mode status indicators.<br>
-<b>Quick Settings Tile</b> — switch modes directly from Android's QS panel.<br>
-<b>Lightweight Operation</b> — no background polling and no continuous service.<br>
-<b>Cached Tile State</b> — keeps the tile fast and avoids unnecessary privileged reads.<br>
-<b>Async Execution</b> — runs Root/Shizuku commands away from the main UI path.<br>
-<b>Safe Feedback</b> — shows a temporary Switching state while commands are running.<br><br>
-
-<b>━━ 💻 COMPATIBILITY ━━</b><br><br>
-
-<b>Dual-SIM Support</b> — supports Auto, SIM 1, and SIM 2 target selection.<br>
-<b>OEM Mapping Support</b> — includes expanded readback mappings for several OEM/ROM network mode variants.<br>
-<b>Android Support</b> — supports Android 7.0, API 24, through Android 16, API 36.<br><br>
+<b>💻 COMPATIBILITY</b><br>
+<b>Seamless Legacy Support (Android 7-11)</b>: Bypasses missing framework commands on older devices by utilizing a standalone, headless Java reflection payload executed natively via app_process.<br>
+<b>Broad Android Support</b>: Fully supports Android 7.0 (API 24) through Android 16 (API 36).<br><br>
 
 Network mode support may vary depending on Android version, OEM skin, ROM, modem, SIM setup, and carrier restrictions.<br><br>
 
-<b>━━ 🛡️ PRIVACY ━━</b><br><br>
-
-<b>No Trackers</b> — no ads, analytics, telemetry, or tracking SDKs.<br>
-<b>No Internet Permission</b> — NetToggle works offline and does not collect, store, or transmit user data.
+<b>🛡️ PRIVACY</b><br>
+<b>No Trackers</b>: No ads, analytics, telemetry, or tracking SDKs.<br>
+<b>No Internet Permission</b>: NetToggle works completely offline. It does not collect, store, or transmit user data.
