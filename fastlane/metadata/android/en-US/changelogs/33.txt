@@ -1,0 +1,7 @@
+- Added fully configurable QS tile cycles with 2 or 3 custom modes
+- Expanded network modes with "Preferred 3G" and "2G Only"
+- Added seamless Android 7-11 switching via headless Java payload
+- Refreshed UI with edge-to-edge layouts, morphing animations, and adaptive icons
+- Added native API fast-paths for faster SIM and capability resolution
+- Added an interactive setup guide and deep diagnostic error tracking
+- Added dynamic mode filtering based on global 2G/3G carrier sunset data
