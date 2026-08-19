@@ -10,8 +10,8 @@ android {
         applicationId = "com.dhangofa.networktoggle"
         minSdk = 24
         targetSdk = 36
-        versionCode = 65
-        versionName = "1.0.65"
+        versionCode = 33
+        versionName = "1.1.0"
     }
     // Suggested by IzzyOnDroid
     dependenciesInfo {
