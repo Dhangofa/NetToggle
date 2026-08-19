@@ -1,1 +1,1 @@
-QS tile to force 5G/4G Only or preferred modes using Root or Shizuku
+Force 5G/4G Only or Pref modes directly from Quick Settings using Root/Shizuku
