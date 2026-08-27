@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.command;
 
+/**
+ * Utility class used internally by ProcessResultReader to asynchronously read an InputStream
+ * into a String. It runs on a separate thread to keep things non-blocking.
+ */
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
