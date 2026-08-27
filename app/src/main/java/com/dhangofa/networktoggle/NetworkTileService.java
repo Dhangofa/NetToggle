@@ -1,4 +1,12 @@
 package com.dhangofa.networktoggle;
+
+/**
+ * Quick Settings (QS) Tile Service.
+ * This handles the actual toggle button that sits in the Android notification shade.
+ * When tapped, it reads the current network mode, figures out the next mode based on the configured cycle,
+ * and executes the change using the chosen backend (Root/Shizuku). 
+ * It also dynamically draws the tile icon to reflect the currently active mode.
+ */
 import android.os.Build;
 
 import android.graphics.Bitmap;
@@ -30,19 +38,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.dhangofa.networktoggle.ui.TileIconManager;
+
 public class NetworkTileService extends TileService {
     private static final ExecutorService EXECUTOR =
             Executors.newSingleThreadExecutor();
     private static final AtomicBoolean IS_SWITCHING =
             new AtomicBoolean(false);
-
-    private static Icon icon4g;
-    private static Icon icon5g;
-    private static Icon iconP5g;
-    private static Icon iconP4g;
-    private static Icon iconP3g;
-    private static Icon icon2g;
-    private static Icon iconUnknown;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -88,8 +90,19 @@ public class NetworkTileService extends TileService {
         NetworkMode cachedMode = appPreferences.getCachedNetworkMode();
         updateTileUI(cachedMode);
 
-        if (appPreferences.getExecutionMode() == ExecutionMode.NONE
-                || cachedMode != NetworkMode.UNKNOWN) {
+        if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
+            return;
+        }
+
+        boolean shouldRefresh = (cachedMode == NetworkMode.UNKNOWN);
+        long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
+        
+        // 5 minute micro-cooldown before passively re-checking modem
+        if (!shouldRefresh && (System.currentTimeMillis() - lastCheck > 5 * 60 * 1000L)) {
+            shouldRefresh = true;
+        }
+
+        if (!shouldRefresh) {
             return;
         }
 
@@ -101,13 +114,14 @@ public class NetworkTileService extends TileService {
                  * A tile click or another operation may have updated the state
                  * while this asynchronous readback was running.
                  */
-                if (appPreferences.getCachedNetworkMode()
-                        != NetworkMode.UNKNOWN) {
+                long newCheck = appPreferences.getLastNetworkCheckTimestamp();
+                if (newCheck > lastCheck && cachedMode != NetworkMode.UNKNOWN) {
                     return;
                 }
 
                 if (realMode != NetworkMode.UNKNOWN) {
                     appPreferences.setCachedNetworkMode(realMode);
+                    appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
                     updateTileUI(realMode);
                 }
             });
@@ -153,6 +167,7 @@ public class NetworkTileService extends TileService {
 
             if (result.isSuccess()) {
                 appPreferences.setCachedNetworkMode(nextMode);
+                appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
                 appPreferences.setAutoSimError(false);
                 appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
                 mainHandler.post(() -> {
@@ -202,71 +217,13 @@ public class NetworkTileService extends TileService {
         });
     }
 
-    private Icon createTextOnlyIcon(String text) {
-        int size = 256;
-        Bitmap bitmap = Bitmap.createBitmap(
-                size,
-                size,
-                Bitmap.Config.ARGB_8888
-        );
-        Canvas canvas = new Canvas(bitmap);
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
-        paint.setTypeface(Typeface.create(
-                "sans-serif-condensed",
-                Typeface.BOLD
-        ));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(190f);
-
-        float width = paint.measureText(text);
-        if (width > 240f) {
-            paint.setTextScaleX(240f / width);
-        }
-
-        Paint.FontMetrics metrics = paint.getFontMetrics();
-        float y = (size / 2f) - (metrics.descent + metrics.ascent) / 2f;
-        canvas.drawText(text, size / 2f, y, paint);
-
-        return Icon.createWithBitmap(bitmap);
-    }
-
-    private Icon getCachedIcon(String text) {
-        switch (text) {
-            case "4G":
-                if (icon4g == null) icon4g = createTextOnlyIcon("4G");
-                return icon4g;
-            case "5G":
-                if (icon5g == null) icon5g = createTextOnlyIcon("5G");
-                return icon5g;
-            case "P5G":
-                if (iconP5g == null) iconP5g = createTextOnlyIcon("P5G");
-                return iconP5g;
-            case "P4G":
-                if (iconP4g == null) iconP4g = createTextOnlyIcon("P4G");
-                return iconP4g;
-            case "P3G":
-                if (iconP3g == null) iconP3g = createTextOnlyIcon("P3G");
-                return iconP3g;
-            case "2G":
-                if (icon2g == null) icon2g = createTextOnlyIcon("2G");
-                return icon2g;
-            default:
-                if (iconUnknown == null) {
-                    iconUnknown = createTextOnlyIcon("?");
-                }
-                return iconUnknown;
-        }
-    }
-
     private void updateTileSwitchingUI() {
         Tile tile = getQsTile();
         if (tile == null) return;
 
         tile.setState(Tile.STATE_INACTIVE);
         tile.setLabel("Switching...");
-        tile.setIcon(getCachedIcon("?"));
+        tile.setIcon(TileIconManager.getCachedIcon("?"));
         tile.updateTile();
     }
 
@@ -281,19 +238,19 @@ public class NetworkTileService extends TileService {
         if (errorState == AppPreferences.TILE_ERROR_SHIZUKU) {
             tile.setState(Tile.STATE_UNAVAILABLE);
             tile.setLabel("Shizuku Unavailable");
-            tile.setIcon(getCachedIcon("?"));
+            tile.setIcon(TileIconManager.getCachedIcon("?"));
             tile.updateTile();
             return;
         } else if (errorState == AppPreferences.TILE_ERROR_ROOT) {
             tile.setState(Tile.STATE_UNAVAILABLE);
             tile.setLabel("Root Unavailable");
-            tile.setIcon(getCachedIcon("?"));
+            tile.setIcon(TileIconManager.getCachedIcon("?"));
             tile.updateTile();
             return;
         } else if (errorState == AppPreferences.TILE_ERROR_CMD) {
             tile.setState(Tile.STATE_INACTIVE);
             tile.setLabel("Error Check App");
-            tile.setIcon(getCachedIcon("?"));
+            tile.setIcon(TileIconManager.getCachedIcon("?"));
             tile.updateTile();
             return;
         }
@@ -309,11 +266,11 @@ public class NetworkTileService extends TileService {
                 tile.setLabel("Tap to Set " + firstMode.getTileLabel());
             }
 
-            tile.setIcon(getCachedIcon("?"));
+            tile.setIcon(TileIconManager.getCachedIcon("?"));
         } else {
             tile.setState(Tile.STATE_ACTIVE);
             tile.setLabel(mode.getTileLabel());
-            tile.setIcon(getCachedIcon(mode.getIconText()));
+            tile.setIcon(TileIconManager.getCachedIcon(mode.getIconText()));
         }
 
         tile.updateTile();
