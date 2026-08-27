@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.telephony;
 
+/**
+ * A registry of carriers that require LTE as a minimum.
+ * Prevents users from dropping to 3G/2G on networks that no longer support it (like Verizon).
+ */
+
 import java.util.Arrays;
 import java.util.List;
 
