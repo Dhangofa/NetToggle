@@ -96,6 +96,7 @@ final class ShizukuBinderModeController {
                     return CommandResult.failed("AIDL: setAllowedNetworkTypesForReason", "ITelephony returned false.");
                 }
                 
+                triggerUiRefreshNudge(simInfo.subId);
                 return CommandResult.completed("AIDL: setAllowedNetworkTypesForReason", 0, "Network mode applied successfully via Shizuku Binder.", "");
             }
             
@@ -122,10 +123,61 @@ final class ShizukuBinderModeController {
                 return CommandResult.failed("AIDL: setPreferredNetworkType", "ITelephony returned false.");
             }
             
+            triggerUiRefreshNudge(simInfo.subId);
             return CommandResult.completed("AIDL: setPreferredNetworkType", 0, "Legacy network mode applied successfully via Shizuku Binder.", "");
             
         } catch (Throwable throwable) {
             return CommandResult.failed("AIDL Binder Call", TelephonyMethodHelper.describe(throwable));
+        }
+    }
+    
+    /**
+     * Directly pings the telephony.registry Binder to force SystemUI to redraw the network icons.
+     * This bypasses OEM caching delays (e.g. Samsung/ColorOS 5G icon smoothing) with zero CPU overhead.
+     */
+    private void triggerUiRefreshNudge(int subId) {
+        try {
+            IBinder rawRegistry = SystemServiceHelper.getSystemService("telephony.registry");
+            if (rawRegistry == null || !rawRegistry.pingBinder()) {
+                return;
+            }
+            
+            IBinder registryBinder = new ShizukuBinderWrapper(rawRegistry);
+            
+            @SuppressLint("PrivateApi") 
+            Class<?> stub = Class.forName("com.android.internal.telephony.ITelephonyRegistry$Stub");
+            Object registry = stub.getDeclaredMethod("asInterface", IBinder.class).invoke(null, registryBinder);
+            if (registry == null) {
+                return;
+            }
+            
+            Method notifyCarrier = TelephonyMethodHelper.find(
+                    registry.getClass(), 
+                    "notifyCarrierNetworkChange",
+                    new Class<?>[] {boolean.class}
+            );
+            
+            if (notifyCarrier == null) {
+                notifyCarrier = TelephonyMethodHelper.find(
+                        registry.getClass(), 
+                        "notifyCarrierNetworkChangeWithSubId",
+                        new Class<?>[] {int.class, boolean.class}
+                );
+            }
+            
+            if (notifyCarrier != null) {
+                if (notifyCarrier.getParameterCount() == 2) {
+                    notifyCarrier.invoke(registry, subId, true);
+                    Thread.sleep(50);
+                    notifyCarrier.invoke(registry, subId, false);
+                } else {
+                    notifyCarrier.invoke(registry, true);
+                    Thread.sleep(50);
+                    notifyCarrier.invoke(registry, false);
+                }
+            }
+        } catch (Throwable ignored) {
+            // Nudge is strictly a best-effort UX improvement. Safely ignore failures.
         }
     }
 }
