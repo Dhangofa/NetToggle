@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.telephony;
 
+/**
+ * Resolves what network types (5G, 4G, etc.) the phone actually supports.
+ * It parses raw baseband properties to decide which toggle options should be available in the UI.
+ */
+
 import android.os.Build;
 
 import com.dhangofa.networktoggle.command.CommandExecutor;
