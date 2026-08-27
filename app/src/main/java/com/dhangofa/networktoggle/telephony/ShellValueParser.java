@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.telephony;
 
+/**
+ * Utility to parse the raw text output from the `cmd phone` shell commands
+ * back into the NetworkMode enum.
+ */
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
