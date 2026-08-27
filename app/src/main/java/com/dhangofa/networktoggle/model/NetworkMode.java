@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.model;
 
+/**
+ * This enum maps the different network types (like 5G, 4G, 3G) to their internal Android telephony IDs.
+ * Translates requested modes into the raw values the `cmd phone` commands expect.
+ */
+
 public enum NetworkMode {
     UNKNOWN(0, "Unknown", "Tap to Set 4G", "?", null, -1),
     FOUR_G_ONLY(1, "4G Only", "4G Only", "4G", "1000000000000", 11),
