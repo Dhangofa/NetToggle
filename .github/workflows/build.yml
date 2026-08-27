@@ -1,4 +1,6 @@
-name: Build and Automate NetToggle Release
+name: Build NetToggle
+
+run-name: ${{ github.event_name == 'workflow_dispatch' && (github.ref_name == 'main' && 'Build NetToggle for New Release' || 'Build NetToggle for Testing') || github.event.pull_request.title }}
 
 on:
   workflow_dispatch:
@@ -37,6 +39,17 @@ jobs:
 
       - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
+
+      - name: Inject Automated Versioning (Test Builds)
+        if: github.event_name == 'workflow_dispatch' && github.ref_name != 'main'
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          RUN_NUM=${{ github.run_number }}
+          sed -i -E "s/versionCode *= *[0-9]+/versionCode = $RUN_NUM/" app/build.gradle.kts
+          sed -i -E "s/versionName *= *\"([^\"]+)\"/versionName = \"\1-test-$SHORT_SHA\"/" app/build.gradle.kts
+          
+          echo "Injected Test Versioning:"
+          grep -E "versionCode|versionName" app/build.gradle.kts
 
       - name: Compile Release APK
         run: ./gradlew assembleRelease
