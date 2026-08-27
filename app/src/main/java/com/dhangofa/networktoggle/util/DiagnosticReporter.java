@@ -1,5 +1,11 @@
 package com.dhangofa.networktoggle.util;
 
+/**
+ * Utility class to generate detailed crash logs and diagnostic strings.
+ * It grabs device info, Android versions, Shizuku state, and network capabilities so to easily
+ * debug issues when things go wrong.
+ */
+
 import android.os.Build;
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.DiagnosticError;
