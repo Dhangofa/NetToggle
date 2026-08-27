@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation("org.lsposed.hiddenapibypass:hiddenapibypass:4.3")
 
     // Shizuku API
     implementation("dev.rikka.shizuku:api:13.1.5")
