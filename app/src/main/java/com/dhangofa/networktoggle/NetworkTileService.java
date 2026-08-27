@@ -33,16 +33,13 @@ import com.dhangofa.networktoggle.telephony.NetworkModeController;
 import com.dhangofa.networktoggle.telephony.NetworkModeReader;
 import com.dhangofa.networktoggle.telephony.SimResolver;
 import com.dhangofa.networktoggle.cycle.TileCycleManager;
+import com.dhangofa.networktoggle.util.AppExecutors;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.dhangofa.networktoggle.ui.TileIconManager;
 
 public class NetworkTileService extends TileService {
-    private static final ExecutorService EXECUTOR =
-            Executors.newSingleThreadExecutor();
     private static final AtomicBoolean IS_SWITCHING =
             new AtomicBoolean(false);
 
@@ -106,7 +103,7 @@ public class NetworkTileService extends TileService {
             return;
         }
 
-        EXECUTOR.execute(() -> {
+        AppExecutors.executeTelephony(() -> {
             NetworkMode realMode = networkModeReader.readCurrentMode();
 
             mainHandler.post(() -> {
@@ -148,7 +145,7 @@ public class NetworkTileService extends TileService {
         NetworkMode nextMode = tileCycleManager.getNextMode(currentMode);
         updateTileSwitchingUI();
 
-        EXECUTOR.execute(() -> {
+        AppExecutors.executeTelephony(() -> {
             int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
             if (!simResolver.isValidSlotIndex(slotIndex)) {
                 mainHandler.post(() -> {
