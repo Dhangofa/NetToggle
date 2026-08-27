@@ -1,5 +1,12 @@
 package com.dhangofa.networktoggle.config;
 
+/**
+ * Central configuration and state manager.
+ * Reads and writes all the SharedPreferences for the app, including which execution mode
+ * (Root/Shizuku) is selected, target SIM, saved network cycles, and any transient error states.
+ * This acts as the single source of truth for app settings.
+ */
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -15,6 +22,7 @@ public final class AppPreferences {
     private static final String KEY_EXEC_MODE = "exec_mode";
     private static final String KEY_TARGET_SIM = "target_sim";
     private static final String KEY_NETWORK_STATE = "net_state";
+    private static final String KEY_LAST_NETWORK_CHECK = "last_network_check";
     private static final String KEY_AUTO_SIM_ERROR = "auto_sim_error";
     private static final String KEY_TILE_CYCLE_MODES = "tile_cycle_modes";
     
@@ -77,6 +85,14 @@ public final class AppPreferences {
 
     public void clearCachedNetworkMode() {
         setCachedNetworkMode(NetworkMode.UNKNOWN);
+    }
+
+    public long getLastNetworkCheckTimestamp() {
+        return preferences.getLong(KEY_LAST_NETWORK_CHECK, 0);
+    }
+
+    public void setLastNetworkCheckTimestamp(long timestamp) {
+        preferences.edit().putLong(KEY_LAST_NETWORK_CHECK, timestamp).apply();
     }
 
     public boolean hasAutoSimError() {
