@@ -1,5 +1,11 @@
 package com.dhangofa.networktoggle.telephony;
 
+/**
+ * Helper to manage multi-SIM devices.
+ * It handles the logic for resolving "Auto" SIM to the active data slot, and finding the correct
+ * subId (subscription ID) and phoneId for a given physical SIM slot.
+ */
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
