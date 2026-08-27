@@ -39,6 +39,9 @@ import com.dhangofa.networktoggle.telephony.NetworkCapabilityResolver;
 import com.dhangofa.networktoggle.telephony.SimResolver;
 import com.dhangofa.networktoggle.ui.TileCycleUiController;
 import com.dhangofa.networktoggle.ui.DialogHelper;
+import com.dhangofa.networktoggle.ui.TargetSimUiController;
+import com.dhangofa.networktoggle.ui.TileCycleSyncController;
+import com.dhangofa.networktoggle.util.AppExecutors;
 import android.app.Dialog;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -90,12 +93,13 @@ public class MainActivity extends Activity implements android.content.SharedPref
 	private TileCycleUiController tileCycleUiController;	
     private volatile boolean activityDestroyed;
     private com.dhangofa.networktoggle.ui.ExecutionStateController executionStateController;
+    private TargetSimUiController targetSimUiController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
-
+        // Triggering fresh deploy to streaming emulator to clear cache/state
         configureStatusBar();
         setContentView(R.layout.activity_main);
 
@@ -114,44 +118,23 @@ public class MainActivity extends Activity implements android.content.SharedPref
         
         executionStateController = new com.dhangofa.networktoggle.ui.ExecutionStateController(this, appPreferences, this::setStatus);
         
-        tileCycleUiController.setOnCycleChangedListener(newCycle -> {
-            new Thread(() -> {
-                NetworkMode currentMode = appPreferences.getCachedNetworkMode();
-                
-                // If cache is wiped (e.g. from SIM switch), but execution is allowed, read it directly once
-                if (currentMode == NetworkMode.UNKNOWN && appPreferences.getExecutionMode() != ExecutionMode.NONE) {
-                    currentMode = new com.dhangofa.networktoggle.telephony.NetworkModeReader(this, appPreferences, simResolver).readCurrentMode();
-                    if (currentMode != NetworkMode.UNKNOWN) {
-                        appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
-                        appPreferences.setCachedNetworkMode(currentMode);
-                    }
-                }
-
-                if (currentMode != NetworkMode.UNKNOWN && !newCycle.contains(currentMode)) {
-                    NetworkMode fallbackMode = newCycle.get(0);
-                    // Attempt to sync the network state silently
-                    com.dhangofa.networktoggle.model.CommandResult result = modeController.apply(fallbackMode, appPreferences.getExecutionMode());
-                    if (result.isSuccess()) {
-                        appPreferences.setCachedNetworkMode(fallbackMode);
-                        appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
-                    }
-                } else if (currentMode != NetworkMode.UNKNOWN) {
-                    // It's in the cycle, ensure it is cached so UI shows the actual active state
-                    appPreferences.setCachedNetworkMode(currentMode);
-                }
-            }).start();
-        });
+        TileCycleSyncController tileCycleSyncController = new TileCycleSyncController(
+                this, appPreferences, simResolver, modeController);
+        tileCycleUiController.setOnCycleChangedListener(tileCycleSyncController);
 
 		tileCycleUiController.initialize();
         executionStateController.registerListeners();
-        loadSavedExecutionMode();
-        loadSavedTargetSimMode();
-        updateAutoSimWarning();
+        targetSimUiController = new TargetSimUiController(
+                this, appPreferences, this::updateCapabilities);
+        targetSimUiController.initialize();
         bindSelectionListeners();
 		updateSeparatorVisibility();
         carouselManager = new com.dhangofa.networktoggle.ui.CarouselManager(this);
-        carouselManager.setupCarousel(isUIAuthorized);
+        carouselManager.setupCarousel(false); // Default to false, loadSavedExecutionMode will correct it
         setupStaticLandscapeCards();
+        
+        // Load initial mode and update UI authorization state (triggers dimming if NONE)
+        loadSavedExecutionMode();
     }
 
     private void configureStatusBar() {
@@ -194,7 +177,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
     private void bindLinks() {
         githubLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle"));
         telegramLink.setOnClickListener(v -> openUrl("https://t.me/dhangofas_projects_chat"));
-        if (faqLink != null) faqLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle/wiki"));
+        if (faqLink != null) faqLink.setOnClickListener(v -> openUrl("https://github.com/Dhangofa/NetToggle/wiki/Frequently-Asked-Questions-(FAQ)"));
     }
 	
 
@@ -319,7 +302,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
     protected void onResume() {
         super.onResume();
 
-        if (appPreferences != null) updateAutoSimWarning();
+        if (targetSimUiController != null) targetSimUiController.updateAutoSimWarning();
         if (permissionManager != null) permissionManager.checkAndRequest();
         updateErrorBanner();
     }
@@ -352,14 +335,14 @@ public class MainActivity extends Activity implements android.content.SharedPref
     }
 
     private void updateCapabilities() {
-        new Thread(() -> {
+        AppExecutors.executeTelephony(() -> {
             AppPreferences.NetworkCapabilities caps = capabilityResolver.getCapabilities(appPreferences.getExecutionMode());
             runOnUiThread(() -> {
                 if (!activityDestroyed && tileCycleUiController != null) {
                     tileCycleUiController.applyCapabilities(caps);
                 }
             });
-        }).start();
+        });
     }
 
     @Override
@@ -421,7 +404,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
     
     
     
-    private boolean isUIAuthorized = false;
+    private boolean isUIAuthorized = true;
     
 	private void updateAuthorizationUI(boolean authorized) {
 	    if (isUIAuthorized == authorized) return;
@@ -438,6 +421,9 @@ public class MainActivity extends Activity implements android.content.SharedPref
 	    
 	    if (tileCycleUiController != null) {
 	        tileCycleUiController.setAuthorized(authorized);
+	    }
+        if (targetSimUiController != null) {
+	        targetSimUiController.setAuthorized(authorized);
 	    }
 	    
 	    if (authorized && appPreferences != null) {
