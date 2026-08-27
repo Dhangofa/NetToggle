@@ -18,6 +18,8 @@ import rikka.shizuku.ShizukuBinderWrapper;
 import rikka.shizuku.SystemServiceHelper;
 
 final class ShizukuBinderModeReader {
+
+    private static final String PACKAGE = "com.dhangofa.networktoggle";
     private final SimResolver simResolver;
 
     ShizukuBinderModeReader(SimResolver simResolver) {
@@ -29,8 +31,9 @@ final class ShizukuBinderModeReader {
             return NetworkMode.UNKNOWN;
         }
 
-        int targetSubId = simResolver.resolveTargetSubId(executionMode);
-        if (!simResolver.isValidSubId(targetSubId)) {
+        int subId = simResolver.resolveTargetSubId(executionMode);
+        
+        if (!simResolver.isValidSubId(subId)) {
             return NetworkMode.UNKNOWN;
         }
 
@@ -39,92 +42,87 @@ final class ShizukuBinderModeReader {
                 org.lsposed.hiddenapibypass.HiddenApiBypass.addHiddenApiExemptions("Lcom/android/internal/telephony/");
             }
 
-            IBinder binder = new ShizukuBinderWrapper(SystemServiceHelper.getSystemService("phone"));
-            if (binder == null) {
+            IBinder raw = SystemServiceHelper.getSystemService("phone");
+            if (raw == null || !raw.pingBinder()) {
                 return NetworkMode.UNKNOWN;
             }
 
-            @SuppressLint("PrivateApi")
-            Class<?> iTelephonyStubClass = Class.forName("com.android.internal.telephony.ITelephony$Stub");
-            Method asInterfaceMethod = iTelephonyStubClass.getDeclaredMethod("asInterface", IBinder.class);
-            Object iTelephony = asInterfaceMethod.invoke(null, binder);
-
-            if (iTelephony == null) {
+            IBinder binder = new ShizukuBinderWrapper(raw);
+            if (!binder.pingBinder()) {
                 return NetworkMode.UNKNOWN;
             }
 
-            Class<?> iTelephonyClass = Class.forName("com.android.internal.telephony.ITelephony");
+            @SuppressLint("PrivateApi") 
+            Class<?> stub = Class.forName("com.android.internal.telephony.ITelephony$Stub");
+            Object phone = stub.getDeclaredMethod("asInterface", IBinder.class).invoke(null, binder);
+            
+            Class<?> api = Class.forName("com.android.internal.telephony.ITelephony");
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                Method getAllowedMethod = null;
-                for (Method m : iTelephonyClass.getDeclaredMethods()) {
-                    if (m.getName().equals("getAllowedNetworkTypesForReason")) {
-                        getAllowedMethod = m;
-                        break;
-                    }
+                Method method = TelephonyMethodHelper.find(
+                        api, 
+                        "getAllowedNetworkTypesForReason",
+                        new Class<?>[] {int.class, int.class}, 
+                        new Class<?>[] {int.class, int.class, String.class}, 
+                        new Class<?>[] {int.class}
+                );
+                
+                if (method == null) {
+                    return NetworkMode.UNKNOWN;
                 }
 
-                if (getAllowedMethod != null) {
-                    Class<?>[] pTypes = getAllowedMethod.getParameterTypes();
-                    long bitmask = -1;
-                    if (pTypes.length == 2) {
-                        bitmask = (long) getAllowedMethod.invoke(iTelephony, targetSubId, 0 /* reason user */);
-                    } else if (pTypes.length == 3 && pTypes[2] == String.class) {
-                        bitmask = (long) getAllowedMethod.invoke(iTelephony, targetSubId, 0, "com.dhangofa.networktoggle");
-                    } else if (pTypes.length == 1) {
-                         bitmask = (long) getAllowedMethod.invoke(iTelephony, targetSubId);
-                    }
-                    
-                    if (bitmask != -1) {
-                        // Find closest exact matching NetworkMode by bitmask
-                        for (NetworkMode mode : NetworkMode.values()) {
-                            if (mode.getBinaryMask() != null) {
-                                long modeMask = Long.parseLong(mode.getBinaryMask(), 2);
-                                if (modeMask == bitmask) {
-                                    return mode;
-                                }
-                            }
-                        }
-                        
-                        // Approximate mapping if exact bitmask fails
-                        if ((bitmask & (1L << 19 /* NR */)) != 0) {
-                             if ((bitmask & (1L << 12 /* LTE */)) == 0) return NetworkMode.FIVE_G_ONLY;
-                             return NetworkMode.PREFERRED_5G;
-                        }
-                        if ((bitmask & (1L << 12 /* LTE */)) != 0) {
-                             if ((bitmask & (1L << 13 /* TD_SCDMA */)) == 0 && (bitmask & (1L << 9 /* WCDMA */)) == 0) return NetworkMode.FOUR_G_ONLY;
-                             return NetworkMode.PREFERRED_4G;
-                        }
-                        return NetworkMode.PREFERRED_3G;
+                Object value = method.getParameterCount() == 2 
+                        ? method.invoke(phone, subId, 0)
+                        : method.getParameterCount() == 3 
+                                ? method.invoke(phone, subId, 0, PACKAGE) 
+                                : method.invoke(phone, subId);
+                                
+                if (!(value instanceof Number)) {
+                    return NetworkMode.UNKNOWN;
+                }
+                
+                long bitmask = ((Number) value).longValue();
+                
+                for (NetworkMode mode : NetworkMode.values()) {
+                    if (mode.getBinaryMask() != null && Long.parseLong(mode.getBinaryMask(), 2) == bitmask) {
+                        return mode;
                     }
                 }
-            } else {
-                Method getPrefMethod = null;
-                for (Method m : iTelephonyClass.getDeclaredMethods()) {
-                    if (m.getName().equals("getPreferredNetworkType")) {
-                        getPrefMethod = m;
-                        break;
-                    }
+                
+                if ((bitmask & (1L << 19)) != 0) {
+                    return (bitmask & (1L << 12)) == 0 ? NetworkMode.FIVE_G_ONLY : NetworkMode.PREFERRED_5G;
                 }
-
-                if (getPrefMethod != null) {
-                    Class<?>[] pTypes = getPrefMethod.getParameterTypes();
-                    int legacyMode = -1;
-                    if (pTypes.length == 1) {
-                        legacyMode = (int) getPrefMethod.invoke(iTelephony, targetSubId);
-                    } else if (pTypes.length == 2 && pTypes[1] == String.class) {
-                        legacyMode = (int) getPrefMethod.invoke(iTelephony, targetSubId, "com.dhangofa.networktoggle");
-                    }
-                    
-                    if (legacyMode != -1) {
-                        return NetworkMode.fromLegacyMode(legacyMode);
-                    }
+                
+                if ((bitmask & (1L << 12)) != 0) {
+                    return (bitmask & (1L << 13)) == 0 && (bitmask & (1L << 9)) == 0 
+                            ? NetworkMode.FOUR_G_ONLY 
+                            : NetworkMode.PREFERRED_4G;
                 }
+                
+                return NetworkMode.PREFERRED_3G;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return NetworkMode.UNKNOWN;
+            Method method = TelephonyMethodHelper.find(
+                    api, 
+                    "getPreferredNetworkType",
+                    new Class<?>[] {int.class}, 
+                    new Class<?>[] {int.class, String.class}
+            );
+            
+            if (method == null) {
+                return NetworkMode.UNKNOWN;
+            }
+            
+            Object value = method.getParameterCount() == 1 
+                    ? method.invoke(phone, subId) 
+                    : method.invoke(phone, subId, PACKAGE);
+                    
+            return value instanceof Number 
+                    ? NetworkMode.fromLegacyMode(((Number) value).intValue()) 
+                    : NetworkMode.UNKNOWN;
+                    
+        } catch (Throwable ignored) {
+            return NetworkMode.UNKNOWN;
+        }
     }
 }
