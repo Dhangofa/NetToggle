@@ -7,7 +7,8 @@ package com.dhangofa.networktoggle.model;
 public enum TargetSim {
     AUTO(0, -1),
     SIM_1(1, 0),
-    SIM_2(2, 1);
+    SIM_2(2, 1),
+    BOTH(3, -1);
 
     private final int value;
     private final int manualSlotIndex;
