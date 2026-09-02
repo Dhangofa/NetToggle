@@ -274,4 +274,19 @@ public final class AppPreferences {
                 .remove(KEY_SLOT_CAPS_PREFIX + slotIndex + "_5g")
                 .apply();
     }
+
+    public void saveRoutineShortcut(int slot, String mode, int sim) {
+        preferences.edit()
+                .putString("routine_shortcut_mode_" + slot, mode)
+                .putInt("routine_shortcut_sim_" + slot, sim)
+                .apply();
+    }
+
+    public String getRoutineShortcutMode(int slot) {
+        return preferences.getString("routine_shortcut_mode_" + slot, "NONE");
+    }
+
+    public int getRoutineShortcutSim(int slot) {
+        return preferences.getInt("routine_shortcut_sim_" + slot, 1); // 1 = SIM 1
+    }
 }
