@@ -57,7 +57,7 @@ public final class DialogHelper {
 
         TextView reportText = dialog.findViewById(R.id.diagnosticReportText);
         if (reportText != null) {
-            String report = DiagnosticReporter.generateReport(appPreferences, simResolver);
+            String report = DiagnosticReporter.generateReport(activity, appPreferences, simResolver);
             reportText.setText(report);
         }
 
@@ -75,7 +75,7 @@ public final class DialogHelper {
                 ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Activity.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Diagnostic Report", reportText.getText());
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(activity, "Report copied to clipboard", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.toast_report_copied), Toast.LENGTH_SHORT).show();
             });
         }
 
