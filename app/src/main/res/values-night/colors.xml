@@ -1,52 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Primary Accents -->
-    <color name="brand_primary">#D0BCFF</color>
-    <color name="brand_primary_container">#23212A</color>
-    <color name="brand_on_primary_container">#EADDFF</color>
+    <!-- Brand Primary Accents (Olive) -->
+    <color name="brand_primary">#9CB071</color>
+    <color name="brand_primary_container">#324021</color>
+    <color name="brand_on_primary_container">#E6EDDF</color>
 
-    <!-- Surfaces & Backgrounds -->
-    <color name="surface_background">#000000</color>
-    <color name="card_surface">#141218</color>
-    <color name="card_border">#2B2930</color>
-    <color name="qs_hint_bg">#2B2930</color>
+    <!-- Surfaces & Backgrounds (Warm Dark) -->
+    <color name="surface_background">#181715</color>
+    <color name="card_surface">#24221F</color>
+    <color name="card_border">#36332F</color>
 
     <!-- Typography -->
-    <color name="text_primary">#E6E1E5</color>
-    <color name="text_secondary">#CAC4D0</color>
-    <color name="text_tertiary">#938F96</color>
+    <color name="text_primary">#F0EFEA</color>
+    <color name="text_secondary">#A39F98</color>
+    <color name="text_tertiary">#73706B</color>
 
     <!-- Status Alerts -->
-    <color name="status_success_bg">#1A3822</color>
-    <color name="status_error_bg">#3E1A19</color>
-    <color name="status_error_text">#F2B8B5</color>
+    <color name="status_success_bg">#23381B</color>
+    <color name="status_success_text">#83B86E</color>
+    <color name="status_error_bg">#4A1D1A</color>
+    <color name="status_error_text">#E07873</color>
+    <color name="status_warning_bg">#4A3210</color>
+    <color name="status_warning_text">#E0AD60</color>
 
     <!-- Controls -->
-    <color name="social_button_bg">#2B2930</color>
+    <color name="social_button_bg">#36332F</color>
+    <color name="dialog_bg">#24221F</color>
+    <color name="cycle_order_badge_bg">#36332F</color>
 
-    <!-- Segmented controls -->
-    <color name="segmented_separator">#49454F</color>
-    <color name="segmented_container">#1B1A20</color>
-    <color name="segmented_text_unselected">#938F96</color>
+    <!-- Carousel Pages -->
+    <color name="carousel_bg_default">#181715</color>
+    <color name="carousel_page1_bg">#2B2433</color> <!-- Lavender tinted dark -->
+    <color name="carousel_page2_bg">#252E1E</color> <!-- Olive tinted dark -->
+    <color name="carousel_page3_bg">#36281A</color> <!-- Sand tinted dark -->
+    <color name="carousel_button_bg">#36332F</color>
+    <color name="carousel_page1_accent">#B8A3CC</color>
+    <color name="carousel_page2_accent">#9CB071</color>
+    <color name="carousel_page3_accent">#DEBA90</color>
+    <color name="carousel_page4_bg">#1D2A33</color> <!-- Blue tinted dark -->
+    <color name="carousel_page5_bg">#331E23</color> <!-- Rose tinted dark -->
+    <color name="carousel_page4_accent">#8BB4CC</color>
+    <color name="carousel_page5_accent">#CC97A0</color>
 
-    <!-- Colorful Accents -->
-    <color name="accent_orange">#FFB782</color>
-    <color name="accent_pink">#F48FB1</color>
+    <!-- Cycle Card Custom Tones (Warm Sand) -->
+    <color name="cycle_accent">#DEBA90</color>
+    <color name="cycle_card_surface">#24221F</color>
+    <color name="cycle_segmented_selected">#36332F</color>
+    <color name="cycle_segmented_text_selected">#DEBA90</color>
+    <color name="cycle_segmented_text_unselected">#A39F98</color>
+    <color name="cycle_segmented_separator">#45413C</color>
+    <color name="cycle_segmented_container">#181715</color>
 
-    <!-- Carousel Page -->
-    <color name="first_pg_bg">#11161A</color>
-    <color name="second_pg_bg">#1A130F</color>
-    <color name="third_pg_bg">#160309</color>
-    <color name="view_guide_button_bg">#2B2930</color>
-
-    <!-- Cycle Card Custom Tones -->
-    <color name="cycle_card_surface">#1A130F</color>
-    <color name="cycle_segmented_selected">#3D210F</color>
-    <color name="cycle_segmented_text_selected">#FFB782</color>
-
-    <!-- Exec Card Custom Tones -->
-    <color name="exec_accent">#57AFFF</color>
-    <color name="exec_card_surface">#11161A</color>
-    <color name="exec_segmented_selected">#1A364F</color>
-    <color name="exec_segmented_text_selected">#8ECCFF</color>
+    <!-- Exec Card Custom Tones (Lavender) -->
+    <color name="exec_accent">#B8A3CC</color>
+    <color name="exec_card_surface">#24221F</color>
+    <color name="exec_segmented_selected">#36332F</color>
+    <color name="exec_segmented_text_selected">#B8A3CC</color>
+    <color name="exec_segmented_text_unselected">#A39F98</color>
+    <color name="exec_segmented_separator">#45413C</color>
+    <color name="exec_segmented_container">#181715</color>
+    
+    <!-- Target SIM Card Custom Tones (Olive) -->
+    <color name="sim_accent">#9CB071</color>
+    <color name="sim_card_surface">#24221F</color>
+    <color name="sim_segmented_selected">#36332F</color>
+    <color name="sim_segmented_text_selected">#9CB071</color>
+    <color name="sim_segmented_text_unselected">#A39F98</color>
+    <color name="sim_segmented_separator">#45413C</color>
+    <color name="sim_segmented_container">#181715</color>
 </resources>
