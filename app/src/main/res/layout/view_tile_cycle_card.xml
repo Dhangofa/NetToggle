@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardTileCycle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/shape_cycle_card_bg"
@@ -25,13 +26,13 @@
                 android:layout_marginEnd="6dp"
                 android:contentDescription="Quick Tile Cycle"
                 android:src="@drawable/ic_refresh"
-                android:tint="@color/accent_orange" />
+                android:tint="@color/cycle_accent" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="Quick Tile Cycle"
+                android:text="@string/quick_tile_cycle"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -45,8 +46,8 @@
             android:background="@drawable/shape_cycle_order_badge"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
-            android:text="3/3"
-            android:textColor="@color/accent_orange"
+            android:text="@string/text_3_3"
+            android:textColor="@color/cycle_accent"
             android:textSize="10sp"
             android:textStyle="bold" />
     </RelativeLayout>
@@ -55,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:text="Select 2 to 3 modes. Selection order becomes the tile cycle order."
+        android:text="@string/select_2_to_3_modes_selection_order_beco"
         android:textColor="@color/text_secondary"
         android:textSize="11sp" />
 
@@ -63,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/shape_segmented_container_rect"
+        android:background="@drawable/shape_cycle_segmented_container_rect"
         android:padding="4dp">
 
         <CheckBox
@@ -76,7 +77,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Pref 5G"
+            android:text="@string/pref_5g"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -87,7 +88,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cyclePreferred4g"
@@ -99,7 +100,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Pref 4G"
+            android:text="@string/pref_4g"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -110,7 +111,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cyclePreferred3g"
@@ -122,7 +123,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Pref 3G"
+            android:text="@string/pref_3g"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -133,7 +134,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
-        android:background="@drawable/shape_segmented_container_rect"
+        android:background="@drawable/shape_cycle_segmented_container_rect"
         android:padding="4dp">
 
         <CheckBox
@@ -146,7 +147,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="5G Only"
+            android:text="@string/text_5g_only"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -157,7 +158,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cycle4gOnly"
@@ -169,7 +170,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="4G Only"
+            android:text="@string/text_4g_only"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -180,7 +181,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cycle2gOnly"
@@ -192,7 +193,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="2G Only"
+            android:text="@string/text_2g_only"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -206,8 +207,8 @@
         android:background="@drawable/shape_cycle_order_badge"
         android:gravity="center"
         android:padding="10dp"
-        android:text="Cycle: 5G Only → 4G Only → Preferred 5G"
-        android:textColor="@color/accent_orange"
+        android:text="@string/cycle_5g_only_4g_only_preferred_5g"
+        android:textColor="@color/cycle_accent"
         android:textSize="11sp"
         android:textStyle="bold" />
 
