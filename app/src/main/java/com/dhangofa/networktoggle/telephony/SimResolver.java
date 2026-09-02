@@ -28,6 +28,8 @@ public final class SimResolver {
 
     private final Context context;
     private final AppPreferences appPreferences;
+    private TargetSim overrideTargetSim = null;
+
     // Data class to hold all extracted variables in one place
     public static class SimInfo {
         public final int subId;
@@ -50,8 +52,12 @@ public final class SimResolver {
         return context;
     }
     
+    public void setOverrideTargetSim(TargetSim targetSim) {
+        this.overrideTargetSim = targetSim;
+    }
+
     public SimInfo resolveTargetSimInfo(ExecutionMode executionMode) {
-        TargetSim targetSim = appPreferences.getTargetSim();
+        TargetSim targetSim = overrideTargetSim != null ? overrideTargetSim : appPreferences.getTargetSim();
         int targetSubId = INVALID_SUB_ID;
         int targetSlotIndex = INVALID_SLOT_INDEX;
         String carrierName = "";
