@@ -12,19 +12,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
+import android.graphics.DashPathEffect;
+import java.util.HashMap;
 
 public final class TileIconManager {
-    private static Icon icon4g;
-    private static Icon icon5g;
-    private static Icon iconP5g;
-    private static Icon iconP4g;
-    private static Icon iconP3g;
-    private static Icon icon2g;
-    private static Icon iconUnknown;
+    private static final HashMap<String, Icon> iconCache = new HashMap<>();
 
     private TileIconManager() {}
 
-    private static Icon createTextOnlyIcon(String text) {
+    private static Icon createTextOnlyIcon(String text, String badge, boolean isAuto) {
         int size = 256;
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -33,7 +29,7 @@ public final class TileIconManager {
         paint.setColor(Color.WHITE);
         paint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(190f);
+        paint.setTextSize(175f);
 
         float width = paint.measureText(text);
         if (width > 240f) {
@@ -42,34 +38,48 @@ public final class TileIconManager {
 
         Paint.FontMetrics metrics = paint.getFontMetrics();
         float y = (size / 2f) - (metrics.descent + metrics.ascent) / 2f;
-        canvas.drawText(text, size / 2f, y, paint);
+        // Shift text slightly to the left and down to make room for the badge
+        canvas.drawText(text, (size / 2f) - 10f, y + 10f, paint);
+
+        if (badge != null && !badge.isEmpty()) {
+            float cx = size - 35f;
+            float cy = 35f;
+            float radius = 28f;
+
+            // Draw circle
+            Paint circlePaint = new Paint();
+            circlePaint.setAntiAlias(true);
+            circlePaint.setColor(Color.WHITE);
+            circlePaint.setStyle(Paint.Style.STROKE);
+            circlePaint.setStrokeWidth(9f);
+            if (isAuto) {
+                // Circumference is ~176 (2 * pi * 28). To get 4 dashes with smaller gaps, dash+gap should be ~44.
+                circlePaint.setPathEffect(new DashPathEffect(new float[]{36f, 8f}, 0f));
+            }
+            canvas.drawCircle(cx, cy, radius, circlePaint);
+
+            // Draw badge text
+            Paint badgeTextPaint = new Paint();
+            badgeTextPaint.setAntiAlias(true);
+            badgeTextPaint.setColor(Color.WHITE);
+            badgeTextPaint.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
+            badgeTextPaint.setFakeBoldText(true); // Force extra thickness
+            badgeTextPaint.setTextAlign(Paint.Align.CENTER);
+            badgeTextPaint.setTextSize(45f);
+            
+            Paint.FontMetrics badgeMetrics = badgeTextPaint.getFontMetrics();
+            float badgeY = cy - (badgeMetrics.descent + badgeMetrics.ascent) / 2f;
+            canvas.drawText(badge, cx, badgeY, badgeTextPaint);
+        }
 
         return Icon.createWithBitmap(bitmap);
     }
 
-    public static Icon getCachedIcon(String text) {
-        switch (text) {
-            case "4G":
-                if (icon4g == null) icon4g = createTextOnlyIcon("4G");
-                return icon4g;
-            case "5G":
-                if (icon5g == null) icon5g = createTextOnlyIcon("5G");
-                return icon5g;
-            case "P5G":
-                if (iconP5g == null) iconP5g = createTextOnlyIcon("P5G");
-                return iconP5g;
-            case "P4G":
-                if (iconP4g == null) iconP4g = createTextOnlyIcon("P4G");
-                return iconP4g;
-            case "P3G":
-                if (iconP3g == null) iconP3g = createTextOnlyIcon("P3G");
-                return iconP3g;
-            case "2G":
-                if (icon2g == null) icon2g = createTextOnlyIcon("2G");
-                return icon2g;
-            default:
-                if (iconUnknown == null) iconUnknown = createTextOnlyIcon("?");
-                return iconUnknown;
+    public static Icon getCachedIcon(String text, String badge, boolean isAuto) {
+        String cacheKey = text + "_" + badge + "_" + isAuto;
+        if (!iconCache.containsKey(cacheKey)) {
+            iconCache.put(cacheKey, createTextOnlyIcon(text, badge, isAuto));
         }
+        return iconCache.get(cacheKey);
     }
 }
