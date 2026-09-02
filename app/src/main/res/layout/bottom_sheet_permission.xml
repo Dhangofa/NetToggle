@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Unlock Maximum Performance"
+            android:text="@string/unlock_maximum_performance"
             android:textSize="20sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -35,7 +35,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NetToggle operates faster if it can directly read your SIM state. Please grant the Phone permission to eliminate system lag and enable instant resolution."
+        android:text="@string/nettoggle_operates_faster_if_it_can_dire"
         android:textSize="14sp"
         android:lineSpacingExtra="4dp"
         android:textColor="@color/text_secondary"
@@ -51,7 +51,7 @@
             android:id="@+id/btnDismissPermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dismiss"
+            android:text="@string/dismiss"
             style="?android:attr/borderlessButtonStyle"
             android:textColor="@color/text_secondary"
             android:layout_marginEnd="8dp" />
@@ -60,7 +60,7 @@
             android:id="@+id/btnGrantPermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Grant Permission"
+            android:text="@string/grant_permission"
             android:paddingHorizontal="24dp"
             android:background="@drawable/shape_button_primary"
             android:textColor="@color/card_surface" />
