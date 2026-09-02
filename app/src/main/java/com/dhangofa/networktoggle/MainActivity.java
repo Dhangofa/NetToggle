@@ -15,6 +15,7 @@
 package com.dhangofa.networktoggle;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -22,8 +23,11 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.content.res.ColorStateList;
 import android.widget.ImageView;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -46,7 +50,6 @@ import android.app.Dialog;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -57,7 +60,56 @@ import com.dhangofa.networktoggle.util.DiagnosticReporter;
 
 import rikka.shizuku.Shizuku;
 
-public class MainActivity extends Activity implements android.content.SharedPreferences.OnSharedPreferenceChangeListener {	
+public class MainActivity extends Activity implements android.content.SharedPreferences.OnSharedPreferenceChangeListener {
+    private int currentThemeMode = -1;
+    private ImageView btnThemeToggle;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences prefs = newBase.getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        int mode = prefs.getInt("app_theme", 0);
+        
+        Configuration config = new Configuration(newBase.getResources().getConfiguration());
+        if (mode == 1) { // Light
+            config.uiMode = (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | Configuration.UI_MODE_NIGHT_NO;
+        } else if (mode == 2 || mode == 3) { // Dark or AMOLED
+            config.uiMode = (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | Configuration.UI_MODE_NIGHT_YES;
+        }
+        super.attachBaseContext(newBase.createConfigurationContext(config));
+    }
+
+    private void cycleThemeMode() {
+        currentThemeMode = (currentThemeMode + 1) % 4;
+        getSharedPreferences("AppPrefs", MODE_PRIVATE).edit().putInt("app_theme", currentThemeMode).apply();
+        recreate();
+    }
+    
+    private void updateThemeIcon() {
+        if (btnThemeToggle == null) return;
+        if (currentThemeMode == 0) {
+            btnThemeToggle.setImageResource(R.drawable.ic_theme_auto);
+        } else if (currentThemeMode == 1) {
+            btnThemeToggle.setImageResource(R.drawable.ic_theme_light);
+        } else if (currentThemeMode == 2) {
+            btnThemeToggle.setImageResource(R.drawable.ic_theme_dark);
+        } else {
+            btnThemeToggle.setImageResource(R.drawable.ic_theme_amoled);
+        }
+    }
+    
+    private void applyAmoledIfNeeded() {
+        if (currentThemeMode == 3) {
+            int black = Color.BLACK;
+            View root = findViewById(R.id.mainRoot);
+            if (root != null) root.setBackgroundColor(black);
+            getWindow().setNavigationBarColor(black);
+            
+            // AMOLED mode only darkens the root window background to pure black to save battery.
+            // Cards and surfaces will retain their default dark mode elevation and borders,
+            // otherwise they become completely invisible against the black background.
+        }
+    }
+	
 	
     private RadioGroup radioGroup;
     private RadioButton radioRoot;
@@ -66,21 +118,12 @@ public class MainActivity extends Activity implements android.content.SharedPref
     private TextView statusText;
     private ImageView githubLink;
     private ImageView telegramLink;
-
-    private RadioGroup targetSimRadioGroup;
-    private RadioButton radioSimAuto;
-    private RadioButton radioSim1;
-    private RadioButton radioSim2;
-    private TextView autoSimWarningText;
-
     private ImageView faqLink;
     
     // Morphing View Carousel
     private com.dhangofa.networktoggle.ui.CarouselManager carouselManager;
 
 	private View separatorRootShizuku;
-    private View separatorAutoSim1;
-    private View separatorSim1Sim2;
 
     private com.dhangofa.networktoggle.ui.PhoneStatePermissionManager permissionManager;
     private View errorBannerContainer;
@@ -94,25 +137,41 @@ public class MainActivity extends Activity implements android.content.SharedPref
     private volatile boolean activityDestroyed;
     private com.dhangofa.networktoggle.ui.ExecutionStateController executionStateController;
     private TargetSimUiController targetSimUiController;
+    private SimResolver simResolver;
+    private NetworkModeController modeController;
+    private com.dhangofa.networktoggle.telephony.NetworkModeReader modeReader;
+    private TargetSim lastTargetSim = TargetSim.AUTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        android.content.SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        currentThemeMode = prefs.getInt("app_theme", 0);
+        
         super.onCreate(savedInstanceState);
         activityDestroyed = false;
         // Triggering fresh deploy to streaming emulator to clear cache/state
         configureStatusBar();
         setContentView(R.layout.activity_main);
+        
+        btnThemeToggle = (ImageView) findViewById(R.id.btnThemeToggle);
+        updateThemeIcon();
+        if (btnThemeToggle != null) {
+            btnThemeToggle.setOnClickListener(v -> cycleThemeMode());
+        }
+        applyAmoledIfNeeded();
 
         appPreferences = new AppPreferences(this);
+        lastTargetSim = appPreferences.getTargetSim();
         appPreferences.registerListener(this);
         bindViews();
-		appVersionText.setText("v" + getAppVersionName());
+		appVersionText.setText(getString(R.string.app_version_format, getAppVersionName()));
         bindLinks();
-        SimResolver simResolver = new SimResolver(this, appPreferences);
+        simResolver = new SimResolver(this, appPreferences);
         capabilityResolver = new NetworkCapabilityResolver(appPreferences, simResolver);
 		TileCycleManager tileCycleManager = new TileCycleManager(appPreferences);
 		tileCycleUiController = new TileCycleUiController(this, tileCycleManager);
-        NetworkModeController modeController = new NetworkModeController(simResolver);
+        modeController = new NetworkModeController(simResolver);
+        modeReader = new com.dhangofa.networktoggle.telephony.NetworkModeReader(this, appPreferences, simResolver);
         
         permissionManager = new com.dhangofa.networktoggle.ui.PhoneStatePermissionManager(this, REQ_CODE_PHONE_STATE, this::updateCapabilities);
         
@@ -125,7 +184,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
 		tileCycleUiController.initialize();
         executionStateController.registerListeners();
         targetSimUiController = new TargetSimUiController(
-                this, appPreferences, this::updateCapabilities);
+                this, appPreferences, this::onTargetSimSelectionChanged);
         targetSimUiController.initialize();
         bindSelectionListeners();
 		updateSeparatorVisibility();
@@ -142,36 +201,63 @@ public class MainActivity extends Activity implements android.content.SharedPref
 
         boolean isNight = (getResources().getConfiguration().uiMode
                 & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-        getWindow().setStatusBarColor(getColor(R.color.card_surface));
-        getWindow().getDecorView().setSystemUiVisibility(
-                isNight ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        
+        android.view.Window window = getWindow();
+        window.setStatusBarColor(getColor(R.color.card_surface));
+        
+        if (currentThemeMode == 3) {
+            window.setNavigationBarColor(Color.BLACK);
+        } else {
+            window.setNavigationBarColor(getColor(R.color.surface_background));
+        }
+        
+        int flags = isNight ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        if (!isNight && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+        window.getDecorView().setSystemUiVisibility(flags);
     }
 
+    private View btnRoutineShortcuts;
+    
     private void bindViews() {
         radioGroup = findViewById(R.id.modeRadioGroup);
         radioRoot = findViewById(R.id.radioRoot);
         radioShizuku = findViewById(R.id.radioShizuku);
         statusText = findViewById(R.id.shizukuStatusText);
 		appVersionText = findViewById(R.id.appVersionText);
-        targetSimRadioGroup = findViewById(R.id.targetSimRadioGroup);
-        radioSimAuto = findViewById(R.id.radioSimAuto);
-        radioSim1 = findViewById(R.id.radioSim1);
-        radioSim2 = findViewById(R.id.radioSim2);
-        autoSimWarningText = findViewById(R.id.autoSimWarningText);
+        faqLink = findViewById(R.id.faqLink);
         githubLink = findViewById(R.id.githubLink);
         telegramLink = findViewById(R.id.telegramLink);
-
-        faqLink = findViewById(R.id.faqLink);
 		separatorRootShizuku = findViewById(R.id.separatorRootShizuku);
-        separatorAutoSim1 = findViewById(R.id.separatorAutoSim1);
-        separatorSim1Sim2 = findViewById(R.id.separatorSim1Sim2);
 
         errorBannerContainer = findViewById(R.id.cardErrorBanner);
         if (errorBannerContainer != null) {
             errorBannerContainer.setOnClickListener(v -> showDiagnosticDialog());
         }
         
-        
+        btnRoutineShortcuts = findViewById(R.id.btnRoutineShortcuts);
+        if (btnRoutineShortcuts != null) {
+            btnRoutineShortcuts.setOnClickListener(v -> com.dhangofa.networktoggle.ui.ShortcutDialogHelper.showDialog(this, appPreferences));
+            
+            android.widget.ScrollView mainScrollView = findViewById(R.id.mainScrollView);
+            if (mainScrollView != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    mainScrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                        if (scrollY > oldScrollY && btnRoutineShortcuts.getScaleX() == 1f) {
+                            // Scrolling down (Swiping up) -> Hide FAB
+                            btnRoutineShortcuts.animate().scaleX(0f).scaleY(0f).setDuration(200).withEndAction(() -> {
+                                btnRoutineShortcuts.setVisibility(View.INVISIBLE);
+                            }).start();
+                        } else if (scrollY < oldScrollY && btnRoutineShortcuts.getScaleX() == 0f) {
+                            // Scrolling up (Swiping down) -> Show FAB
+                            btnRoutineShortcuts.setVisibility(View.VISIBLE);
+                            btnRoutineShortcuts.animate().scaleX(1f).scaleY(1f).setDuration(200).withEndAction(null).start();
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void bindLinks() {
@@ -204,22 +290,6 @@ public class MainActivity extends Activity implements android.content.SharedPref
         } else {
             separatorRootShizuku.setVisibility(View.INVISIBLE);
         }
-
-        // Target SIM Separators
-        int simId = targetSimRadioGroup.getCheckedRadioButtonId();
-        if (simId == -1) {
-            separatorAutoSim1.setVisibility(View.VISIBLE);
-            separatorSim1Sim2.setVisibility(View.VISIBLE);
-        } else if (simId == R.id.radioSimAuto) {
-            separatorAutoSim1.setVisibility(View.INVISIBLE);
-            separatorSim1Sim2.setVisibility(View.VISIBLE);
-        } else if (simId == R.id.radioSim1) {
-            separatorAutoSim1.setVisibility(View.INVISIBLE);
-            separatorSim1Sim2.setVisibility(View.INVISIBLE);
-        } else if (simId == R.id.radioSim2) {
-            separatorAutoSim1.setVisibility(View.VISIBLE);
-            separatorSim1Sim2.setVisibility(View.INVISIBLE);
-        }
     }
 
     private void loadSavedExecutionMode() {
@@ -232,11 +302,9 @@ public class MainActivity extends Activity implements android.content.SharedPref
             executionStateController.checkShizukuPermission(false);
         } else {
             radioGroup.clearCheck();
-            setStatus("Select Root or Shizuku mode.", 0xFFFFB300);
+            setStatus(getString(R.string.status_select_mode), 3);
         }
     }
-
-    private boolean updatingSimUi = false;
 
     private void bindSelectionListeners() {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -248,53 +316,6 @@ public class MainActivity extends Activity implements android.content.SharedPref
                 appPreferences.onExecutionModeChanged(ExecutionMode.SHIZUKU);
                 executionStateController.checkShizukuPermission(true);
             }
-        });
-
-        android.view.View.OnTouchListener lockTouch = (v, event) -> {
-            if (!isUIAuthorized && event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-                android.widget.Toast.makeText(MainActivity.this, "Please authorize Root or Shizuku to configure toggles.", android.widget.Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        };
-        radioSimAuto.setOnTouchListener(lockTouch);
-        radioSim1.setOnTouchListener(lockTouch);
-        radioSim2.setOnTouchListener(lockTouch);
-
-        targetSimRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (updatingSimUi) return;
-            TargetSim target = TargetSim.AUTO;
-            if (checkedId == R.id.radioSim1) target = TargetSim.SIM_1;
-            else if (checkedId == R.id.radioSim2) target = TargetSim.SIM_2;
-            
-            // Validate slot immediately
-            if (target != TargetSim.AUTO && checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                android.telephony.SubscriptionManager sm = getSystemService(android.telephony.SubscriptionManager.class);
-                if (sm != null) {
-                    boolean found = false;
-                    java.util.List<android.telephony.SubscriptionInfo> infos = sm.getActiveSubscriptionInfoList();
-                    if (infos != null) {
-                        for (android.telephony.SubscriptionInfo info : infos) {
-                            if (info.getSimSlotIndex() == target.getManualSlotIndex()) {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!found) {
-                        Toast.makeText(MainActivity.this, "No SIM card found in slot " + (target.getManualSlotIndex() + 1), Toast.LENGTH_SHORT).show();
-                        updatingSimUi = true;
-                        radioSimAuto.setChecked(true);
-                        updatingSimUi = false;
-                        target = TargetSim.AUTO;
-                    }
-                }
-            }
-            
-            updateSeparatorVisibility();
-            appPreferences.onTargetSimChanged(target);
-            updateAutoSimWarning();
-            updateCapabilities();
         });
     }
 
@@ -334,6 +355,41 @@ public class MainActivity extends Activity implements android.content.SharedPref
         diagnosticDialog.show();
     }
 
+    private void onTargetSimSelectionChanged() {
+        TargetSim newTarget = appPreferences.getTargetSim();
+        if (lastTargetSim != TargetSim.BOTH && newTarget == TargetSim.BOTH) {
+            AppExecutors.executeTelephony(() -> {
+                simResolver.setOverrideTargetSim(TargetSim.SIM_1);
+                NetworkMode mode1 = modeReader.readCurrentMode();
+                
+                simResolver.setOverrideTargetSim(TargetSim.SIM_2);
+                NetworkMode mode2 = modeReader.readCurrentMode();
+                simResolver.setOverrideTargetSim(null);
+                
+                if (mode1 != NetworkMode.UNKNOWN && mode2 != NetworkMode.UNKNOWN && mode1 != mode2) {
+                    com.dhangofa.networktoggle.cycle.TileCycleManager tileCycleManager = new com.dhangofa.networktoggle.cycle.TileCycleManager(appPreferences);
+                    AppPreferences.NetworkCapabilities combinedCaps = capabilityResolver.getCapabilities(appPreferences.getExecutionMode());
+                    tileCycleManager.forceRemoveUnsupportedAndAutoFill(combinedCaps);
+                    java.util.List<NetworkMode> cycle = tileCycleManager.getCycle();
+                    NetworkMode modeToApply = cycle.contains(mode1) ? mode1 : (cycle.contains(mode2) ? mode2 : cycle.get(0));
+                    
+                    simResolver.setOverrideTargetSim(TargetSim.SIM_1);
+                    modeController.apply(modeToApply, appPreferences.getExecutionMode());
+                    simResolver.setOverrideTargetSim(TargetSim.SIM_2);
+                    modeController.apply(modeToApply, appPreferences.getExecutionMode());
+                    simResolver.setOverrideTargetSim(null);
+                    
+                    appPreferences.setCachedNetworkMode(NetworkMode.UNKNOWN);
+                }
+                
+                updateCapabilities();
+            });
+        } else {
+            updateCapabilities();
+        }
+        lastTargetSim = newTarget;
+    }
+
     private void updateCapabilities() {
         AppExecutors.executeTelephony(() -> {
             AppPreferences.NetworkCapabilities caps = capabilityResolver.getCapabilities(appPreferences.getExecutionMode());
@@ -341,6 +397,7 @@ public class MainActivity extends Activity implements android.content.SharedPref
                 if (!activityDestroyed && tileCycleUiController != null) {
                     tileCycleUiController.applyCapabilities(caps);
                 }
+                android.service.quicksettings.TileService.requestListeningState(MainActivity.this, new android.content.ComponentName(MainActivity.this, NetworkTileService.class));
             });
         });
     }
@@ -377,47 +434,35 @@ public class MainActivity extends Activity implements android.content.SharedPref
     }
 
 
-	private void setStatus(String text, int color) {
+	private void setStatus(String text, int colorCode) {
 	    statusText.setText(text);
-	    statusText.setTextColor(color);
 	
-	    if (color == 0xFF1B873F) {
-	        statusText.setBackgroundResource(
-	                R.drawable.shape_status_badge_success
-	        );
-	    } else if (color == 0xFFFF5555) {
-	        statusText.setBackgroundResource(
-	                R.drawable.shape_status_badge_error
-	        );
-	    } else {
-	        statusText.setBackgroundResource(
-	                R.drawable.shape_pill_badge_bg
-	        );
+	    if (colorCode == 1) { // Success
+	        statusText.setTextColor(getColor(R.color.status_success_text));
+	        statusText.setBackgroundResource(R.drawable.shape_status_badge_success);
+	    } else if (colorCode == 2) { // Error
+	        statusText.setTextColor(getColor(R.color.status_error_text));
+	        statusText.setBackgroundResource(R.drawable.shape_status_badge_error);
+	    } else { // Warning/Neutral
+	        statusText.setTextColor(getColor(R.color.status_warning_text));
+	        statusText.setBackgroundResource(R.drawable.shape_status_badge_warning);
 	    }
-	    updateAuthorizationUI(color == 0xFF1B873F);
+	    updateAuthorizationUI(colorCode == 1);
 	}
 	
-	
-    
-
-
-    
-    
-    
-    private boolean isUIAuthorized = true;
+    private Boolean isUIAuthorized = null;
     
 	private void updateAuthorizationUI(boolean authorized) {
-	    if (isUIAuthorized == authorized) return;
+	    if (isUIAuthorized != null && isUIAuthorized == authorized) return;
 	    isUIAuthorized = authorized;
 	    if (carouselManager != null) carouselManager.updateCarouselContext(authorized);
 	    
 	    float alpha = authorized ? 1.0f : 0.4f;
-	    View targetSimCard = findViewById(R.id.targetSimRadioGroup);
-	    if (targetSimCard != null) targetSimCard.setAlpha(alpha);
-	    View targetSimHeader = findViewById(R.id.targetSimHeaderContainer);
-	    if (targetSimHeader != null) targetSimHeader.setAlpha(alpha);
-	    View autoSimWarningText = findViewById(R.id.autoSimWarningText);
-	    if (autoSimWarningText != null) autoSimWarningText.setAlpha(alpha);
+        
+        if (btnRoutineShortcuts != null) {
+            btnRoutineShortcuts.setAlpha(alpha);
+            btnRoutineShortcuts.setEnabled(authorized);
+        }
 	    
 	    if (tileCycleUiController != null) {
 	        tileCycleUiController.setAuthorized(authorized);
@@ -447,25 +492,6 @@ public class MainActivity extends Activity implements android.content.SharedPref
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         } catch (Exception ignored) {
-        }
-    }
-
-    private void loadSavedTargetSimMode() {
-        TargetSim target = appPreferences.getTargetSim();
-        if (target == TargetSim.SIM_1) radioSim1.setChecked(true);
-        else if (target == TargetSim.SIM_2) radioSim2.setChecked(true);
-        else radioSimAuto.setChecked(true);
-    }
-
-    private void updateAutoSimWarning() {
-        if (autoSimWarningText == null || appPreferences == null) return;
-        boolean show = appPreferences.hasAutoSimError()
-                && appPreferences.getTargetSim() == TargetSim.AUTO;
-        autoSimWarningText.setVisibility(show ? View.VISIBLE : View.GONE);
-        if (show) {
-            autoSimWarningText.setText(
-                    "Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually.");
-            autoSimWarningText.setTextColor(0xFFFF5555);
         }
     }
 }
