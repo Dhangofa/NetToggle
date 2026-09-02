@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Command Failed"
+            android:text="@string/command_failed"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tap to view diagnostic report"
+            android:text="@string/tap_to_view_diagnostic_report"
             android:textSize="12sp"
             android:textColor="@color/status_error_text" />
     </LinearLayout>
