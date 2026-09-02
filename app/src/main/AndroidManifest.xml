@@ -37,6 +37,25 @@
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
+        <!-- Automation Receiver for Tasker/Macrodroid -->
+        <receiver
+            android:name=".AutomationReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.dhangofa.networktoggle.SET_MODE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Invisible Activity for App Shortcuts -->
+        <activity
+            android:name=".ShortcutActionActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleInstance" />
+
         <!-- Main UI screen -->
         <activity
             android:name=".MainActivity"
@@ -53,7 +72,7 @@
         <service
             android:name=".NetworkTileService"
             android:label="NetToggle"
-            android:icon="@drawable/ic_qs_network"
+            android:icon="@drawable/ic_qs_logo"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
 
