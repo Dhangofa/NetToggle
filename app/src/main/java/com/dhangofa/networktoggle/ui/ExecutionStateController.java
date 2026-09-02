@@ -51,7 +51,7 @@ public class ExecutionStateController {
             activity.runOnUiThread(() -> {
                 if (!isDestroyed && appPreferences != null
                         && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
-                    statusCallback.onStatusUpdate("Shizuku is not running.", 0xFFFF5555);
+                    statusCallback.onStatusUpdate("Shizuku is not running.", 2);
                 }
             });
 
@@ -90,7 +90,7 @@ public class ExecutionStateController {
     }
 
     public void checkRootPermission() {
-        statusCallback.onStatusUpdate("Checking root permission...", 0xFFFFB300);
+        statusCallback.onStatusUpdate("Checking root permission...", 3);
         rootCheckThread = new Thread(() -> {
             boolean granted = false;
             Process process = null;
@@ -110,10 +110,10 @@ public class ExecutionStateController {
                 if (isDestroyed || appPreferences == null
                         || appPreferences.getExecutionMode() != ExecutionMode.ROOT) return;
                 if (finalGranted) {
-                    statusCallback.onStatusUpdate("Root mode active & authorized!", 0xFF1B873F);
+                    statusCallback.onStatusUpdate("Root mode active & authorized!", 1);
                     appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
                 } else {
-                    statusCallback.onStatusUpdate("Root permission denied or unavailable.", 0xFFFF5555);
+                    statusCallback.onStatusUpdate("Root permission denied or unavailable.", 2);
                     appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
                 }
                 TileService.requestListeningState(activity, new ComponentName(activity, NetworkTileService.class));
@@ -126,7 +126,7 @@ public class ExecutionStateController {
         if (isDestroyed) return;
         try {
             if (!Shizuku.pingBinder()) {
-                statusCallback.onStatusUpdate("Shizuku is not running.", 0xFFFF5555);
+                statusCallback.onStatusUpdate("Shizuku is not running.", 2);
                 if (appPreferences != null) {
                     appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
                     TileService.requestListeningState(activity, new ComponentName(activity, NetworkTileService.class));
@@ -134,24 +134,24 @@ public class ExecutionStateController {
                 return;
             }
             if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-                statusCallback.onStatusUpdate("Shizuku mode active & authorized!", 0xFF1B873F);
+                statusCallback.onStatusUpdate("Shizuku mode active & authorized!", 1);
                 if (appPreferences != null) {
                     appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
                     TileService.requestListeningState(activity, new ComponentName(activity, NetworkTileService.class));
                 }
                 return;
             }
-            statusCallback.onStatusUpdate("Shizuku permission not granted.", 0xFFFFB300);
+            statusCallback.onStatusUpdate("Shizuku permission not granted.", 2);
             if (appPreferences != null) {
                 appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
                 TileService.requestListeningState(activity, new ComponentName(activity, NetworkTileService.class));
             }
             if (requestIfNeeded) {
-                statusCallback.onStatusUpdate("Requesting Shizuku permission...", 0xFFFFB300);
+                statusCallback.onStatusUpdate("Requesting Shizuku permission...", 3);
                 Shizuku.requestPermission(0);
             }
         } catch (Exception e) {
-            statusCallback.onStatusUpdate("Shizuku check failed.", 0xFFFF5555);
+            statusCallback.onStatusUpdate("Shizuku check failed.", 2);
             if (appPreferences != null) {
                 appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
                 TileService.requestListeningState(activity, new ComponentName(activity, NetworkTileService.class));
