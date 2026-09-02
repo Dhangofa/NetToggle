@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:id="@+id/mainRoot"
     android:background="@color/surface_background">
 
     <!-- Landscape Header: Top Action Bar Merged with Developer Section -->
@@ -13,8 +14,8 @@
         android:background="@color/card_surface"
         android:paddingHorizontal="20dp"
         android:paddingVertical="10dp"
-        android:elevation="6dp"
-        android:outlineProvider="bounds"
+        android:elevation="8dp"
+        
         android:gravity="center_vertical">
 
         <!-- App Brand Left Group -->
@@ -57,20 +58,23 @@
 
             <!-- App Version Badge -->
             <TextView
-                android:id="@+id/appVersionText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/shape_pill_badge_bg"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center"
-                android:minHeight="22dp"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
-                android:text="v0.0.0"
-                android:textColor="@color/brand_on_primary_container"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+            android:id="@+id/appVersionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/appTitleText"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/shape_pill_badge_bg"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:minHeight="24dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:text="v0.0.0"
+            android:textColor="@color/brand_on_primary_container"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
         </LinearLayout>
 
         <!-- Developer Action Group on Right -->
@@ -89,7 +93,7 @@
                 android:layout_height="34dp"
                 android:padding="7dp"
                 android:src="@drawable/ic_person"
-                android:tint="@color/accent_pink"
+                android:tint="@color/carousel_page3_accent"
                 android:background="@drawable/social_icon_bg"
                 android:contentDescription="Developer"
                 android:layout_marginEnd="8dp" />
@@ -129,27 +133,46 @@
                 android:clickable="true"
                 android:focusable="true" />
 
-                    <ImageView
-                        android:id="@+id/faqLink"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:padding="6dp"
-                        android:src="@drawable/ic_help_outline"
-                        android:tint="@color/text_primary"
-                        android:background="@drawable/social_icon_bg"
-                        android:layout_marginStart="8dp"
-                        android:clickable="true"
-                        android:focusable="true" />
+            <ImageView
+                android:id="@+id/faqLink"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_help_outline"
+                android:tint="@color/text_primary"
+                android:background="@drawable/social_icon_bg"
+                android:layout_marginStart="8dp"
+                android:clickable="true"
+                android:focusable="true" />
 
-                </LinearLayout>
+            <ImageView
+                android:id="@+id/btnThemeToggle"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_theme_light"
+                android:tint="@color/text_primary" />
+
+        </LinearLayout>
     </RelativeLayout>
 
     <!-- Scrollable Content in Landscape -->
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:id="@+id/mainScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
         android:clipToPadding="false"
         android:clipChildren="false"
         android:overScrollMode="never">
@@ -177,6 +200,7 @@
 
             <!-- Setup Guide Static Cards (Landscape) -->
             <LinearLayout
+                android:id="@+id/multiCarouselContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -184,81 +208,89 @@
                 android:clipToPadding="false"
                 android:baselineAligned="false"
                 android:paddingBottom="4dp">
-                    
+
                     <!-- Card 1 -->
                     <LinearLayout
                         android:id="@+id/staticCard1"
                         android:layout_width="0dp" android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:background="@drawable/shape_qs_hint_bg"
-                        android:backgroundTint="@color/first_pg_bg"
+                        android:background="@drawable/shape_carousel_bg_default"
+                        android:backgroundTint="@color/carousel_page1_bg"
                         android:padding="16dp"
-                        android:layout_marginEnd="12dp"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_marginEnd="12dp">
                         
                         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
                             <TextView
+                                android:id="@+id/staticTitle1"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:textColor="@color/text_primary"
                                 android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:text="New to NetToggle?" />
+                                android:textStyle="bold" />
                             <FrameLayout
+                                android:id="@+id/staticIconContainer1"
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:background="@drawable/shape_pill_badge_bg"
                                 android:backgroundTint="@color/card_surface">
                                 <ImageView
+                                    android:id="@+id/staticIcon1"
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
                                     android:layout_gravity="center"
-                                    android:src="@drawable/ic_terminal"
                                     android:tint="@color/exec_accent" />
                             </FrameLayout>
                         </LinearLayout>
                         
                         <TextView
+                            android:id="@+id/staticDesc1"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
-                            android:text="Learn how to set up Execution Modes" />
+                            android:layout_marginBottom="8dp" />
                             
                         <LinearLayout
-                            android:id="@+id/staticCardButton1"
-                            android:foreground="@drawable/ripple_pill_mask"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:background="@drawable/shape_pill_badge_bg"
-                            android:backgroundTint="@color/card_surface"
-                            android:gravity="center_vertical"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:layout_marginTop="12dp"
-                            android:clickable="true"
-                            android:focusable="true">
-                            <TextView
-                                android:layout_width="wrap_content"
+                            android:gravity="bottom">
+                            <LinearLayout
+                                android:id="@+id/staticCardButton1"
+                                android:foreground="@drawable/ripple_pill_mask"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/exec_accent"
-                                android:textStyle="bold"
-                                android:textSize="12sp"
-                                android:text="Read Guide" />
-                            <ImageView
-                                android:layout_width="14dp"
-                                android:layout_height="14dp"
-                                android:src="@drawable/ic_open_in_new"
-                                android:layout_marginStart="4dp"
-                                android:tint="@color/exec_accent" />
+                                android:orientation="horizontal"
+                                android:background="@drawable/shape_pill_badge_bg"
+                                android:backgroundTint="@color/card_surface"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:clickable="true"
+                                android:focusable="true">
+                                <TextView
+                                    android:id="@+id/staticBtnText1"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/exec_accent"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp" />
+                                <ImageView
+                                    android:id="@+id/staticBtnIcon1"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_open_in_new"
+                                    android:layout_marginStart="4dp"
+                                    android:tint="@color/exec_accent" />
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
+
 
                     <!-- Card 2 -->
                     <LinearLayout
@@ -266,151 +298,175 @@
                         android:layout_width="0dp" android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:background="@drawable/shape_qs_hint_bg"
-                        android:backgroundTint="@color/second_pg_bg"
+                        android:background="@drawable/shape_carousel_bg_default"
+                        android:backgroundTint="@color/carousel_page2_bg"
                         android:padding="16dp"
-                        android:layout_marginEnd="12dp"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_marginEnd="12dp">
                         
                         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
                             <TextView
+                                android:id="@+id/staticTitle2"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:textColor="@color/text_primary"
                                 android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:text="Target SIM &amp; Cycle" />
+                                android:textStyle="bold" />
                             <FrameLayout
+                                android:id="@+id/staticIconContainer2"
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:background="@drawable/shape_pill_badge_bg"
                                 android:backgroundTint="@color/card_surface">
                                 <ImageView
+                                    android:id="@+id/staticIcon2"
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
                                     android:layout_gravity="center"
-                                    android:src="@drawable/ic_sim_card"
-                                    android:tint="@color/accent_orange" />
+                                    android:tint="@color/exec_accent" />
                             </FrameLayout>
                         </LinearLayout>
                         
                         <TextView
+                            android:id="@+id/staticDesc2"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
-                            android:text="Learn how to configure your modes" />
+                            android:layout_marginBottom="8dp" />
                             
                         <LinearLayout
-                            android:id="@+id/staticCardButton2"
-                            android:foreground="@drawable/ripple_pill_mask"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:background="@drawable/shape_pill_badge_bg"
-                            android:backgroundTint="@color/card_surface"
-                            android:gravity="center_vertical"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:layout_marginTop="12dp"
-                            android:clickable="true"
-                            android:focusable="true">
-                            <TextView
-                                android:layout_width="wrap_content"
+                            android:gravity="bottom">
+                            <LinearLayout
+                                android:id="@+id/staticCardButton2"
+                                android:foreground="@drawable/ripple_pill_mask"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/accent_orange"
-                                android:textStyle="bold"
-                                android:textSize="12sp"
-                                android:text="Read Guide" />
-                            <ImageView
-                                android:layout_width="14dp"
-                                android:layout_height="14dp"
-                                android:src="@drawable/ic_open_in_new"
-                                android:layout_marginStart="4dp"
-                                android:tint="@color/accent_orange" />
+                                android:orientation="horizontal"
+                                android:background="@drawable/shape_pill_badge_bg"
+                                android:backgroundTint="@color/card_surface"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:clickable="true"
+                                android:focusable="true">
+                                <TextView
+                                    android:id="@+id/staticBtnText2"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/exec_accent"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp" />
+                                <ImageView
+                                    android:id="@+id/staticBtnIcon2"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_open_in_new"
+                                    android:layout_marginStart="4dp"
+                                    android:tint="@color/exec_accent" />
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
-                    
+
+
                     <!-- Card 3 -->
                     <LinearLayout
                         android:id="@+id/staticCard3"
                         android:layout_width="0dp" android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:background="@drawable/shape_qs_hint_bg"
-                        android:backgroundTint="@color/third_pg_bg"
+                        android:background="@drawable/shape_carousel_bg_default"
+                        android:backgroundTint="@color/carousel_page3_bg"
                         android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_marginEnd="0dp">
                         
                         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
                             <TextView
+                                android:id="@+id/staticTitle3"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:textColor="@color/text_primary"
                                 android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:text="Quick Settings Ready" />
+                                android:textStyle="bold" />
                             <FrameLayout
+                                android:id="@+id/staticIconContainer3"
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:background="@drawable/shape_pill_badge_bg"
                                 android:backgroundTint="@color/card_surface">
                                 <ImageView
+                                    android:id="@+id/staticIcon3"
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
                                     android:layout_gravity="center"
-                                    android:src="@drawable/ic_network_bars"
-                                    android:tint="@color/accent_pink" />
+                                    android:tint="@color/exec_accent" />
                             </FrameLayout>
                         </LinearLayout>
                         
                         <TextView
+                            android:id="@+id/staticDesc3"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
-                            android:text="Add the tile to your Control Center" />
+                            android:layout_marginBottom="8dp" />
                             
                         <LinearLayout
-                            android:id="@+id/staticCardButton3"
-                            android:foreground="@drawable/ripple_pill_mask"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:background="@drawable/shape_pill_badge_bg"
-                            android:backgroundTint="@color/card_surface"
-                            android:gravity="center_vertical"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:layout_marginTop="12dp"
-                            android:clickable="true"
-                            android:focusable="true">
-                            <TextView
-                                android:layout_width="wrap_content"
+                            android:gravity="bottom">
+                            <LinearLayout
+                                android:id="@+id/staticCardButton3"
+                                android:foreground="@drawable/ripple_pill_mask"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/accent_pink"
-                                android:textStyle="bold"
-                                android:textSize="12sp"
-                                android:text="Read Guide" />
-                            <ImageView
-                                android:layout_width="14dp"
-                                android:layout_height="14dp"
-                                android:src="@drawable/ic_open_in_new"
-                                android:layout_marginStart="4dp"
-                                android:tint="@color/accent_pink" />
+                                android:orientation="horizontal"
+                                android:background="@drawable/shape_pill_badge_bg"
+                                android:backgroundTint="@color/card_surface"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:clickable="true"
+                                android:focusable="true">
+                                <TextView
+                                    android:id="@+id/staticBtnText3"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/exec_accent"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp" />
+                                <ImageView
+                                    android:id="@+id/staticBtnIcon3"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_open_in_new"
+                                    android:layout_marginStart="4dp"
+                                    android:tint="@color/exec_accent" />
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
 
             </LinearLayout>
             
+            <LinearLayout
+                android:id="@+id/carouselIndicators"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+                
             <include android:id="@+id/cardErrorBanner" layout="@layout/view_error_banner" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:visibility="gone" />
 
             <!-- Parallel 2-Column Cards Row in Landscape -->
@@ -424,12 +480,25 @@
                 android:paddingVertical="8dp">
 
                 <!-- Left Column: Execution Mode + Target SIM Card -->
-                <include 
-                    layout="@layout/view_execution_card"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+                    <include 
+                        android:id="@+id/cardExecutionAndTarget"
+                        layout="@layout/view_execution_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp" />
+                    <include 
+                        android:id="@+id/cardTargetSim"
+                        layout="@layout/view_target_sim_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
                 <!-- Right Column: Quick Tile Cycle Card (Equal match_parent height) -->
                 <include 
@@ -440,6 +509,28 @@
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
+
         </LinearLayout>
     </ScrollView>
+        <FrameLayout
+            android:id="@+id/btnRoutineShortcuts"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/shape_fab_bg"
+            android:elevation="6dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_magic_wand"
+                android:tint="@color/card_surface" />
+        </FrameLayout>
+    </RelativeLayout>
 </LinearLayout>
