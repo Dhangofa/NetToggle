@@ -146,21 +146,43 @@ public class NetworkTileService extends TileService {
         updateTileSwitchingUI();
 
         AppExecutors.executeTelephony(() -> {
-            int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
-            if (!simResolver.isValidSlotIndex(slotIndex)) {
-                mainHandler.post(() -> {
-                    Toast.makeText(getApplicationContext(), "No SIM card found in target slot.", Toast.LENGTH_SHORT).show();
-                    appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
-                    updateTileUI(appPreferences.getCachedNetworkMode());
-                    IS_SWITCHING.set(false);
-                });
-                return;
+            CommandResult result;
+            
+            if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
+                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+                CommandResult result1 = networkModeController.apply(nextMode, executionMode);
+                
+                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+                CommandResult result2 = networkModeController.apply(nextMode, executionMode);
+                
+                simResolver.setOverrideTargetSim(null);
+                
+                if (result1.isSuccess() && result2.isSuccess()) {
+                    result = CommandResult.completed("", 0, "Applied to both SIMs", "");
+                } else if (result1.isSuccess()) {
+                    result = CommandResult.failed("", "Failed to apply to SIM 2");
+                } else if (result2.isSuccess()) {
+                    result = CommandResult.failed("", "Failed to apply to SIM 1");
+                } else {
+                    result = result1;
+                }
+            } else {
+                int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
+                if (!simResolver.isValidSlotIndex(slotIndex)) {
+                    mainHandler.post(() -> {
+                        Toast.makeText(getApplicationContext(), getString(R.string.toast_no_sim_target_slot), Toast.LENGTH_SHORT).show();
+                        appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
+                        updateTileUI(appPreferences.getCachedNetworkMode());
+                        IS_SWITCHING.set(false);
+                    });
+                    return;
+                }
+    
+                result = networkModeController.apply(
+                        nextMode,
+                        executionMode
+                );
             }
-
-            CommandResult result = networkModeController.apply(
-                    nextMode,
-                    executionMode
-            );
 
             if (result.isSuccess()) {
                 appPreferences.setCachedNetworkMode(nextMode);
@@ -219,8 +241,8 @@ public class NetworkTileService extends TileService {
         if (tile == null) return;
 
         tile.setState(Tile.STATE_INACTIVE);
-        tile.setLabel("Switching...");
-        tile.setIcon(TileIconManager.getCachedIcon("?"));
+        tile.setLabel(getString(R.string.tile_switching));
+        tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
         tile.updateTile();
     }
 
@@ -234,20 +256,20 @@ public class NetworkTileService extends TileService {
         int errorState = appPreferences.getTileErrorState();
         if (errorState == AppPreferences.TILE_ERROR_SHIZUKU) {
             tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel("Shizuku Unavailable");
-            tile.setIcon(TileIconManager.getCachedIcon("?"));
+            tile.setLabel(getString(R.string.tile_shizuku_unavailable));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
             tile.updateTile();
             return;
         } else if (errorState == AppPreferences.TILE_ERROR_ROOT) {
             tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel("Root Unavailable");
-            tile.setIcon(TileIconManager.getCachedIcon("?"));
+            tile.setLabel(getString(R.string.tile_root_unavailable));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
             tile.updateTile();
             return;
         } else if (errorState == AppPreferences.TILE_ERROR_CMD) {
             tile.setState(Tile.STATE_INACTIVE);
-            tile.setLabel("Error Check App");
-            tile.setIcon(TileIconManager.getCachedIcon("?"));
+            tile.setLabel(getString(R.string.tile_error_check_app));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
             tile.updateTile();
             return;
         }
@@ -255,19 +277,36 @@ public class NetworkTileService extends TileService {
         if (mode == NetworkMode.UNKNOWN) {
             if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
                 tile.setState(Tile.STATE_UNAVAILABLE);
-                tile.setLabel("Setup Required");
+                tile.setLabel(getString(R.string.tile_setup_required));
             } else {
                 NetworkMode firstMode = tileCycleManager.getFirstMode();
 
                 tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel("Tap to Set " + firstMode.getTileLabel());
+                tile.setLabel(getString(R.string.tile_tap_to_set, firstMode.getTileLabel()));
             }
 
-            tile.setIcon(TileIconManager.getCachedIcon("?"));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
         } else {
             tile.setState(Tile.STATE_ACTIVE);
             tile.setLabel(mode.getTileLabel());
-            tile.setIcon(TileIconManager.getCachedIcon(mode.getIconText()));
+
+            // Determine badge and auto state
+            com.dhangofa.networktoggle.model.TargetSim targetSim = appPreferences.getTargetSim();
+            String badge = "";
+            boolean isAuto = targetSim == com.dhangofa.networktoggle.model.TargetSim.AUTO;
+
+            if (isAuto) {
+                int activeSlot = simResolver.resolveTargetSlotIndex(appPreferences.getExecutionMode());
+                badge = String.valueOf(activeSlot + 1);
+            } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_1) {
+                badge = "1";
+            } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_2) {
+                badge = "2";
+            } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.BOTH) { // Future proofing for BOTH
+                badge = "B";
+            }
+
+            tile.setIcon(TileIconManager.getCachedIcon(mode.getIconText(), badge, isAuto));
         }
 
         tile.updateTile();
@@ -278,8 +317,7 @@ public class NetworkTileService extends TileService {
     private void showAutoSimErrorToast() {
         Toast.makeText(
                 this,
-                "Unable to detect active data SIM automatically. "
-                        + "Please choose SIM from the app.",
+                getString(R.string.toast_auto_sim_failed),
                 Toast.LENGTH_LONG
         ).show();
     }
