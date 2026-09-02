@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardTargetSim"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_target_sim_card_bg"
+    android:elevation="8dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/targetSimHeaderContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <LinearLayout
+            android:id="@+id/targetSimTitleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_smartphone"
+                android:tint="@color/sim_accent"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/target_sim"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/autoSimWarningText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/targetSimTitleGroup"
+            android:text="@string/auto_failed"
+            android:textSize="11sp"
+            android:gravity="end|center_vertical"
+            android:textColor="@color/status_error_text"
+            android:background="@drawable/shape_status_badge_error"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="4dp"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+    
+    <RadioGroup
+        android:id="@+id/targetSimRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/shape_sim_segmented_container"
+        android:padding="4dp">
+        
+        <RadioButton
+            android:id="@+id/radioSimAuto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/auto"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_sim"
+            android:textColor="@color/color_segmented_text_sim"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View 
+            android:id="@+id/separatorAutoSim1"
+            android:layout_width="1dp" 
+            android:layout_height="match_parent" 
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/sim_segmented_separator" />
+
+        <RadioButton
+            android:id="@+id/radioSim1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sim_1"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_sim"
+            android:textColor="@color/color_segmented_text_sim"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View 
+            android:id="@+id/separatorSim1Sim2"
+            android:layout_width="1dp" 
+            android:layout_height="match_parent" 
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/sim_segmented_separator" />
+
+        <RadioButton
+            android:id="@+id/radioSim2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sim_2"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_sim"
+            android:textColor="@color/color_segmented_text_sim"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View 
+            android:id="@+id/separatorSim2Both"
+            android:layout_width="1dp" 
+            android:layout_height="match_parent" 
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/sim_segmented_separator" />
+
+        <RadioButton
+            android:id="@+id/radioSimBoth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/both"
+            android:button="@null"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/selector_segmented_tab_sim"
+            android:textColor="@color/color_segmented_text_sim"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </RadioGroup>
+</LinearLayout>
