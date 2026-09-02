@@ -12,5 +12,11 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@style/FabDialogAnimation</item>
+    </style>
+
+    <style name="FabDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/fab_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/fab_dialog_exit</item>
     </style>
 </resources>
