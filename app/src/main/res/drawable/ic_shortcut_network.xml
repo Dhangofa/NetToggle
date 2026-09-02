@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:fillColor="@color/carousel_page4_accent"
+      android:pathData="M12.722,2.616L2.892,19.222L6.346,21.268L8.640,17.390L17.288,17.390L17.288,21.546L21.288,21.546L21.288,13.546L17.288,13.546L17.288,3.818C17.288,3.486 17.020,3.218 16.688,3.218L14.170,3.218C13.730,3.218 13.328,3.456 13.110,3.824L12.722,2.616ZM11.004,13.390L13.370,9.390L17.288,9.390L17.288,13.390L11.004,13.390Z"/>
+</vector>
