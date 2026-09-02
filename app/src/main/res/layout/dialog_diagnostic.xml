@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Diagnostic Report"
+        android:text="@string/diagnostic_report"
         android:textSize="18sp"
         android:fontFamily="sans-serif-medium"
         android:textStyle="bold"
@@ -52,9 +52,10 @@
 
         <TextView
             android:id="@+id/btnCloseDiagnostic"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CLOSE"
+            android:text="@string/close"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -66,9 +67,10 @@
 
         <TextView
             android:id="@+id/btnCopyDiagnostic"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="COPY REPORT"
+            android:text="@string/copy_report"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
