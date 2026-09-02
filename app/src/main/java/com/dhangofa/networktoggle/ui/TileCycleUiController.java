@@ -147,13 +147,13 @@ public final class TileCycleUiController {
             String reason = "";
             if ((mode == NetworkMode.PREFERRED_5G || mode == NetworkMode.FIVE_G_ONLY) && !currentCaps.supports5g) {
                 supported = false;
-                reason = "5G is not supported by your device or current carrier.";
+                reason = activity.getString(R.string.tilecycle_5g_unsupported);
             } else if (mode == NetworkMode.PREFERRED_3G && !currentCaps.supports3g) {
                 supported = false;
-                reason = "3G is disabled or not supported by your current carrier.";
+                reason = activity.getString(R.string.tilecycle_3g_unsupported);
             } else if (mode == NetworkMode.TWO_G_ONLY && !currentCaps.supports2g) {
                 supported = false;
-                reason = "2G is disabled or not supported by your current carrier.";
+                reason = activity.getString(R.string.tilecycle_2g_unsupported);
             }
             
             if (!supported) {
@@ -169,9 +169,9 @@ public final class TileCycleUiController {
                 cycleChangedListener.onCycleChanged(cycleManager.getCycle());
             }
         } else if (result == TileCycleManager.ChangeResult.MINIMUM_REACHED) {
-            showToast("Select at least 2 tile modes.");
+            showToast(activity.getString(R.string.toast_select_at_least_2));
         } else if (result == TileCycleManager.ChangeResult.MAXIMUM_REACHED) {
-            showToast("You can select up to 3 tile modes.");
+            showToast(activity.getString(R.string.toast_select_up_to_3));
         }
         refresh();
     }
@@ -193,13 +193,13 @@ public final class TileCycleUiController {
         separatorCycleOnly1.setVisibility(mode5gOnly.isChecked() || mode4gOnly.isChecked() ? View.INVISIBLE : View.VISIBLE);
         separatorCycleOnly2.setVisibility(mode4gOnly.isChecked() || mode2gOnly.isChecked() ? View.INVISIBLE : View.VISIBLE);
         
-        selectedCount.setText("Selected: " + cycle.size() + "/3");
+        selectedCount.setText(activity.getString(R.string.cycle_selected_count, cycle.size()));
         cycleOrder.setText(buildOrderText(cycle));
         updatingUi = false;
     }
 
     private String buildOrderText(List<NetworkMode> cycle) {
-        StringBuilder text = new StringBuilder("Cycle: ");
+        StringBuilder text = new StringBuilder(activity.getString(R.string.cycle_prefix));
         for (int i = 0; i < cycle.size(); i++) {
             if (i > 0) text.append("  →  ");
             text.append(cycle.get(i).getDisplayName());
