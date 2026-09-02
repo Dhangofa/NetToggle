@@ -1,48 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    
-    <!-- Background Circle for legacy icon (Flat blue fallback) -->
-    <path
-        android:fillColor="#0055FF"
-        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0" />
 
-    <!-- Background Circle with Gradient -->
-    <path android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0">
+    <!-- Background -->
+    <!-- 1. Vibrant Diagonal Gradient (True Authentic MIUI / HyperOS Squircle) -->
+    <path 
+        android:pathData="M 54,4 
+                          C 76.5,4 93.5,4 100,14 
+                          C 104,20 104,31.5 104,54 
+                          C 104,76.5 104,88 100,94 
+                          C 93.5,104 76.5,104 54,104 
+                          C 31.5,104 14.5,104 8,94 
+                          C 4,88 4,76.5 4,54 
+                          C 4,31.5 4,20 8,14 
+                          C 14.5,4 31.5,4 54,4 Z">
         <aapt:attr name="android:fillColor">
-            <gradient
-                android:startX="4"
-                android:startY="4"
-                android:endX="104"
-                android:endY="104"
-                android:type="linear">
-                <item android:offset="0.0" android:color="#2979FF" /> <!-- Vibrant light blue -->
-                <item android:offset="0.6" android:color="#0055FF" /> <!-- Standard solid blue -->
-                <item android:offset="1.0" android:color="#002277" /> <!-- Deep navy edge -->
+            <gradient 
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108">
+                <item android:offset="0.0" android:color="#95C271" />
+                <item android:offset="0.5" android:color="#6B8E4E" />
+                <item android:offset="1.0" android:color="#364A26" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Foreground Group -->
-    <group 
-        android:translateX="0.0"
-        android:translateY="0.0">
+    <!-- 2. Fixed Geometric Radar Rings -->
+    <!-- Outer faint ring -->
+    <path 
+        android:pathData="M54,54m-44,0a44,44 0,1 1,88 0a44,44 0,1 1,-88 0"
+        android:strokeWidth="1.5"
+        android:strokeColor="#1AFFFFFF" />
         
-        <!-- Subtle Drop Shadow to create floating depth -->
-        <group android:translateX="2.5" android:translateY="4.5">
+    <!-- Inner thicker, softer ring (FIXED: Complete closed arc paths) -->
+    <path 
+        android:pathData="M54,54m-38,0a38,38 0,1 1,76 0a38,38 0,1 1,-76 0"
+        android:strokeWidth="3"
+        android:strokeColor="#14FFFFFF" />
+
+
+    <!-- Foreground (Pure 1x Scale) -->
+    <group>
+        <!-- 4. Antenna Icon Drop Shadow -->
+        <group android:translateX="1.0" android:translateY="2.0">
             <path
-                android:fillColor="#40001030"
-                android:fillType="nonZero"
-                android:pathData="M54,28 A2,2 0 0,0 52,30 L52,42 L42,42 A2,2 0 0,0 40,44 L40,78 A2,2 0 0,0 42,80 L66,80 A2,2 0 0,0 68,78 L68,44 A2,2 0 0,0 66,42 L56,42 L56,30 A2,2 0 0,0 54,28 Z M45,47 L63,47 L63,75 L45,75 Z M32,46 A2,2 0 0,0 30,48 C30,58 34,68 40,75 A2,2 0 0,0 43,72 C37,66 34,58 34,48 A2,2 0 0,0 32,46 Z M76,46 A2,2 0 0,0 74,48 C74,58 71,66 65,72 A2,2 0 0,0 68,75 C74,68 78,58 78,48 A2,2 0 0,0 76,46 Z M23,36 A2,2 0 0,0 21,38 C21,52 26,65 35,76 A2,2 0 0,0 38,73 C29,63 25,51 25,38 A2,2 0 0,0 23,36 Z M85,36 A2,2 0 0,0 83,38 C83,51 79,63 70,73 A2,2 0 0,0 73,76 C82,65 87,52 87,38 A2,2 0 0,0 85,36 Z" />
+                android:fillColor="#400A1204"
+                android:pathData="M55,28 L53,28 A2,2 0 0,0 51,30 L51,42 L42,42 A2,2 0 0,0 40,44 L40,78 A2,2 0 0,0 42,80 L66,80 A2,2 0 0,0 68,78 L68,44 A2,2 0 0,0 66,42 L57,42 L57,30 A2,2 0 0,0 55,28 Z M47,49 L61,49 L61,73 L47,73 Z M32,46 A2,2 0 0,0 30,48 C30,58 34,68 40,75 A2,2 0 0,0 43,72 C37,66 34,58 34,48 A2,2 0 0,0 32,46 Z M76,46 A2,2 0 0,0 74,48 C74,58 71,66 65,72 A2,2 0 0,0 68,75 C74,68 78,58 78,48 A2,2 0 0,0 76,46 Z M23,36 A2,2 0 0,0 21,38 C21,52 26,65 35,76 A2,2 0 0,0 38,73 C29,63 25,51 25,38 A2,2 0 0,0 23,36 Z M85,36 A2,2 0 0,0 83,38 C83,51 79,63 70,73 A2,2 0 0,0 73,76 C82,65 87,52 87,38 A2,2 0 0,0 85,36 Z" />
         </group>
 
-        <!-- Main Crisp White Icon -->
+        <!-- 5. Main Crisp White Antenna Icon -->
         <path
             android:fillColor="#FFFFFF"
-            android:fillType="nonZero"
-            android:pathData="M54,28 A2,2 0 0,0 52,30 L52,42 L42,42 A2,2 0 0,0 40,44 L40,78 A2,2 0 0,0 42,80 L66,80 A2,2 0 0,0 68,78 L68,44 A2,2 0 0,0 66,42 L56,42 L56,30 A2,2 0 0,0 54,28 Z M45,47 L63,47 L63,75 L45,75 Z M32,46 A2,2 0 0,0 30,48 C30,58 34,68 40,75 A2,2 0 0,0 43,72 C37,66 34,58 34,48 A2,2 0 0,0 32,46 Z M76,46 A2,2 0 0,0 74,48 C74,58 71,66 65,72 A2,2 0 0,0 68,75 C74,68 78,58 78,48 A2,2 0 0,0 76,46 Z M23,36 A2,2 0 0,0 21,38 C21,52 26,65 35,76 A2,2 0 0,0 38,73 C29,63 25,51 25,38 A2,2 0 0,0 23,36 Z M85,36 A2,2 0 0,0 83,38 C83,51 79,63 70,73 A2,2 0 0,0 73,76 C82,65 87,52 87,38 A2,2 0 0,0 85,36 Z" />
+            android:pathData="M55,28 L53,28 A2,2 0 0,0 51,30 L51,42 L42,42 A2,2 0 0,0 40,44 L40,78 A2,2 0 0,0 42,80 L66,80 A2,2 0 0,0 68,78 L68,44 A2,2 0 0,0 66,42 L57,42 L57,30 A2,2 0 0,0 55,28 Z M47,49 L61,49 L61,73 L47,73 Z M32,46 A2,2 0 0,0 30,48 C30,58 34,68 40,75 A2,2 0 0,0 43,72 C37,66 34,58 34,48 A2,2 0 0,0 32,46 Z M76,46 A2,2 0 0,0 74,48 C74,58 71,66 65,72 A2,2 0 0,0 68,75 C74,68 78,58 78,48 A2,2 0 0,0 76,46 Z M23,36 A2,2 0 0,0 21,38 C21,52 26,65 35,76 A2,2 0 0,0 38,73 C29,63 25,51 25,38 A2,2 0 0,0 23,36 Z M85,36 A2,2 0 0,0 83,38 C83,51 79,63 70,73 A2,2 0 0,0 73,76 C82,65 87,52 87,38 A2,2 0 0,0 85,36 Z" />
     </group>
 </vector>
