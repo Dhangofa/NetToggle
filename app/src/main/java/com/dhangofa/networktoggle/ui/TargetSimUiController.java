@@ -28,9 +28,11 @@ public final class TargetSimUiController {
     private final RadioButton auto;
     private final RadioButton sim1;
     private final RadioButton sim2;
+    private final RadioButton simBoth;
     private final TextView warning;
     private final View sep1;
     private final View sep2;
+    private final View sep3;
     
     private boolean updating;
     private boolean authorized;
@@ -44,9 +46,11 @@ public final class TargetSimUiController {
         this.auto = activity.findViewById(R.id.radioSimAuto);
         this.sim1 = activity.findViewById(R.id.radioSim1);
         this.sim2 = activity.findViewById(R.id.radioSim2);
+        this.simBoth = activity.findViewById(R.id.radioSimBoth);
         this.warning = activity.findViewById(R.id.autoSimWarningText);
         this.sep1 = activity.findViewById(R.id.separatorAutoSim1);
         this.sep2 = activity.findViewById(R.id.separatorSim1Sim2);
+        this.sep3 = activity.findViewById(R.id.separatorSim2Both);
     }
     
     public void initialize() {
@@ -56,13 +60,15 @@ public final class TargetSimUiController {
             sim1.setChecked(true);
         } else if (targetSim == TargetSim.SIM_2) {
             sim2.setChecked(true);
+        } else if (targetSim == TargetSim.BOTH) {
+            simBoth.setChecked(true);
         } else {
             auto.setChecked(true);
         }
         
         View.OnTouchListener lock = (v, e) -> {
             if (!authorized && e.getAction() == MotionEvent.ACTION_DOWN) {
-                Toast.makeText(activity, "Please authorize Root or Shizuku to configure toggles.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.toast_auth_required), Toast.LENGTH_SHORT).show();
                 return true;
             }
             return false;
@@ -71,6 +77,7 @@ public final class TargetSimUiController {
         auto.setOnTouchListener(lock);
         sim1.setOnTouchListener(lock);
         sim2.setOnTouchListener(lock);
+        simBoth.setOnTouchListener(lock);
         
         group.setOnCheckedChangeListener((g, id) -> select(id));
         updateSeparators();
@@ -85,10 +92,16 @@ public final class TargetSimUiController {
             targetSim = TargetSim.SIM_1;
         } else if (id == R.id.radioSim2) {
             targetSim = TargetSim.SIM_2;
+        } else if (id == R.id.radioSimBoth) {
+            targetSim = TargetSim.BOTH;
         }
         
         if (targetSim != TargetSim.AUTO && !exists(targetSim)) {
-            Toast.makeText(activity, "No SIM card found in slot " + (targetSim.getManualSlotIndex() + 1), Toast.LENGTH_SHORT).show();
+            if (targetSim == TargetSim.BOTH) {
+                Toast.makeText(activity, activity.getString(R.string.toast_both_sims_required), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(activity, activity.getString(targetSim.getManualSlotIndex() == 0 ? R.string.toast_no_sim_slot_1 : R.string.toast_no_sim_slot_2), Toast.LENGTH_SHORT).show();
+            }
             updating = true;
             auto.setChecked(true);
             updating = false;
@@ -118,6 +131,16 @@ public final class TargetSimUiController {
             List<SubscriptionInfo> infos = sm.getActiveSubscriptionInfoList();
             if (infos == null) return false;
             
+            if (target == TargetSim.BOTH) {
+                boolean hasSim1 = false;
+                boolean hasSim2 = false;
+                for (SubscriptionInfo info : infos) {
+                    if (info.getSimSlotIndex() == 0) hasSim1 = true;
+                    if (info.getSimSlotIndex() == 1) hasSim2 = true;
+                }
+                return hasSim1 && hasSim2;
+            }
+            
             for (SubscriptionInfo info : infos) {
                 if (info.getSimSlotIndex() == target.getManualSlotIndex()) {
                     return true;
@@ -132,14 +155,9 @@ public final class TargetSimUiController {
     public void setAuthorized(boolean value) {
         this.authorized = value;
         float alpha = value ? 1f : 0.4f;
-        group.setAlpha(alpha);
-        
-        View header = activity.findViewById(R.id.targetSimHeaderContainer);
-        if (header != null) {
-            header.setAlpha(alpha);
-        }
-        if (warning != null) {
-            warning.setAlpha(alpha);
+        View card = activity.findViewById(R.id.cardTargetSim);
+        if (card != null) {
+            card.setAlpha(alpha);
         }
     }
     
@@ -150,8 +168,8 @@ public final class TargetSimUiController {
         warning.setVisibility(show ? View.VISIBLE : View.GONE);
         
         if (show) {
-            warning.setText("Auto SIM detection failed. Please choose SIM 1 or SIM 2 manually.");
-            warning.setTextColor(0xFFFF5555);
+            warning.setText(R.string.warning_auto_sim_failed);
+            warning.setTextColor(activity.getColor(R.color.status_error_text));
         }
     }
     
@@ -161,15 +179,27 @@ public final class TargetSimUiController {
         if (id == -1) {
             sep1.setVisibility(View.VISIBLE);
             sep2.setVisibility(View.VISIBLE);
+            sep3.setVisibility(View.VISIBLE);
         } else if (id == R.id.radioSimAuto) {
             sep1.setVisibility(View.INVISIBLE);
             sep2.setVisibility(View.VISIBLE);
+            sep3.setVisibility(View.VISIBLE);
         } else if (id == R.id.radioSim1) {
             sep1.setVisibility(View.INVISIBLE);
             sep2.setVisibility(View.INVISIBLE);
-        } else {
+            sep3.setVisibility(View.VISIBLE);
+        } else if (id == R.id.radioSim2) {
             sep1.setVisibility(View.VISIBLE);
             sep2.setVisibility(View.INVISIBLE);
+            sep3.setVisibility(View.INVISIBLE);
+        } else if (id == R.id.radioSimBoth) {
+            sep1.setVisibility(View.VISIBLE);
+            sep2.setVisibility(View.VISIBLE);
+            sep3.setVisibility(View.INVISIBLE);
+        } else {
+            sep1.setVisibility(View.VISIBLE);
+            sep2.setVisibility(View.VISIBLE);
+            sep3.setVisibility(View.VISIBLE);
         }
     }
 }
