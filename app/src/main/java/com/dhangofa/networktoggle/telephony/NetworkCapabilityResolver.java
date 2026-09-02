@@ -36,6 +36,28 @@ public final class NetworkCapabilityResolver {
     public NetworkCapabilities getCapabilities(ExecutionMode mode) {
         if (mode == ExecutionMode.NONE) return NetworkCapabilities.assumeAll();
 
+        com.dhangofa.networktoggle.model.TargetSim targetSim = appPreferences.getTargetSim();
+        if (targetSim == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
+            simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+            NetworkCapabilities caps1 = getSingleSimCapabilities(mode);
+            
+            simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+            NetworkCapabilities caps2 = getSingleSimCapabilities(mode);
+            
+            simResolver.setOverrideTargetSim(null);
+            
+            return new NetworkCapabilities(
+                    caps1.supports2g && caps2.supports2g,
+                    caps1.supports3g && caps2.supports3g,
+                    caps1.supports4g && caps2.supports4g,
+                    caps1.supports5g && caps2.supports5g
+            );
+        }
+
+        return getSingleSimCapabilities(mode);
+    }
+
+    private NetworkCapabilities getSingleSimCapabilities(ExecutionMode mode) {
         // ONE SINGLE CALL to get slotIndex, subId, and carrierName!
         SimResolver.SimInfo simInfo = simResolver.resolveTargetSimInfo(mode);
 
