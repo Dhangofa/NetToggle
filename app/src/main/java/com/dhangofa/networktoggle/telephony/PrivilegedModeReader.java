@@ -17,15 +17,15 @@ import com.dhangofa.networktoggle.model.TargetSim;
 final class PrivilegedModeReader {
     private final Context context;
     private final SimResolver simResolver;
-    
+
     PrivilegedModeReader(Context context, SimResolver simResolver) {
         this.context = context;
         this.simResolver = simResolver;
     }
-    
+
     NetworkMode readCurrentMode(ExecutionMode executionMode, TargetSim targetSim) {
         int targetSubId = simResolver.resolveTargetSubId(executionMode);
-        
+
         // NATIVE API FAST-PATH:
         // Only works reliably on Android 9 (Pie) and below. Android 10+ will throw SecurityException.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && simResolver.isValidSubId(targetSubId)) {
@@ -38,7 +38,7 @@ final class PrivilegedModeReader {
                 // Ignore SecurityExceptions or null pointers, proceed to shell fallback
             }
         }
-        
+
         // SHELL FALLBACK:
         String command;
         if (simResolver.isValidSubId(targetSubId)) {
@@ -49,12 +49,12 @@ final class PrivilegedModeReader {
         } else {
             return NetworkMode.UNKNOWN;
         }
-        
+
         CommandExecutor executor = CommandExecutorFactory.forMode(executionMode);
         if (executor == null) {
             return NetworkMode.UNKNOWN;
         }
-        
+
         CommandResult result = executor.execute(command);
         return result.isSuccess() ? NetworkMode.fromLegacyMode(ShellValueParser.extractFirstInt(result.getStdout())) : NetworkMode.UNKNOWN;
     }
