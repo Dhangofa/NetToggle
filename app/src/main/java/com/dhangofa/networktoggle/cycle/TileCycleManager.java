@@ -85,15 +85,15 @@ public final class TileCycleManager {
         List<NetworkMode> cycle = getCycle();
         boolean changed = false;
 
-        if (!caps.supports5g) { 
-            changed |= cycle.remove(NetworkMode.PREFERRED_5G); 
-            changed |= cycle.remove(NetworkMode.FIVE_G_ONLY); 
+        if (!caps.supports5g) {
+            changed |= cycle.remove(NetworkMode.PREFERRED_5G);
+            changed |= cycle.remove(NetworkMode.FIVE_G_ONLY);
         }
-        if (!caps.supports3g) { 
-            changed |= cycle.remove(NetworkMode.PREFERRED_3G); 
+        if (!caps.supports3g) {
+            changed |= cycle.remove(NetworkMode.PREFERRED_3G);
         }
-        if (!caps.supports2g) { 
-            changed |= cycle.remove(NetworkMode.TWO_G_ONLY); 
+        if (!caps.supports2g) {
+            changed |= cycle.remove(NetworkMode.TWO_G_ONLY);
         }
 
         if (changed) {
