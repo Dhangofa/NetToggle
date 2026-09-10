@@ -32,22 +32,22 @@ final class LegacyRootModeController {
                 || !simResolver.isValidSubId(simInfo.subId)) {
             return CommandResult.failed("", "Unable to resolve the target SIM.");
         }
-        
+
         String apkPath = context.getApplicationInfo().sourceDir;
         String className = "com.dhangofa.networktoggle.telephony.LegacyRootPayload";
-        
+
         String command = "CLASSPATH=\"" + apkPath + "\" app_process /system/bin " + className + " " + simInfo.subId + " " + networkMode.getLegacyMode();
-        
+
         CommandExecutor executor = CommandExecutorFactory.forMode(executionMode);
         if (executor == null) {
             return CommandResult.failed(command, "No execution mode selected.");
         }
-        
+
         CommandResult result = executor.execute(command);
         if (!result.isSuccess()) {
             return result;
         }
-        
+
         return CommandResult.completed(command, 0,
                 "Legacy network mode applied successfully via Java payload.", "");
     }
