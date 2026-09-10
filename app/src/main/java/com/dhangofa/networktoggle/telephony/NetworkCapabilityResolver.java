@@ -21,7 +21,7 @@ public final class NetworkCapabilityResolver {
     private static final class CarrierCapabilityResult {
         final NetworkCapabilities capabilities;
         final boolean cacheable;
-    
+
         CarrierCapabilityResult(NetworkCapabilities capabilities, boolean cacheable) {
             this.capabilities = capabilities;
             this.cacheable = cacheable;
@@ -40,12 +40,12 @@ public final class NetworkCapabilityResolver {
         if (targetSim == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
             simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
             NetworkCapabilities caps1 = getSingleSimCapabilities(mode);
-            
+
             simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
             NetworkCapabilities caps2 = getSingleSimCapabilities(mode);
-            
+
             simResolver.setOverrideTargetSim(null);
-            
+
             return new NetworkCapabilities(
                     caps1.supports2g && caps2.supports2g,
                     caps1.supports3g && caps2.supports3g,
@@ -82,10 +82,10 @@ public final class NetworkCapabilityResolver {
 
         // Invalidate cache and fetch
         appPreferences.invalidateSlotCache(slotIndex);
-        
+
         // Stage 1 & 2: Global Device/OS Capabilities
         NetworkCapabilities deviceCaps = fetchDeviceCapabilities(mode);
-        
+
         // Stage 3 & 4: Slot-Specific Carrier Capabilities (Pass carrierName directly)
         CarrierCapabilityResult carrierResult = fetchCarrierCapabilities(mode, slotIndex, carrierName);
         NetworkCapabilities carrierCaps = carrierResult.capabilities;
@@ -106,19 +106,19 @@ public final class NetworkCapabilityResolver {
 
     private NetworkCapabilities fetchDeviceCapabilities(ExecutionMode mode) {
         NetworkCapabilities cachedDevice = appPreferences.getDeviceCapabilities();
-    
+
         if (cachedDevice != null) {
             return cachedDevice;
         }
-    
+
         // 5G capability detection starts from Android 11.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             NetworkCapabilities legacyCapabilities = new NetworkCapabilities(true, true, true, false);
-    
+
             appPreferences.saveDeviceCapabilities(legacyCapabilities);
             return legacyCapabilities;
         }
-    
+
         CommandExecutor executor = CommandExecutorFactory.forMode(mode);
         if (executor == null) {
             return NetworkCapabilities.assumeAll();
@@ -128,12 +128,12 @@ public final class NetworkCapabilityResolver {
             return NetworkCapabilities.assumeAll();
         }
         String output = result.getStdout();
-    
+
         // Empty output does not prove that 5G is unsupported.
         if (output == null || output.trim().isEmpty()) {
             return NetworkCapabilities.assumeAll();
         }
-    
+
         boolean foundValidProfile = false;
         boolean supports5g = false;
         String[] values = output.trim().split(",");
@@ -149,12 +149,12 @@ public final class NetworkCapabilityResolver {
                 break;
             }
         }
-    
+
         // Do not cache a result when the property had no numeric profile.
         if (!foundValidProfile) {
             return NetworkCapabilities.assumeAll();
         }
-            
+
         NetworkCapabilities deviceCapabilities = new NetworkCapabilities(true, true, true, supports5g);
         appPreferences.saveDeviceCapabilities(deviceCapabilities);
         return deviceCapabilities;
@@ -166,14 +166,14 @@ public final class NetworkCapabilityResolver {
             String carrierName
     ) {
         CommandExecutor executor = CommandExecutorFactory.forMode(mode);
-    
+
         if (executor == null) {
             return new CarrierCapabilityResult(
                     NetworkCapabilities.assumeAll(),
                     false
             );
         }
-    
+
         // Stage 3: Carrier Config XML verification.
         String command =
                 "dumpsys carrier_config | grep -E " +
@@ -183,82 +183,82 @@ public final class NetworkCapabilityResolver {
                 "hide_enable_3g_bool|" +
                 "carrier_supports_3g_bool|" +
                 "carrier_nr_availabilities_int_array'";
-    
+
         CommandResult result = executor.execute(command);
-    
+
         boolean supports2g = true;
         boolean supports3g = true;
         boolean supports5g = true;
         boolean foundCarrierSetting = false;
-    
+
         if (result.isSuccess() && !result.getStdout().trim().isEmpty()) {
             String[] lines = result.getStdout().split("\\n");
             boolean inTargetSlot = false;
-    
+
             for (String line : lines) {
                 String trimmed = line.trim();
-    
+
                 if (trimmed.startsWith("Phone Id =")) {
                     Integer currentSlot = ShellValueParser.extractFirstInt(trimmed);
                     inTargetSlot = currentSlot != null && currentSlot == slotIndex;
                     continue;
                 }
-    
+
                 if (!inTargetSlot) {
                     continue;
                 }
-    
+
                 if (trimmed.startsWith("hide_enable_2g_bool =")) {
                     foundCarrierSetting = true;
-    
+
                     if (trimmed.endsWith("true")) {
                         supports2g = false;
                     }
                 }
-    
+
                 if (trimmed.startsWith("carrier_supports_2g_bool =")) {
                     foundCarrierSetting = true;
-    
+
                     if (trimmed.endsWith("false")) {
                         supports2g = false;
                     }
                 }
-    
+
                 if (trimmed.startsWith("hide_enable_3g_bool =")) {
                     foundCarrierSetting = true;
-    
+
                     if (trimmed.endsWith("true")) {
                         supports3g = false;
                     }
                 }
-    
+
                 if (trimmed.startsWith("carrier_supports_3g_bool =")) {
                     foundCarrierSetting = true;
-    
+
                     if (trimmed.endsWith("false")) {
                         supports3g = false;
                     }
                 }
-    
+
                 if (trimmed.startsWith("carrier_nr_availabilities_int_array =")) {
                     foundCarrierSetting = true;
-    
+
                     if (trimmed.endsWith("[]")) {
                         supports5g = false;
                     }
                 }
             }
         }
-    
+
         // Stage 4: maintained real-world carrier restrictions.
         boolean registryMatched =
                 LteAndAboveCarrierRegistry.isLteAndAboveOnly(carrierName);
-    
+
         if (registryMatched) {
             supports2g = false;
             supports3g = false;
         }
-    
+
         NetworkCapabilities capabilities =
                 new NetworkCapabilities(
                         supports2g,
@@ -266,9 +266,9 @@ public final class NetworkCapabilityResolver {
                         true,
                         supports5g
                 );
-    
+
         boolean cacheable = foundCarrierSetting || registryMatched;
-    
+
         return new CarrierCapabilityResult(capabilities, cacheable);
     }
 }
