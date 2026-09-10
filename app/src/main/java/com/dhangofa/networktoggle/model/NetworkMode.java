@@ -94,4 +94,32 @@ public enum NetworkMode {
                 return UNKNOWN;
         }
     }
+
+    public static NetworkMode fromString(String modeString) {
+        if (modeString == null) return UNKNOWN;
+        modeString = modeString.toUpperCase().trim();
+        switch (modeString) {
+            case "5G_ONLY":
+            case "5G":
+                return FIVE_G_ONLY;
+            case "4G_ONLY":
+            case "4G":
+            case "LTE":
+                return FOUR_G_ONLY;
+            case "PREF_5G":
+            case "PREFERRED_5G":
+                return PREFERRED_5G;
+            case "PREF_4G":
+            case "PREFERRED_4G":
+                return PREFERRED_4G;
+            case "PREF_3G":
+            case "PREFERRED_3G":
+                return PREFERRED_3G;
+            case "2G_ONLY":
+            case "2G":
+                return TWO_G_ONLY;
+            default:
+                return UNKNOWN;
+        }
+    }
 }
