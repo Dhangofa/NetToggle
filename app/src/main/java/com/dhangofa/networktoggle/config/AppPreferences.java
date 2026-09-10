@@ -24,17 +24,19 @@ public final class AppPreferences {
     private static final String KEY_NETWORK_STATE = "net_state";
     private static final String KEY_LAST_NETWORK_CHECK = "last_network_check";
     private static final String KEY_AUTO_SIM_ERROR = "auto_sim_error";
+    private static final String KEY_EXTERNAL_AUTOMATION = "external_automation_enabled";
+    private static final String KEY_AUTOMATION_TOKEN = "automation_token";
     private static final String KEY_TILE_CYCLE_MODES = "tile_cycle_modes";
-    
+
     private static final String KEY_LAST_ERROR_CMD = "last_error_cmd";
     private static final String KEY_LAST_ERROR_STDERR = "last_error_stderr";
     private static final String KEY_LAST_ERROR_TIMESTAMP = "last_error_time";
-    
+
     // Keys for capabilities caching
     private static final String KEY_DEVICE_CAPS_PREFIX = "device_cap_";
     private static final String KEY_SLOT_SUBID_PREFIX = "slot_subid_";
     private static final String KEY_SLOT_CAPS_PREFIX = "slot_cap_";
-    
+
     public static final int TILE_ERROR_NONE = 0;
     public static final int TILE_ERROR_SHIZUKU = 1;
     public static final int TILE_ERROR_ROOT = 2;
@@ -91,6 +93,27 @@ public final class AppPreferences {
         return preferences.getLong(KEY_LAST_NETWORK_CHECK, 0);
     }
 
+    public boolean isExternalAutomationEnabled() {
+        return preferences.getBoolean(KEY_EXTERNAL_AUTOMATION, false);
+    }
+
+    public void setExternalAutomationEnabled(boolean enabled) {
+        preferences.edit().putBoolean(KEY_EXTERNAL_AUTOMATION, enabled).apply();
+    }
+
+    public String getAutomationToken() {
+        String token = preferences.getString(KEY_AUTOMATION_TOKEN, "");
+        if (token == null || token.trim().isEmpty()) {
+            token = java.util.UUID.randomUUID().toString().substring(0, 8);
+            preferences.edit().putString(KEY_AUTOMATION_TOKEN, token).apply();
+        }
+        return token;
+    }
+
+    public void setAutomationToken(String token) {
+        preferences.edit().putString(KEY_AUTOMATION_TOKEN, token).apply();
+    }
+
     public void setLastNetworkCheckTimestamp(long timestamp) {
         preferences.edit().putLong(KEY_LAST_NETWORK_CHECK, timestamp).apply();
     }
@@ -108,10 +131,10 @@ public final class AppPreferences {
                 .putString(KEY_LAST_ERROR_CMD, command)
                 .putInt("last_error_exit_code", exitCode)
                 .putString("last_error_stdout", stdout)
-                
+
                 .putString(KEY_LAST_ERROR_STDERR, stderr)
                 .putString("last_error_exception", exceptionMsg)
-                
+
                 .putLong(KEY_LAST_ERROR_TIMESTAMP, System.currentTimeMillis())
                 .apply();
     }
@@ -123,7 +146,7 @@ public final class AppPreferences {
         String stdout = preferences.getString("last_error_stdout", "");
         String exceptionMsg = preferences.getString("last_error_exception", "");
         long time = preferences.getLong(KEY_LAST_ERROR_TIMESTAMP, 0);
-        
+
         if (cmd == null && stderr == null) return null;
         return new com.dhangofa.networktoggle.model.DiagnosticError(cmd, exitCode, stdout, stderr, exceptionMsg, time);
     }
@@ -134,7 +157,10 @@ public final class AppPreferences {
         }
         preferences.edit()
                 .remove(KEY_LAST_ERROR_CMD)
+                .remove("last_error_exit_code")
+                .remove("last_error_stdout")
                 .remove(KEY_LAST_ERROR_STDERR)
+                .remove("last_error_exception")
                 .remove(KEY_LAST_ERROR_TIMESTAMP)
                 .apply();
     }
@@ -255,7 +281,7 @@ public final class AppPreferences {
                 preferences.getBoolean(KEY_SLOT_CAPS_PREFIX + slotIndex + "_5g", true)
         );
     }
-    
+
     public void clearDeviceCapabilities() {
         preferences.edit()
                 .remove(KEY_DEVICE_CAPS_PREFIX + "2g")
@@ -276,10 +302,19 @@ public final class AppPreferences {
     }
 
     public void saveRoutineShortcut(int slot, String mode, int sim) {
+        saveRoutineShortcut(slot, getRoutineShortcutName(slot), mode, sim);
+    }
+
+    public void saveRoutineShortcut(int slot, String name, String mode, int sim) {
         preferences.edit()
+                .putString("routine_shortcut_name_" + slot, name != null ? name : "")
                 .putString("routine_shortcut_mode_" + slot, mode)
                 .putInt("routine_shortcut_sim_" + slot, sim)
                 .apply();
+    }
+
+    public String getRoutineShortcutName(int slot) {
+        return preferences.getString("routine_shortcut_name_" + slot, "");
     }
 
     public String getRoutineShortcutMode(int slot) {
@@ -288,5 +323,13 @@ public final class AppPreferences {
 
     public int getRoutineShortcutSim(int slot) {
         return preferences.getInt("routine_shortcut_sim_" + slot, 1); // 1 = SIM 1
+    }
+
+    public boolean isRoutineShortcutsInitialized() {
+        return preferences.getBoolean("routine_shortcuts_initialized", false);
+    }
+
+    public void setRoutineShortcutsInitialized(boolean initialized) {
+        preferences.edit().putBoolean("routine_shortcuts_initialized", initialized).apply();
     }
 }
