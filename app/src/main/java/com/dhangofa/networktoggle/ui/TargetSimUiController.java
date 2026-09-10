@@ -23,7 +23,7 @@ public final class TargetSimUiController {
     private final Activity activity;
     private final AppPreferences prefs;
     private final Runnable changed;
-    
+
     private final RadioGroup group;
     private final RadioButton auto;
     private final RadioButton sim1;
@@ -33,15 +33,15 @@ public final class TargetSimUiController {
     private final View sep1;
     private final View sep2;
     private final View sep3;
-    
+
     private boolean updating;
     private boolean authorized;
-    
+
     public TargetSimUiController(Activity activity, AppPreferences prefs, Runnable changed) {
         this.activity = activity;
         this.prefs = prefs;
         this.changed = changed;
-        
+
         this.group = activity.findViewById(R.id.targetSimRadioGroup);
         this.auto = activity.findViewById(R.id.radioSimAuto);
         this.sim1 = activity.findViewById(R.id.radioSim1);
@@ -52,10 +52,10 @@ public final class TargetSimUiController {
         this.sep2 = activity.findViewById(R.id.separatorSim1Sim2);
         this.sep3 = activity.findViewById(R.id.separatorSim2Both);
     }
-    
+
     public void initialize() {
         TargetSim targetSim = prefs.getTargetSim();
-        
+
         if (targetSim == TargetSim.SIM_1) {
             sim1.setChecked(true);
         } else if (targetSim == TargetSim.SIM_2) {
@@ -65,7 +65,7 @@ public final class TargetSimUiController {
         } else {
             auto.setChecked(true);
         }
-        
+
         View.OnTouchListener lock = (v, e) -> {
             if (!authorized && e.getAction() == MotionEvent.ACTION_DOWN) {
                 Toast.makeText(activity, activity.getString(R.string.toast_auth_required), Toast.LENGTH_SHORT).show();
@@ -73,20 +73,20 @@ public final class TargetSimUiController {
             }
             return false;
         };
-        
+
         auto.setOnTouchListener(lock);
         sim1.setOnTouchListener(lock);
         sim2.setOnTouchListener(lock);
         simBoth.setOnTouchListener(lock);
-        
+
         group.setOnCheckedChangeListener((g, id) -> select(id));
         updateSeparators();
         updateAutoSimWarning();
     }
-    
+
     private void select(int id) {
         if (updating) return;
-        
+
         TargetSim targetSim = TargetSim.AUTO;
         if (id == R.id.radioSim1) {
             targetSim = TargetSim.SIM_1;
@@ -95,7 +95,7 @@ public final class TargetSimUiController {
         } else if (id == R.id.radioSimBoth) {
             targetSim = TargetSim.BOTH;
         }
-        
+
         if (targetSim != TargetSim.AUTO && !exists(targetSim)) {
             if (targetSim == TargetSim.BOTH) {
                 Toast.makeText(activity, activity.getString(R.string.toast_both_sims_required), Toast.LENGTH_SHORT).show();
@@ -107,30 +107,30 @@ public final class TargetSimUiController {
             updating = false;
             targetSim = TargetSim.AUTO;
         }
-        
+
         updateSeparators();
         prefs.onTargetSimChanged(targetSim);
         updateAutoSimWarning();
-        
+
         if (changed != null) {
             changed.run();
         }
     }
-    
+
     private boolean exists(TargetSim target) {
         if (activity.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             return true;
         }
-        
+
         SubscriptionManager sm = activity.getSystemService(SubscriptionManager.class);
         if (sm == null) {
             return true;
         }
-        
+
         try {
             List<SubscriptionInfo> infos = sm.getActiveSubscriptionInfoList();
             if (infos == null) return false;
-            
+
             if (target == TargetSim.BOTH) {
                 boolean hasSim1 = false;
                 boolean hasSim2 = false;
@@ -140,7 +140,7 @@ public final class TargetSimUiController {
                 }
                 return hasSim1 && hasSim2;
             }
-            
+
             for (SubscriptionInfo info : infos) {
                 if (info.getSimSlotIndex() == target.getManualSlotIndex()) {
                     return true;
@@ -151,7 +151,7 @@ public final class TargetSimUiController {
         }
         return false;
     }
-    
+
     public void setAuthorized(boolean value) {
         this.authorized = value;
         float alpha = value ? 1f : 0.4f;
@@ -160,22 +160,22 @@ public final class TargetSimUiController {
             card.setAlpha(alpha);
         }
     }
-    
+
     public void updateAutoSimWarning() {
         if (warning == null) return;
-        
+
         boolean show = prefs.hasAutoSimError() && prefs.getTargetSim() == TargetSim.AUTO;
         warning.setVisibility(show ? View.VISIBLE : View.GONE);
-        
+
         if (show) {
             warning.setText(R.string.warning_auto_sim_failed);
             warning.setTextColor(activity.getColor(R.color.status_error_text));
         }
     }
-    
+
     private void updateSeparators() {
         int id = group.getCheckedRadioButtonId();
-        
+
         if (id == -1) {
             sep1.setVisibility(View.VISIBLE);
             sep2.setVisibility(View.VISIBLE);
@@ -203,4 +203,3 @@ public final class TargetSimUiController {
         }
     }
 }
-
