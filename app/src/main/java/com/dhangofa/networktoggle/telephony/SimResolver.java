@@ -28,7 +28,7 @@ public final class SimResolver {
 
     private final Context context;
     private final AppPreferences appPreferences;
-    private TargetSim overrideTargetSim = null;
+    private volatile TargetSim overrideTargetSim = null;
 
     // Data class to hold all extracted variables in one place
     public static class SimInfo {
@@ -51,13 +51,20 @@ public final class SimResolver {
     Context getContext() {
         return context;
     }
-    
+
     public void setOverrideTargetSim(TargetSim targetSim) {
         this.overrideTargetSim = targetSim;
     }
 
     public SimInfo resolveTargetSimInfo(ExecutionMode executionMode) {
         TargetSim targetSim = overrideTargetSim != null ? overrideTargetSim : appPreferences.getTargetSim();
+        return resolveTargetSimInfo(executionMode, targetSim);
+    }
+
+    public SimInfo resolveTargetSimInfo(ExecutionMode executionMode, TargetSim targetSim) {
+        if (targetSim == TargetSim.BOTH) {
+            return null;
+        }
         int targetSubId = INVALID_SUB_ID;
         int targetSlotIndex = INVALID_SLOT_INDEX;
         String carrierName = "";
@@ -149,6 +156,11 @@ public final class SimResolver {
     public int resolveTargetSubId(ExecutionMode executionMode) {
         SimInfo info = resolveTargetSimInfo(executionMode);
         return info != null ? info.subId : INVALID_SUB_ID;
+    }
+
+    public int resolveTargetSlotIndex(ExecutionMode executionMode, TargetSim targetSim) {
+        SimInfo info = resolveTargetSimInfo(executionMode, targetSim);
+        return info != null ? info.slotIndex : INVALID_SLOT_INDEX;
     }
 
     public boolean isValidSlotIndex(int slotIndex) {
