@@ -74,7 +74,7 @@ public final class LteAndAboveCarrierRegistry {
     private static boolean matchesCarrier(String carrierName, List<String> carrierAliases) {
         for (String alias : carrierAliases) {
             String normalizedAlias = alias.toLowerCase().trim();
-    
+
             if (carrierName.equals(normalizedAlias)) {
                 return true;
             }
@@ -87,18 +87,18 @@ public final class LteAndAboveCarrierRegistry {
                 return true;
             }
         }
-    
+
         return false;
     }
-    
+
     private static boolean containsWholePhrase(String carrierName, String alias) {
         String normalizedCarrier = normalizeSeparators(carrierName);
         String normalizedAlias = normalizeSeparators(alias);
-    
+
         return (" " + normalizedCarrier + " ")
                 .contains(" " + normalizedAlias + " ");
     }
-    
+
     private static String normalizeSeparators(String value) {
         return value.replace('-', ' ')
                 .replace('_', ' ')
