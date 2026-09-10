@@ -21,30 +21,30 @@ public class LegacyRootPayload {
             }
             int subId = Integer.parseInt(args[0]);
             int networkMode = Integer.parseInt(args[1]);
-            
+
             @SuppressLint("PrivateApi")
             Class<?> serviceManagerClass = Class.forName("android.os.ServiceManager");
             Method getServiceMethod = serviceManagerClass.getDeclaredMethod("getService", String.class);
             IBinder binder = (IBinder) getServiceMethod.invoke(null, "phone");
-            
+
             if (binder == null) {
                 System.err.println("Failed to get 'phone' service binder.");
                 System.exit(1);
             }
-            
+
             @SuppressLint("PrivateApi")
             Class<?> iTelephonyStubClass = Class.forName("com.android.internal.telephony.ITelephony$Stub");
             Method asInterfaceMethod = iTelephonyStubClass.getDeclaredMethod("asInterface", IBinder.class);
             Object iTelephony = asInterfaceMethod.invoke(null, binder);
-            
+
             if (iTelephony == null) {
                 System.err.println("Failed to get ITelephony interface.");
                 System.exit(1);
             }
-            
+
             Method setPrefNetworkTypeMethod = iTelephony.getClass().getMethod("setPreferredNetworkType", int.class, int.class);
             Object result = setPrefNetworkTypeMethod.invoke(iTelephony, subId, networkMode);
-            
+
             if (result instanceof Boolean && !((Boolean) result)) {
                 System.err.println("ITelephony returned false.");
                 System.exit(1);
