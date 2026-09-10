@@ -21,7 +21,7 @@ public class ExecutionStateController {
     private final Activity activity;
     private final AppPreferences appPreferences;
     private final StatusCallback statusCallback;
-    
+
     private Thread rootCheckThread;
     private Process rootCheckProcess;
     private boolean isDestroyed = false;
@@ -38,7 +38,7 @@ public class ExecutionStateController {
         this.activity = activity;
         this.appPreferences = appPreferences;
         this.statusCallback = statusCallback;
-        
+
         binderReceivedListener = () ->
             activity.runOnUiThread(() -> {
                 if (!isDestroyed && appPreferences != null
@@ -91,6 +91,13 @@ public class ExecutionStateController {
 
     public void checkRootPermission() {
         statusCallback.onStatusUpdate("Checking root permission...", 3);
+        if (rootCheckProcess != null) {
+            rootCheckProcess.destroy();
+            rootCheckProcess = null;
+        }
+        if (rootCheckThread != null && rootCheckThread.isAlive()) {
+            rootCheckThread.interrupt();
+        }
         rootCheckThread = new Thread(() -> {
             boolean granted = false;
             Process process = null;
