@@ -2,7 +2,7 @@ package com.dhangofa.networktoggle;
 
 /**
  * Broadcast receiver for system boot and app update events.
- * Clears out any stale transient state (like temporary errors or cached 
+ * Clears out any stale transient state (like temporary errors or cached
  * network modes) so the app can start completely fresh after a device reboot or app update.
  */
 import android.content.BroadcastReceiver;
