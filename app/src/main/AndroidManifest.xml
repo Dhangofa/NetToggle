@@ -6,6 +6,8 @@
 
     <!-- Used only to clear stale cached QS tile state after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Strictly required to resolve active physical SIM slots via Android's native SubscriptionManager API -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -60,7 +62,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="NetToggle">
+            android:label="NetToggle"
+            android:theme="@style/Theme.NetToggle.Splash"
+            android:windowSoftInputMode="adjustResize">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
