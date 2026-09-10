@@ -66,7 +66,7 @@ public final class TileIconManager {
             badgeTextPaint.setFakeBoldText(true); // Force extra thickness
             badgeTextPaint.setTextAlign(Paint.Align.CENTER);
             badgeTextPaint.setTextSize(45f);
-            
+
             Paint.FontMetrics badgeMetrics = badgeTextPaint.getFontMetrics();
             float badgeY = cy - (badgeMetrics.descent + badgeMetrics.ascent) / 2f;
             canvas.drawText(badge, cx, badgeY, badgeTextPaint);
