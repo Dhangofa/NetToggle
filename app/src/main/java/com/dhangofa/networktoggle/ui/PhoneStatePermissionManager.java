@@ -18,12 +18,14 @@ public class PhoneStatePermissionManager {
     private final Runnable onGranted;
     private Dialog permissionDialog;
     private boolean activityDestroyed;
+    private boolean isGrantedCallbackDispatched;
 
     public PhoneStatePermissionManager(Activity activity, int reqCode, Runnable onGranted) {
         this.activity = activity;
         this.reqCode = reqCode;
         this.onGranted = onGranted;
         this.activityDestroyed = false;
+        this.isGrantedCallbackDispatched = false;
     }
 
     public void checkAndRequest() {
@@ -40,12 +42,14 @@ public class PhoneStatePermissionManager {
                 if (permissionDialog != null && permissionDialog.isShowing()) {
                     permissionDialog.dismiss();
                 }
-                if (onGranted != null) {
+                if (!isGrantedCallbackDispatched && onGranted != null) {
+                    isGrantedCallbackDispatched = true;
                     onGranted.run();
                 }
             }
         } else {
-            if (onGranted != null) {
+            if (!isGrantedCallbackDispatched && onGranted != null) {
+                isGrantedCallbackDispatched = true;
                 onGranted.run();
             }
         }
@@ -59,7 +63,7 @@ public class PhoneStatePermissionManager {
                 }
             });
         }
-        
+
         if (!permissionDialog.isShowing() && !activityDestroyed) {
             permissionDialog.show();
         }
