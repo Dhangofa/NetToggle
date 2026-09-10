@@ -6,10 +6,14 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.DiagnosticError;
+import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.telephony.SimResolver;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import rikka.shizuku.Shizuku;
 
 public class DiagnosticReporter {
@@ -43,19 +47,58 @@ public class DiagnosticReporter {
         int slotIndex = simResolver.resolveTargetSlotIndex(prefs.getExecutionMode());
         sb.append("Resolved Slot Index: ").append(slotIndex).append("\n\n");
 
-        sb.append("[SHIZUKU STATUS]\n");
-        try {
-            boolean isBinderAlive = Shizuku.pingBinder();
-            sb.append("Binder Alive: ").append(isBinderAlive).append("\n");
-            if (isBinderAlive) {
-                sb.append("Shizuku Version: ").append(Shizuku.getVersion()).append("\n");
-                boolean hasPermission = Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
-                sb.append("Permission Granted: ").append(hasPermission).append("\n");
+        ExecutionMode selectedMode = prefs.getExecutionMode();
+        if (selectedMode == ExecutionMode.ROOT) {
+            sb.append("[ROOT STATUS]\n");
+            Process process = null;
+            try {
+                process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
+                int exitCode = -1;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    boolean finished = process.waitFor(2, TimeUnit.SECONDS);
+                    if (finished) {
+                        exitCode = process.exitValue();
+                    } else {
+                        process.destroy();
+                    }
+                } else {
+                    exitCode = process.waitFor();
+                }
+                boolean granted = (exitCode == 0);
+                sb.append("Root Access: ").append(granted ? "Granted" : "Denied/Unavailable").append("\n");
+                if (granted) {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                        String line = reader.readLine();
+                        if (line != null && !line.trim().isEmpty()) {
+                            sb.append("Identity: ").append(line.trim()).append("\n");
+                        }
+                    }
+                } else {
+                    sb.append("Exit Code: ").append(exitCode).append("\n");
+                }
+            } catch (Throwable e) {
+                sb.append("Root Access: Unavailable (").append(e.getClass().getSimpleName()).append(")\n");
+            } finally {
+                if (process != null) {
+                    process.destroy();
+                }
             }
-        } catch (Throwable e) {
-            sb.append("Status: Error reading Shizuku status (").append(e.getClass().getSimpleName()).append(")\n");
+            sb.append("\n");
+        } else if (selectedMode == ExecutionMode.SHIZUKU) {
+            sb.append("[SHIZUKU STATUS]\n");
+            try {
+                boolean isBinderAlive = Shizuku.pingBinder();
+                sb.append("Binder Alive: ").append(isBinderAlive).append("\n");
+                if (isBinderAlive) {
+                    sb.append("Shizuku Version: ").append(Shizuku.getVersion()).append("\n");
+                    boolean hasPermission = Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+                    sb.append("Permission Granted: ").append(hasPermission).append("\n");
+                }
+            } catch (Throwable e) {
+                sb.append("Status: Error reading Shizuku status (").append(e.getClass().getSimpleName()).append(")\n");
+            }
+            sb.append("\n");
         }
-        sb.append("\n");
 
         sb.append("[LAST ERROR EVENT]\n");
         DiagnosticError error = prefs.getLastError();
