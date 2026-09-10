@@ -4,23 +4,13 @@ package com.dhangofa.networktoggle;
  * Quick Settings (QS) Tile Service.
  * This handles the actual toggle button that sits in the Android notification shade.
  * When tapped, it reads the current network mode, figures out the next mode based on the configured cycle,
- * and executes the change using the chosen backend (Root/Shizuku). 
+ * and executes the change using the chosen backend (Root/Shizuku).
  * It also dynamically draws the tile icon to reflect the currently active mode.
  */
-import android.os.Build;
-
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.graphics.drawable.Icon;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import android.content.Intent;
-import android.app.PendingIntent;
 import rikka.shizuku.Shizuku;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
@@ -66,7 +56,7 @@ public class NetworkTileService extends TileService {
     @Override
     public void onStartListening() {
         super.onStartListening();
-        
+
         // Passive Shizuku Check
         if (appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
             boolean isShizukuOk = false;
@@ -75,7 +65,7 @@ public class NetworkTileService extends TileService {
             } catch (Throwable t) {
                 isShizukuOk = false;
             }
-        
+
             int currentError = appPreferences.getTileErrorState();
             if (!isShizukuOk && currentError != AppPreferences.TILE_ERROR_SHIZUKU) {
                 appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
@@ -93,7 +83,7 @@ public class NetworkTileService extends TileService {
 
         boolean shouldRefresh = (cachedMode == NetworkMode.UNKNOWN);
         long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
-        
+
         // 5 minute micro-cooldown before passively re-checking modem
         if (!shouldRefresh && (System.currentTimeMillis() - lastCheck > 5 * 60 * 1000L)) {
             shouldRefresh = true;
@@ -147,22 +137,26 @@ public class NetworkTileService extends TileService {
 
         AppExecutors.executeTelephony(() -> {
             CommandResult result;
-            
+
             if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
-                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
-                CommandResult result1 = networkModeController.apply(nextMode, executionMode);
-                
-                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
-                CommandResult result2 = networkModeController.apply(nextMode, executionMode);
-                
-                simResolver.setOverrideTargetSim(null);
-                
+                CommandResult result1 = null;
+                CommandResult result2 = null;
+                try {
+                    simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+                    result1 = networkModeController.apply(nextMode, executionMode);
+
+                    simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+                    result2 = networkModeController.apply(nextMode, executionMode);
+                } finally {
+                    simResolver.setOverrideTargetSim(null);
+                }
+
                 if (result1.isSuccess() && result2.isSuccess()) {
                     result = CommandResult.completed("", 0, "Applied to both SIMs", "");
                 } else if (result1.isSuccess()) {
-                    result = CommandResult.failed("", "Failed to apply to SIM 2");
+                    result = CommandResult.failed("", "Failed to apply to SIM 2. Err: " + result2.getStderr());
                 } else if (result2.isSuccess()) {
-                    result = CommandResult.failed("", "Failed to apply to SIM 1");
+                    result = CommandResult.failed("", "Failed to apply to SIM 1. Err: " + result1.getStderr());
                 } else {
                     result = result1;
                 }
@@ -177,7 +171,7 @@ public class NetworkTileService extends TileService {
                     });
                     return;
                 }
-    
+
                 result = networkModeController.apply(
                         nextMode,
                         executionMode
@@ -303,7 +297,7 @@ public class NetworkTileService extends TileService {
             } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_2) {
                 badge = "2";
             } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.BOTH) { // Future proofing for BOTH
-                badge = "B";
+                badge = "+";
             }
 
             tile.setIcon(TileIconManager.getCachedIcon(mode.getIconText(), badge, isAuto));
@@ -311,8 +305,6 @@ public class NetworkTileService extends TileService {
 
         tile.updateTile();
     }
-
-
 
     private void showAutoSimErrorToast() {
         Toast.makeText(
