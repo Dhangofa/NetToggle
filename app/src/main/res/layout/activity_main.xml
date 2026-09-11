@@ -38,11 +38,11 @@
             android:background="@drawable/shape_app_icon_bg"
             android:layout_marginEnd="12dp">
             <ImageView
-        android:contentDescription="@null"
-                android:layout_width="47dp"
-                android:layout_height="47dp"
+                android:contentDescription="@null"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_logo_ui"
+                android:src="@drawable/ic_logo"
                 android:tint="@color/brand_on_primary_container" />
         </FrameLayout>
 
@@ -116,7 +116,7 @@
                 android:clickable="true"
                 android:focusable="true">
                 <ImageView
-        android:contentDescription="@null"
+                    android:contentDescription="@null"
                     android:id="@+id/iconNavHome"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
@@ -146,7 +146,7 @@
                 android:clickable="true"
                 android:focusable="true">
                 <ImageView
-        android:contentDescription="@null"
+                    android:contentDescription="@null"
                     android:id="@+id/iconNavAutomation"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
@@ -176,7 +176,7 @@
                 android:clickable="true"
                 android:focusable="true">
                 <ImageView
-        android:contentDescription="@null"
+                    android:contentDescription="@null"
                     android:id="@+id/iconNavGuides"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
