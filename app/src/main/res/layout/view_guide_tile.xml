@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/shape_guide_card_bg"
+    android:stateListAnimator="@animator/anim_guide_card_popup"
+    android:elevation="4dp"
+    android:padding="16dp"
+    android:gravity="center_horizontal"
+    android:clickable="true"
+    android:focusable="true">
+    
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/tileIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        android:layout_gravity="center_horizontal" />
+    
+    <TextView
+        android:id="@+id/tileTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="@color/text_primary"
+        android:gravity="center"
+        android:maxLines="2"
+        android:layout_marginBottom="6dp"/>
+        
+    <TextView
+        android:id="@+id/tileDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:textSize="11sp"
+        android:textColor="@color/text_secondary"
+        android:gravity="center"
+        android:maxLines="2"
+        android:layout_marginBottom="14dp"/>
+        
+    <LinearLayout
+        android:id="@+id/tileBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingHorizontal="14dp"
+        android:background="@drawable/shape_guide_pill_btn"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/tileBtnText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/read_guide_caps"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/tileBtnIcon"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginStart="6dp"
+            android:src="@drawable/ic_open_in_new"
+            android:contentDescription="@null" />
+    </LinearLayout>
+</LinearLayout>
