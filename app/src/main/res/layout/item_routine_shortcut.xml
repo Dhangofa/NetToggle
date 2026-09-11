@@ -2,44 +2,218 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_marginBottom="8dp"
-    android:gravity="center_vertical"
-    android:background="@drawable/shape_cycle_segmented_container_rect"
-    android:padding="4dp">
+    android:orientation="vertical"
+    android:background="@drawable/shape_exec_card_bg"
+    android:elevation="8dp"
+    android:layout_marginBottom="14dp">
 
-    <TextView
-        android:id="@+id/slotLabel"
-        android:layout_width="wrap_content"
+    <!-- Header: Slot Badge and Shortcut Name -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/text_1"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="4dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <Spinner
-        android:id="@+id/spinnerSim"
-        android:layout_width="0dp"
+        <TextView
+            android:id="@+id/slotLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_badge_slot_purple"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="@string/shortcut_hash_1"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="@color/shortcut_badge_purple_text" />
+
+        <EditText
+            android:id="@+id/editShortcutTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:hint="@string/shortcut_name_hint"
+            android:textColorHint="@color/text_tertiary"
+            android:textColor="@color/text_primary"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:saveEnabled="false"
+            android:inputType="textCapWords" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/card_border" />
+
+    <!-- Configuration: Target SIM & Target Mode -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:minHeight="40dp" />
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
-    <Spinner
-        android:id="@+id/spinnerMode"
-        android:layout_width="0dp"
+        <!-- Target SIM Column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/target_sim"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="6dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/shape_input_bg">
+
+                <Spinner
+                    android:id="@+id/spinnerSim"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:saveEnabled="false"
+                    android:spinnerMode="dropdown" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Target Mode Column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/target_mode"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="6dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/shape_input_bg">
+
+                <Spinner
+                    android:id="@+id/spinnerMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:saveEnabled="false"
+                    android:spinnerMode="dropdown" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/card_border" />
+
+    <!-- Action Row: Test, Pin, Delete -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1.5"
-        android:minHeight="40dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <ImageView
-        android:id="@+id/btnRemoveShortcut"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:padding="4dp"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        android:tint="@color/status_error_text"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:layout_marginEnd="4dp"
-        android:contentDescription="Remove shortcut" />
+        <!-- Test Shortcut Button -->
+        <LinearLayout
+            android:id="@+id/btnTestShortcut"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/shape_btn_test_broadcast"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:layout_marginEnd="8dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_play_arrow"
+                android:tint="@color/status_success_text"
+                android:contentDescription="@null"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/test_shortcut"
+                android:textColor="@color/status_success_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Pin to Home Button -->
+        <LinearLayout
+            android:id="@+id/btnPinShortcut"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/shape_btn_pin_shortcut"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/ic_pin_shortcut"
+                android:tint="@color/text_primary"
+                android:contentDescription="@null"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pin_to_home"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Delete Button -->
+        <ImageView
+            android:id="@+id/btnRemoveShortcut"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="7dp"
+            android:src="@drawable/ic_delete"
+            android:tint="@color/text_tertiary"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/remove_shortcut" />
+    </LinearLayout>
 </LinearLayout>
