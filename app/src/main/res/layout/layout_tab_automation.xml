@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabAutomation"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:visibility="gone">
+
+    <ScrollView
+        android:id="@+id/scrollAutomation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:paddingBottom="96dp"
+        android:overScrollMode="never">
+
+    <LinearLayout android:clipToPadding="false" android:clipChildren="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Top Segmented Control -->
+        <RadioGroup
+            android:id="@+id/automationSegmentGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/shape_cycle_segmented_container_rect"
+            android:padding="4dp"
+            android:layout_marginBottom="24dp">
+            
+            <RadioButton
+                android:id="@+id/radioBroadcasts"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/nav_segment_broadcasts"
+                android:button="@null"
+                android:gravity="center"
+                android:minHeight="40dp"
+                android:paddingVertical="4dp"
+                android:background="@drawable/selector_segmented_tab_cycle"
+                android:textColor="@color/color_segmented_text_broadcasts"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radioShortcuts"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/nav_segment_shortcuts"
+                android:button="@null"
+                android:gravity="center"
+                android:minHeight="40dp"
+                android:paddingVertical="4dp"
+                android:background="@drawable/selector_segmented_tab_cycle"
+                android:textColor="@color/color_segmented_text_cycle"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </RadioGroup>
+
+        <!-- Shortcuts Page -->
+        <LinearLayout android:clipToPadding="false" android:clipChildren="false"
+            android:id="@+id/pageShortcuts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Header Card: Routine Shortcuts Overview -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/shape_exec_card_bg"
+                android:elevation="8dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Sparkle Icon in Soft Peach Box -->
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/shape_count_badge_bg"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_magic_wand"
+                            android:tint="@color/cycle_accent"
+                            android:contentDescription="@string/routine_shortcuts" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/routine_shortcuts"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/up_to_4_shortcuts"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <!-- Counter Badge "4 of 4" -->
+                    <TextView
+                        android:id="@+id/badgeShortcutCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_count_badge_bg"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/zero_of_four"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/shortcut_count_badge_text" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routine_shortcuts_description"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="14dp" />
+
+                <!-- Lavender Routine Tip Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_shortcut_tip_bg"
+                    android:padding="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="top">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_lightbulb_glow"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginTop="1dp"
+                        android:contentDescription="@string/tip_content_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/routine_shortcuts_tip"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="2sp"
+                        android:textColor="@color/shortcut_tip_text" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Shortcuts Container -->
+            <LinearLayout android:clipToPadding="false" android:clipChildren="false"
+                android:id="@+id/shortcutsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Banner shown when max 4 are configured -->
+            <TextView
+                android:id="@+id/bannerLimitReached"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_banner_limit_reached"
+                android:paddingVertical="14dp"
+                android:paddingHorizontal="16dp"
+                android:gravity="center"
+                android:text="@string/maximum_4_shortcuts_configured"
+                android:textColor="@color/text_tertiary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+        </LinearLayout>
+
+        <!-- Broadcasts Page -->
+        <LinearLayout android:clipToPadding="false" android:clipChildren="false"
+            android:id="@+id/pageBroadcasts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Card 1: External Automation -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/shape_exec_card_bg"
+                android:elevation="8dp"
+                android:padding="16dp"
+                android:orientation="vertical">
+                
+                <!-- Top Row: Title, Status Badge, Switch -->
+                <LinearLayout
+                    android:id="@+id/rowExternalAutomationToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Terminal Icon in Soft Peach Box -->
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/shape_count_badge_bg"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_broadcast"
+                            android:tint="@color/cycle_accent"
+                            android:contentDescription="@string/external_automation" />
+                    </FrameLayout>
+                    
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/external_automation"
+                        android:textColor="@color/text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"/>
+
+                    <TextView
+                        android:id="@+id/badgeAutomationStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/shape_status_badge_ready"
+                        android:text="@string/status_ready"
+                        android:textColor="@color/status_success_text"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    
+                    <Switch
+                        android:id="@+id/switchExternalAutomation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:track="@drawable/selector_switch_track_broadcast"
+                        android:thumb="@drawable/selector_switch_thumb"
+                        android:splitTrack="false"
+                        android:showText="false"
+                        android:thumbTextPadding="0dp"
+                        android:switchMinWidth="52dp" />
+                </LinearLayout>
+
+                <!-- Description -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/external_automation_description"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp"/>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/card_border" />
+
+                <!-- Bottom Row: Intent Receiver & Test Broadcast -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/intent_receiver_label"
+                            android:textColor="@color/text_tertiary"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/automation_receiver_name"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnTestBroadcast"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_btn_test_broadcast"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+        android:contentDescription="@null"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="6dp"
+                            android:src="@drawable/ic_play_arrow" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/test_broadcast_btn"
+                            android:textColor="@color/status_success_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 2: Broadcast Protocol -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_exec_card_bg"
+                android:elevation="8dp"
+                android:padding="16dp"
+                android:orientation="vertical">
+
+                <!-- Header: Title, Subtitle, and Copy Specs Button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/broadcast_protocol"
+                            android:textColor="@color/text_primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/standard_intent_specs"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnCopyIntent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_btn_test_broadcast"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+        android:contentDescription="@null"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="6dp"
+                            android:src="@drawable/ic_copy"
+                            android:tint="@color/status_success_text" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/copy_specs"
+                            android:textColor="@color/status_success_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Specs List directly on card surface (no background or border box, wrapping, no horizontal scroll) -->
+                <LinearLayout
+                    android:id="@+id/boxSpecDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="65dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/action_label"
+                            android:textColor="@color/text_secondary"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-medium" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/action_name"
+                            android:textColor="@color/brand_primary"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="65dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/target_label"
+                            android:textColor="@color/text_secondary"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-medium" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/broadcast_send_intent"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="65dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/package_label"
+                            android:textColor="@color/text_secondary"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-medium" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/pkg_name"
+                            android:textColor="@color/text_secondary"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="65dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/class_label"
+                            android:textColor="@color/text_secondary"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-medium" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/automation_receiver_class"
+                            android:textColor="@color/text_secondary"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Extra 1 (String): mode -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/extra_1_string"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/mode_lowercase"
+                            android:textColor="@color/cycle_accent"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tap_to_preview"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Mode Chips Horizontal Scroll -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:overScrollMode="never"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:id="@+id/containerModeChips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipMode5G"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/mode_5g"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="7dp"
+                            android:background="@drawable/shape_chip_selected_orange"
+                            android:textColor="@color/cycle_accent"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/chipMode4G"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/mode_4g"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="7dp"
+                            android:background="@drawable/shape_chip_unselected"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/chipModePref5G"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pref_5g_text"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="7dp"
+                            android:background="@drawable/shape_chip_unselected"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/chipModePref4G"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pref_4g_text"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="7dp"
+                            android:background="@drawable/shape_chip_unselected"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/chipModePref3G"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pref_3g_text"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="7dp"
+                            android:background="@drawable/shape_chip_unselected"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/chipMode2G"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/text_2g"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="7dp"
+                            android:background="@drawable/shape_chip_unselected"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Extra 2 (Integer): sim -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/extra_2_integer"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sim_lowercase"
+                            android:textColor="@color/status_success_text"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/optional_lowercase"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- SIM Chips Row -->
+                <LinearLayout
+                    android:id="@+id/containerSimChips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/chipSim1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/one_sim_1"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="7dp"
+                        android:background="@drawable/shape_chip_selected_green"
+                        android:textColor="@color/status_success_text"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/chipSim2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/two_sim_2"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="7dp"
+                        android:background="@drawable/shape_chip_unselected"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/chipSimBoth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/three_both"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="7dp"
+                        android:background="@drawable/shape_chip_unselected"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Extra 3 (String): token -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/extra_3_string"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/token_lowercase"
+                            android:textColor="#7E57C2"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/security_handshake"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Token Input Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/shape_input_bg"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:id="@+id/editAutomationToken"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/security_token"
+                        android:inputType="textVisiblePassword"
+                        android:background="@null"
+                        android:fontFamily="monospace"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/btnGenerateToken"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:text="@string/generate_uppercase"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/brand_primary"
+                        android:background="@drawable/shape_btn_chip" />
+                </LinearLayout>
+
+                <!-- Shell / ADB Command Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dot_symbol"
+                            android:textColor="@color/status_success_text"
+                            android:textSize="10sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/shell_adb_command"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tap_to_copy"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Terminal / ADB Command Box -->
+                <LinearLayout
+                    android:id="@+id/blockShellCommand"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_terminal_bg"
+                    android:padding="14dp"
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/textShellCommand"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/automation_broadcast_example"
+                        android:textColor="#CFD8DC"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    </ScrollView>
+</FrameLayout>
+
