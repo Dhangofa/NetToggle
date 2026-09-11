@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.NetToggle.Splash" parent="@android:style/Theme.Material.NoActionBar">
+        <!-- Pre-Android 12 Fallback -->
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        
+        <item name="android:statusBarColor">@color/brand_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/brand_primary</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
     <style name="Theme.NetToggle" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/surface_background</item>
         <item name="android:colorPrimary">@color/brand_primary</item>
         <item name="android:statusBarColor">@color/card_surface</item>
         <item name="android:windowLightStatusBar">false</item>
