@@ -39,8 +39,8 @@
             android:layout_marginEnd="12dp">
             <ImageView
                 android:contentDescription="@null"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_logo"
                 android:tint="@color/brand_on_primary_container" />
