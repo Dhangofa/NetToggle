@@ -185,11 +185,11 @@
                 android:background="@drawable/shape_app_icon_bg"
                 android:layout_marginEnd="10dp">
                 <ImageView
-        android:contentDescription="@null"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:contentDescription="@null"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_logo_ui"
+                    android:src="@drawable/ic_logo"
                     android:tint="@color/brand_on_primary_container" />
             </FrameLayout>
 
