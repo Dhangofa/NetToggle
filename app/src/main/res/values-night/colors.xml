@@ -41,6 +41,8 @@
     <color name="carousel_page5_bg">#331E23</color> <!-- Rose tinted dark -->
     <color name="carousel_page4_accent">#8BB4CC</color>
     <color name="carousel_page5_accent">#CC97A0</color>
+    <color name="carousel_page6_bg">#282233</color> <!-- Purple tinted dark -->
+    <color name="carousel_page6_accent">#B39DDB</color>
 
     <!-- Cycle Card Custom Tones (Warm Sand) -->
     <color name="cycle_accent">#DEBA90</color>
@@ -68,4 +70,44 @@
     <color name="sim_segmented_text_unselected">#A39F98</color>
     <color name="sim_segmented_separator">#45413C</color>
     <color name="sim_segmented_container">#181715</color>
+
+    <!-- Broadcast Page Subtle Strokes (matching each shape bg) -->
+    <color name="broadcast_chip_mode_selected_stroke">#483624</color>
+    <color name="broadcast_chip_sim_selected_stroke">#324B27</color>
+    <color name="broadcast_btn_chip_stroke">#42532D</color>
+    <color name="broadcast_chip_unselected_stroke">#36332F</color>
+    <color name="broadcast_container_stroke">#272522</color>
+
+    <!-- Warm Charcoal & Sand Navigation Bar Specifications (Dark Mode) -->
+    <color name="nav_pill_bg">#24221F</color>
+    <color name="nav_pill_stroke">#33302B</color>
+    <color name="nav_item_selected_bg">#35322D</color>
+    <color name="nav_item_selected_content">#F2EFE9</color>
+    <color name="nav_item_unselected_icon">#736F68</color>
+
+    <!-- AMOLED Nav Bar Colors -->
+    <color name="nav_pill_bg_amoled">#000000</color>
+    <color name="nav_pill_stroke_amoled">#2E2C28</color>
+    <color name="nav_item_selected_bg_amoled">#1E1D1B</color>
+    <color name="nav_item_selected_content_amoled">#FFFFFF</color>
+    <color name="nav_item_unselected_icon_amoled">#8E8981</color>
+    <!-- Disabled State Status Badge (Dark Mode) -->
+    <color name="status_disabled_text">#98938B</color>
+
+    <!-- Shortcut Tab Palette (Dark Mode) -->
+    <color name="shortcut_badge_purple_bg">#352945</color>
+    <color name="shortcut_badge_purple_text">#D0BCFF</color>
+    <color name="shortcut_badge_green_bg">#263B2A</color>
+    <color name="shortcut_badge_green_text">#A6D3A9</color>
+    <color name="shortcut_count_badge_bg">#3D2E21</color>
+    <color name="shortcut_count_badge_text">#F5BA82</color>
+    <color name="shortcut_tip_bg">#2D2638</color>
+    <color name="shortcut_tip_text">#CEBAEE</color>
+    <color name="fab_add_shortcut_bg">@color/nav_pill_bg</color>
+    <color name="fab_add_shortcut_stroke">@color/nav_pill_stroke</color>
+    <color name="fab_add_shortcut_icon">@color/nav_item_selected_content</color>
+    <color name="fab_add_shortcut_ripple">#30FFFFFF</color>
+    <color name="fab_add_shortcut_bg_amoled">@color/nav_item_selected_bg_amoled</color>
+    <color name="fab_add_shortcut_stroke_amoled">@color/nav_item_selected_bg_amoled</color>
+    <color name="fab_add_shortcut_icon_amoled">@color/nav_item_selected_content_amoled</color>
 </resources>
