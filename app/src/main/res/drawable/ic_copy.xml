@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Main board outline -->
+    <path
+        android:strokeColor="@color/status_success_text"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M8,4 H6 A2,2 0 0,0 4,6 V20 A2,2 0 0,0 6,22 H18 A2,2 0 0,0 20,20 V6 A2,2 0 0,0 18,4 H16" />
+    <!-- Top clip -->
+    <path
+        android:strokeColor="@color/status_success_text"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M9,2 h6 a1,1 0 0,1 1,1 v1 a1,1 0 0,1 -1,1 h-6 a1,1 0 0,1 -1,-1 v-1 a1,1 0 0,1 1,-1 z" />
+</vector>
