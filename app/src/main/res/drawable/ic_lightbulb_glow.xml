@@ -1,0 +1,57 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer warm glowing halo -->
+    <path
+        android:fillColor="#35FFC107"
+        android:pathData="M 12 2 A 9 9 0 1 0 12 20 A 9 9 0 1 0 12 2 Z" />
+
+    <!-- Inner golden glowing halo -->
+    <path
+        android:fillColor="#55FFD54F"
+        android:pathData="M 12 4 A 7 7 0 1 0 12 18 A 7 7 0 1 0 12 4 Z" />
+
+    <!-- Bulb solid body -->
+    <path
+        android:fillColor="#FFCA28"
+        android:pathData="M 12 3.5 C 7.86 3.5 4.5 6.86 4.5 11 C 4.5 13.5 5.75 15.7 7.7 17.05 L 7.7 18 C 7.7 18.55 8.15 19 8.7 19 L 15.3 19 C 15.85 19 16.3 18.55 16.3 18 L 16.3 17.05 C 18.25 15.7 19.5 13.5 19.5 11 C 19.5 6.86 16.14 3.5 12 3.5 Z" />
+
+    <!-- Radiant yellow core -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M 12 4.5 C 8.41 4.5 5.5 7.41 5.5 11 C 5.5 13.15 6.55 15.05 8.2 16.2 L 8.5 17.8 L 15.5 17.8 L 15.8 16.2 C 17.45 15.05 18.5 13.15 18.5 11 C 18.5 7.41 15.59 4.5 12 4.5 Z" />
+
+    <!-- Filament -->
+    <path
+        android:strokeColor="#E65100"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 9.5 14.5 L 9.5 11.2 C 9.5 9.8 10.6 8.7 12 8.7 C 13.4 8.7 14.5 9.8 14.5 11.2 L 14.5 14.5" />
+
+    <!-- Specular highlight on upper-right bulb surface -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeAlpha="0.85"
+        android:strokeLineCap="round"
+        android:pathData="M 14.2 6 C 16.2 7.4 17.2 9.3 17.2 11.3" />
+
+    <!-- Screw base top thread -->
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M 8.5 18.8 L 15.5 18.8 L 15.5 20.1 L 8.5 20.1 Z" />
+
+    <!-- Screw base bottom thread -->
+    <path
+        android:fillColor="#64748B"
+        android:pathData="M 9.2 20.3 L 14.8 20.3 L 14.8 21.5 L 9.2 21.5 Z" />
+
+    <!-- Bottom contact point -->
+    <path
+        android:fillColor="#334155"
+        android:pathData="M 10.3 21.6 L 13.7 21.6 C 13.7 22.7 12.9 23.3 12 23.3 C 11.1 23.3 10.3 22.7 10.3 21.6 Z" />
+</vector>
