@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#40FFFFFF">
+    <item>
+        <vector
+            android:width="56dp"
+            android:height="56dp"
+            android:viewportWidth="56"
+            android:viewportHeight="56">
+            <path
+                android:fillColor="@color/fab_add_shortcut_bg_amoled"
+                android:strokeColor="@color/fab_add_shortcut_stroke_amoled"
+                android:strokeWidth="1.0"
+                android:pathData="M 55.00,28.00 C 55.00,32.80 48.52,35.46 46.62,38.75 C 44.72,42.04 45.66,48.98 41.50,51.38 C 37.34,53.78 31.80,49.50 28.00,49.50 C 24.20,49.50 18.66,53.78 14.50,51.38 C 10.34,48.98 11.28,42.04 9.38,38.75 C 7.48,35.46 1.00,32.80 1.00,28.00 C 1.00,23.20 7.48,20.54 9.38,17.25 C 11.28,13.96 10.34,7.02 14.50,4.62 C 18.66,2.22 24.20,6.50 28.00,6.50 C 31.80,6.50 37.34,2.22 41.50,4.62 C 45.66,7.02 44.72,13.96 46.62,17.25 C 48.52,20.54 55.00,23.20 55.00,28.00 Z" />
+        </vector>
+    </item>
+</ripple>
