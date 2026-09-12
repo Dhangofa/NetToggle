@@ -186,4 +186,8 @@
     <string name="overall_status_no_auth_desc">Authorize Root or Shizuku below to enable switching</string>
     <string name="overall_status_no_phone_desc">Grant Phone permission to enable instant multi-SIM detection</string>
     <string name="overall_status_ready_desc">All privileged and system permissions are active</string>
+
+    <!-- Auto-restore preferred mode -->
+    <string name="auto_restore_preferred_mode">Auto-Restore on shade pull</string>
+    <string name="auto_restore_preferred_mode_description">Automatically re-applies your last toggled mode when shade is pulled if carrier or thermals downgraded or the system altered it</string>
 </resources>
