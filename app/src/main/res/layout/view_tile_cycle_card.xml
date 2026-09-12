@@ -5,8 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/shape_cycle_card_bg"
     android:elevation="8dp"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -95,6 +94,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:text="@string/select_2_to_3_modes_selection_order_beco"
         android:textColor="@color/text_secondary"
         android:textSize="11sp" />
@@ -250,5 +251,66 @@
         android:textColor="@color/cycle_accent"
         android:textSize="11sp"
         android:textStyle="bold" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/cycle_segmented_separator" />
+
+    <!-- Auto-Restore Preferred Mode Toggle Row -->
+    <LinearLayout
+        android:id="@+id/rowAutoRestoreToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_restore_preferred_mode"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/auto_restore_preferred_mode_description"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2dp" />
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/switchAutoRestore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:track="@drawable/selector_switch_track_cycle"
+            android:thumb="@drawable/selector_switch_thumb"
+            android:splitTrack="false"
+            android:showText="false"
+            android:thumbTextPadding="0dp"
+            android:switchMinWidth="52dp" />
+    </LinearLayout>
 
 </LinearLayout>
