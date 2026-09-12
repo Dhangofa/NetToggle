@@ -21,7 +21,7 @@ public class ThemeController {
     public ThemeController(Activity activity, SharedPreferences prefs) {
         this.activity = activity;
         this.prefs = prefs;
-        this.currentThemeMode = prefs.getInt("app_theme", 0);
+        this.currentThemeMode = prefs.getInt("app_theme", 1);
         activity.setTheme(R.style.Theme_NetToggle);
     }
 
@@ -74,7 +74,7 @@ public class ThemeController {
             window.setStatusBarColor(-16777216);
             window.setNavigationBarColor(-16777216);
         } else {
-            window.setStatusBarColor(activity.getColor(R.color.card_surface));
+            window.setStatusBarColor(activity.getColor(R.color.surface_background));
             window.setNavigationBarColor(activity.getColor(R.color.surface_background));
         }
         int n = flags = isNight ? 0 : 8192; // SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
@@ -112,9 +112,6 @@ public class ThemeController {
                 window.setNavigationBarColor(black);
             }
             
-            View topBar = activity.findViewById(R.id.topBar);
-            if (topBar != null) topBar.setBackgroundColor(black);
-            
             View bottomNavPill = activity.findViewById(R.id.bottomNavPill);
             if (bottomNavPill != null && bottomNavPill.getBackground() instanceof GradientDrawable) {
                 GradientDrawable gd = (GradientDrawable) bottomNavPill.getBackground().mutate();
@@ -122,10 +119,11 @@ public class ThemeController {
                 gd.setStroke((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0f, activity.getResources().getDisplayMetrics()), activity.getColor(R.color.nav_pill_stroke_amoled));
             }
             View edgeBarContainer = activity.findViewById(R.id.edgeBarContainer);
-            if (edgeBarContainer != null) edgeBarContainer.setBackgroundColor(black);
-            
-            View cornerBlankBlock = activity.findViewById(R.id.cornerBlankBlock);
-            if (cornerBlankBlock != null) cornerBlankBlock.setBackgroundColor(black);
+            if (edgeBarContainer != null && edgeBarContainer.getBackground() instanceof GradientDrawable) {
+                GradientDrawable gd = (GradientDrawable) edgeBarContainer.getBackground().mutate();
+                gd.setColor(black);
+                gd.setStroke((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0f, activity.getResources().getDisplayMetrics()), activity.getColor(R.color.nav_pill_stroke_amoled));
+            }
             
             if (navIndicatorPill != null && navIndicatorPill.getBackground() instanceof GradientDrawable) {
                 ((GradientDrawable) navIndicatorPill.getBackground().mutate())
