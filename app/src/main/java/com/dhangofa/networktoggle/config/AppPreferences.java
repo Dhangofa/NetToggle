@@ -27,6 +27,8 @@ public final class AppPreferences {
     private static final String KEY_EXTERNAL_AUTOMATION = "external_automation_enabled";
     private static final String KEY_AUTOMATION_TOKEN = "automation_token";
     private static final String KEY_TILE_CYCLE_MODES = "tile_cycle_modes";
+    private static final String KEY_AUTO_RESTORE_ENABLED = "auto_restore_enabled";
+    private static final String KEY_LAST_USER_SELECTED_MODE = "last_user_selected_mode";
 
     private static final String KEY_LAST_ERROR_CMD = "last_error_cmd";
     private static final String KEY_LAST_ERROR_STDERR = "last_error_stderr";
@@ -99,6 +101,25 @@ public final class AppPreferences {
 
     public void setExternalAutomationEnabled(boolean enabled) {
         preferences.edit().putBoolean(KEY_EXTERNAL_AUTOMATION, enabled).apply();
+    }
+
+    public boolean isAutoRestorePreferredModeEnabled() {
+        return preferences.getBoolean(KEY_AUTO_RESTORE_ENABLED, false);
+    }
+
+    public void setAutoRestorePreferredModeEnabled(boolean enabled) {
+        preferences.edit().putBoolean(KEY_AUTO_RESTORE_ENABLED, enabled).apply();
+    }
+
+    public NetworkMode getLastUserSelectedMode() {
+        int val = preferences.getInt(KEY_LAST_USER_SELECTED_MODE, NetworkMode.UNKNOWN.getStateValue());
+        return NetworkMode.fromStateValue(val);
+    }
+
+    public void setLastUserSelectedMode(NetworkMode mode) {
+        if (mode != null && mode != NetworkMode.UNKNOWN) {
+            preferences.edit().putInt(KEY_LAST_USER_SELECTED_MODE, mode.getStateValue()).apply();
+        }
     }
 
     public String getAutomationToken() {
