@@ -41,6 +41,55 @@ public class NetworkTileService extends TileService {
     private TileCycleManager tileCycleManager;
     private com.dhangofa.networktoggle.telephony.SimResolver simResolver;
 
+    private final Runnable shizukuGraceCheckRunnable = () -> {
+        if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+            boolean isShizukuOk = false;
+            try {
+                isShizukuOk = Shizuku.pingBinder()
+                        && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+            } catch (Throwable t) {
+                isShizukuOk = false;
+            }
+
+            int currentError = appPreferences.getTileErrorState();
+            if (!isShizukuOk && currentError != AppPreferences.TILE_ERROR_SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                updateTileUI(appPreferences.getCachedNetworkMode());
+            } else if (isShizukuOk && currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                updateTileUI(appPreferences.getCachedNetworkMode());
+            }
+        }
+    };
+
+    private final Shizuku.OnBinderReceivedListener binderReceivedListener = () ->
+        mainHandler.post(() -> {
+            mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+            if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                boolean isShizukuOk = false;
+                try {
+                    isShizukuOk = Shizuku.pingBinder()
+                            && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+                } catch (Throwable ignored) {}
+
+                if (isShizukuOk) {
+                    if (appPreferences.getTileErrorState() == AppPreferences.TILE_ERROR_SHIZUKU) {
+                        appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                    }
+                    updateTileUI(appPreferences.getCachedNetworkMode());
+                }
+            }
+        });
+
+    private final Shizuku.OnBinderDeadListener binderDeadListener = () ->
+        mainHandler.post(() -> {
+            mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+            if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                updateTileUI(appPreferences.getCachedNetworkMode());
+            }
+        });
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -51,6 +100,27 @@ public class NetworkTileService extends TileService {
         simResolver = new com.dhangofa.networktoggle.telephony.SimResolver(this, appPreferences);
         networkModeReader = new com.dhangofa.networktoggle.telephony.NetworkModeReader(this, appPreferences, simResolver);
         networkModeController = new NetworkModeController(simResolver);
+
+        try {
+            Shizuku.addBinderReceivedListenerSticky(binderReceivedListener);
+            Shizuku.addBinderDeadListener(binderDeadListener);
+        } catch (Throwable ignored) {}
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mainHandler.removeCallbacksAndMessages(null);
+        try {
+            Shizuku.removeBinderReceivedListener(binderReceivedListener);
+            Shizuku.removeBinderDeadListener(binderDeadListener);
+        } catch (Throwable ignored) {}
+    }
+
+    @Override
+    public void onStopListening() {
+        super.onStopListening();
+        mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
     }
 
     @Override
@@ -61,16 +131,22 @@ public class NetworkTileService extends TileService {
         if (appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
             boolean isShizukuOk = false;
             try {
-                isShizukuOk = rikka.shizuku.Shizuku.pingBinder() && rikka.shizuku.Shizuku.checkSelfPermission() == android.content.pm.PackageManager.PERMISSION_GRANTED;
+                isShizukuOk = Shizuku.pingBinder()
+                        && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
             } catch (Throwable t) {
                 isShizukuOk = false;
             }
 
             int currentError = appPreferences.getTileErrorState();
-            if (!isShizukuOk && currentError != AppPreferences.TILE_ERROR_SHIZUKU) {
-                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
-            } else if (isShizukuOk && currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
-                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+            if (isShizukuOk) {
+                if (currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                }
+            } else {
+                // On cold start, Shizuku IPC handshake takes ~20-50ms to bind.
+                // Do not prematurely mark tile as dead; give it a 500ms grace check.
+                mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+                mainHandler.postDelayed(shizukuGraceCheckRunnable, 500);
             }
         }
 
@@ -137,6 +213,15 @@ public class NetworkTileService extends TileService {
 
         AppExecutors.executeTelephony(() -> {
             CommandResult result;
+
+            // Cold-start binder latch: wait briefly (up to 300ms) for Shizuku binder to attach if needed
+            if (executionMode == ExecutionMode.SHIZUKU && !Shizuku.pingBinder()) {
+                for (int i = 0; i < 6 && !Shizuku.pingBinder(); i++) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignored) {}
+                }
+            }
 
             if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
                 CommandResult result1 = null;
@@ -249,11 +334,22 @@ public class NetworkTileService extends TileService {
 
         int errorState = appPreferences.getTileErrorState();
         if (errorState == AppPreferences.TILE_ERROR_SHIZUKU) {
-            tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel(getString(R.string.tile_shizuku_unavailable));
-            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
-            tile.updateTile();
-            return;
+            boolean isActuallyOk = false;
+            try {
+                isActuallyOk = Shizuku.pingBinder()
+                        && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+            } catch (Throwable ignored) {}
+
+            if (isActuallyOk) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                errorState = AppPreferences.TILE_ERROR_NONE;
+            } else {
+                tile.setState(Tile.STATE_UNAVAILABLE);
+                tile.setLabel(getString(R.string.tile_shizuku_unavailable));
+                tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
+                tile.updateTile();
+                return;
+            }
         } else if (errorState == AppPreferences.TILE_ERROR_ROOT) {
             tile.setState(Tile.STATE_UNAVAILABLE);
             tile.setLabel(getString(R.string.tile_root_unavailable));
