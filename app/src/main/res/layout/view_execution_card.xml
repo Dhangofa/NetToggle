@@ -4,7 +4,9 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/shape_exec_card_bg"
-    android:elevation="8dp"
+    android:elevation="6dp"
+    android:outlineProvider="background"
+    android:clipToOutline="true"
     android:padding="12dp">
 
     <RelativeLayout
