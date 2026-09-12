@@ -12,63 +12,142 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:clipToPadding="false"
         android:clipChildren="false"
         android:paddingHorizontal="16dp"
         android:paddingTop="12dp"
         android:paddingBottom="16dp">
 
-        <!-- Left Column: Execution Card + Target SIM Card -->
+        <!-- Top Action Bar (Scrollable with Home content, seamless with App background) -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginEnd="8dp"
-            android:clipToPadding="false"
-            android:clipChildren="false">
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            android:paddingVertical="4dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <include
-                android:id="@+id/cardErrorBanner"
-                layout="@layout/view_error_banner"
-                android:layout_width="match_parent"
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/shape_app_icon_bg"
+                android:layout_marginEnd="10dp">
+                <ImageView
+                    android:contentDescription="@null"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_logo"
+                    android:tint="@color/brand_on_primary_container" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/cardExecutionAndTarget"
-                layout="@layout/view_execution_card"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_marginBottom="12dp" />
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_title_net_toggle"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_desc_advanced"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
 
-            <include
-                android:id="@+id/cardTargetSim"
-                layout="@layout/view_target_sim_card"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
+            <ImageView
+                android:id="@+id/btnThemeToggle"
+                android:contentDescription="@string/change_theme"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_theme_light"
+                android:tint="@color/text_primary" />
         </LinearLayout>
 
-        <!-- Right Column: Quick Settings Tile Cycle Card -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:clipToPadding="false"
             android:clipChildren="false">
 
-            <include
-                android:id="@+id/cardTileCycle"
-                layout="@layout/view_tile_cycle_card"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            <!-- Left Column: Overall Status Card with Execution Mode Card -->
+            <LinearLayout
+                android:id="@+id/homeLeftColumn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp"
+                android:clipToPadding="false"
+                android:clipChildren="false">
+
+                <include
+                    android:id="@+id/cardErrorBanner"
+                    layout="@layout/view_error_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+                <!-- Unauthenticated / Setup State: Two-Card Permission Selector Hero -->
+                <include
+                    android:id="@+id/cardSetupHero"
+                    layout="@layout/view_setup_hero"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Authenticated State: Compact Execution Mode Card -->
+                <include
+                    android:id="@+id/cardExecutionAndTarget"
+                    layout="@layout/view_execution_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Right Column: Target SIM Card + Quick Settings Tile Cycle Card -->
+            <LinearLayout
+                android:id="@+id/homeRightColumn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp"
+                android:clipToPadding="false"
+                android:clipChildren="false">
+
+                <include
+                    android:id="@+id/cardTargetSim"
+                    layout="@layout/view_target_sim_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp" />
+
+                <include
+                    android:id="@+id/cardTileCycle"
+                    layout="@layout/view_tile_cycle_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
