@@ -13,7 +13,7 @@
     <style name="Theme.NetToggle" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/surface_background</item>
         <item name="android:colorPrimary">@color/brand_primary</item>
-        <item name="android:statusBarColor">@color/card_surface</item>
+        <item name="android:statusBarColor">@color/surface_background</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/surface_background</item>
         <item name="android:windowLightNavigationBar">true</item>
@@ -23,11 +23,11 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowAnimationStyle">@style/FabDialogAnimation</item>
+        <item name="android:windowAnimationStyle">@style/BottomSheetAnimation</item>
     </style>
 
-    <style name="FabDialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/fab_dialog_enter</item>
-        <item name="android:windowExitAnimation">@anim/fab_dialog_exit</item>
+    <style name="BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/bottom_sheet_enter</item>
+        <item name="android:windowExitAnimation">@anim/bottom_sheet_exit</item>
     </style>
 </resources>
