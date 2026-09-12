@@ -6,10 +6,12 @@ package com.dhangofa.networktoggle.ui;
  */
 
 import android.app.Activity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +25,7 @@ import java.util.List;
 public final class TileCycleUiController {
     private final Activity activity;
     private final TileCycleManager cycleManager;
+    private final AppPreferences appPreferences;
 
     private final CheckBox modePref5g;
     private final CheckBox modePref4g;
@@ -39,6 +42,8 @@ public final class TileCycleUiController {
     private final TextView selectedCount;
     private final TextView cycleOrder;
     private final View lockBadge;
+    private final Switch switchAutoRestore;
+    private final View rowAutoRestoreToggle;
     private boolean updatingUi;
 
     private AppPreferences.NetworkCapabilities currentCaps;
@@ -49,9 +54,10 @@ public final class TileCycleUiController {
         void onCycleChanged(List<NetworkMode> newCycle);
     }
 
-    public TileCycleUiController(Activity activity, TileCycleManager cycleManager) {
+    public TileCycleUiController(Activity activity, TileCycleManager cycleManager, AppPreferences appPreferences) {
         this.activity = activity;
         this.cycleManager = cycleManager;
+        this.appPreferences = appPreferences;
 
         modePref5g = activity.findViewById(R.id.cyclePreferred5g);
         modePref4g = activity.findViewById(R.id.cyclePreferred4g);
@@ -68,6 +74,8 @@ public final class TileCycleUiController {
         selectedCount = activity.findViewById(R.id.cycleSelectedCount);
         cycleOrder = activity.findViewById(R.id.cycleOrderText);
         lockBadge = activity.findViewById(R.id.tileCycleLockBadge);
+        switchAutoRestore = activity.findViewById(R.id.switchAutoRestore);
+        rowAutoRestoreToggle = activity.findViewById(R.id.rowAutoRestoreToggle);
     }
 
     public void setOnCycleChangedListener(OnCycleChangedListener listener) {
@@ -104,6 +112,53 @@ public final class TileCycleUiController {
                 handleSelection(NetworkMode.FOUR_G_ONLY, selected));
         mode2gOnly.setOnCheckedChangeListener((button, selected) ->
                 handleSelection(NetworkMode.TWO_G_ONLY, selected));
+
+        if (switchAutoRestore != null) {
+            switchAutoRestore.setOnTouchListener((v, event) -> {
+                boolean isAuth = isAuthorized != null && isAuthorized;
+                if (!isAuth) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        showToast(activity.getString(R.string.toast_auth_required_tile));
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            switchAutoRestore.setOnClickListener(v -> {
+                boolean isAuth = isAuthorized != null && isAuthorized;
+                if (!isAuth) {
+                    switchAutoRestore.setChecked(false);
+                    showToast(activity.getString(R.string.toast_auth_required_tile));
+                }
+            });
+
+            switchAutoRestore.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (updatingUi) return;
+                boolean isAuth = isAuthorized != null && isAuthorized;
+                if (!isAuth && isChecked) {
+                    switchAutoRestore.setChecked(false);
+                    showToast(activity.getString(R.string.toast_auth_required_tile));
+                    return;
+                }
+                if (appPreferences != null) {
+                    appPreferences.setAutoRestorePreferredModeEnabled(isChecked);
+                }
+            });
+        }
+
+        if (rowAutoRestoreToggle != null) {
+            rowAutoRestoreToggle.setOnClickListener(v -> {
+                boolean isAuth = isAuthorized != null && isAuthorized;
+                if (!isAuth) {
+                    showToast(activity.getString(R.string.toast_auth_required_tile));
+                    return;
+                }
+                if (switchAutoRestore != null) {
+                    switchAutoRestore.toggle();
+                }
+            });
+        }
     }
 
     public void setAuthorized(boolean authorized) {
@@ -175,6 +230,15 @@ public final class TileCycleUiController {
                     lockBadge.setScaleY(1f);
                 }
             }
+        }
+
+        if (switchAutoRestore != null && appPreferences != null) {
+            updatingUi = true;
+            if (!authorized && appPreferences.isAutoRestorePreferredModeEnabled()) {
+                appPreferences.setAutoRestorePreferredModeEnabled(false);
+            }
+            switchAutoRestore.setChecked(authorized && appPreferences.isAutoRestorePreferredModeEnabled());
+            updatingUi = false;
         }
     }
 
@@ -266,6 +330,12 @@ public final class TileCycleUiController {
 
         selectedCount.setText(activity.getString(R.string.cycle_selected_count, cycle.size()));
         cycleOrder.setText(buildOrderText(cycle));
+
+        if (switchAutoRestore != null && appPreferences != null) {
+            boolean isChecked = (isAuthorized != null && isAuthorized) && appPreferences.isAutoRestorePreferredModeEnabled();
+            switchAutoRestore.setChecked(isChecked);
+        }
+
         updatingUi = false;
     }
 
