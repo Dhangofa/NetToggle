@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardSetupHeroRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/shape_card_surface"
+    android:elevation="8dp"
+    android:clipToOutline="true"
+    android:outlineProvider="background"
+    android:padding="16dp">
+
+    <!-- Header Area -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Icon Badge -->
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/shape_setup_icon_bg"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:contentDescription="@null"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_key_shield"
+                android:tint="@color/setup_icon_tint" />
+        </FrameLayout>
+
+        <!-- Title & Subtitle Group -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setup_required"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/pending_auth"
+                    android:background="@drawable/shape_badge_pending_auth"
+                    android:textColor="@color/setup_badge_pending_text"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/setup_hero_subtitle"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Description Paragraph -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="14dp"
+        android:text="@string/setup_hero_desc"
+        android:textSize="13sp"
+        android:lineSpacingMultiplier="1.15"
+        android:textColor="@color/text_secondary" />
+
+    <!-- Shizuku Selection Card -->
+    <LinearLayout
+        android:id="@+id/cardSelectShizuku"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/shape_setup_option_selected"
+        android:padding="12dp"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Top Row: Icon + Title + Recommended Badge + Radio -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/shizukuTitleRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/radioIndicatorShizuku"
+                android:layout_centerVertical="true">
+
+                <FrameLayout
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:background="@drawable/shape_option_icon_bg"
+                    android:layout_marginEnd="8dp">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_bolt"
+                        android:tint="@color/setup_icon_tint" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/shizuku_title"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/recommended"
+                    android:background="@drawable/shape_badge_recommended"
+                    android:textColor="@color/setup_badge_recommended_text"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="7dp"
+                    android:paddingVertical="2dp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/radioIndicatorShizuku"
+                android:contentDescription="@null"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/shape_radio_selected" />
+        </RelativeLayout>
+
+        <!-- Subtitle Description -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/shizuku_desc"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary" />
+
+        <!-- Live Status Line -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <View
+                android:id="@+id/shizukuStatusDot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:background="@drawable/shape_count_badge_bg"
+                android:backgroundTint="@color/status_success_icon"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/shizukuLiveStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/shizuku_status_running"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/status_success_text" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Root Selection Card -->
+    <LinearLayout
+        android:id="@+id/cardSelectRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/shape_setup_option_unselected"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Top Row: Icon + Title + Superuser Badge + Radio -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/rootTitleRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/radioIndicatorRoot"
+                android:layout_centerVertical="true">
+
+                <FrameLayout
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:background="@drawable/shape_option_icon_bg"
+                    android:layout_marginEnd="8dp">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_hash"
+                        android:tint="@color/text_primary" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/root_access_title"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/superuser"
+                    android:background="@drawable/shape_badge_superuser"
+                    android:textColor="@color/setup_badge_superuser_text"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="7dp"
+                    android:paddingVertical="2dp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/radioIndicatorRoot"
+                android:contentDescription="@null"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/shape_radio_unselected" />
+        </RelativeLayout>
+
+        <!-- Subtitle Description -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/root_access_desc"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary" />
+
+        <!-- Live Status Line for Root -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <View
+                android:id="@+id/rootStatusDot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:background="@drawable/shape_count_badge_bg"
+                android:backgroundTint="@color/status_warning_icon"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/rootLiveStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/root_status_not_granted"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/status_warning_text" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Primary Action Button -->
+    <LinearLayout
+        android:id="@+id/btnSetupAuthorize"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/shape_setup_action_btn"
+        android:paddingHorizontal="16dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/setupActionBtnText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_authorize_shizuku"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/setup_btn_text" />
+
+        <ImageView
+            android:contentDescription="@null"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_chevron_right"
+            android:tint="@color/setup_btn_text" />
+    </LinearLayout>
+
+    <!-- Footer Link to Guides Tab -->
+    <TextView
+        android:id="@+id/btnOpenGuidesLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="@string/need_help_open_guides"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/setup_icon_tint"
+        android:padding="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground" />
+
+</LinearLayout>
