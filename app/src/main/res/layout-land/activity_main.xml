@@ -7,158 +7,138 @@
     android:fitsSystemWindows="true"
     android:background="@color/surface_background">
 
-    <!-- Edge Navigation Rail Container (dynamically docked to Left or Right based on rotation) -->
-    <LinearLayout
+    <!-- Edge Navigation Rail Container (Floating Pill shape matching portrait mode) -->
+    <FrameLayout
         android:id="@+id/edgeBarContainer"
-        android:layout_width="72dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@drawable/bg_edge_nav">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_edge_nav"
+        android:elevation="12dp"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="4dp">
 
-        <!-- Blank Top Corner Block joining Top Action Bar -->
-        <View
-            android:id="@+id/cornerBlankBlock"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            android:background="@color/nav_pill_bg" />
-
-        <!-- Vertical Navigation Tabs Container -->
         <FrameLayout
-            android:id="@+id/edgeNavPillWrapper"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_gravity="center_horizontal">
+            android:id="@+id/edgeNavItemsContainer"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
 
+            <!-- Sliding Active Indicator Pill -->
+            <View
+                android:id="@+id/navIndicatorPill"
+                android:layout_width="56dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_nav_item_selected" />
+
+            <!-- Vertical Navigation Column -->
             <LinearLayout
+                android:id="@+id/edgeNavTabsColumn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
-                <FrameLayout
-                    android:id="@+id/edgeNavItemsContainer"
+                <!-- Tab 0: Home -->
+                <LinearLayout
+                    android:id="@+id/navHome"
                     android:layout_width="56dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal">
+                    android:layout_height="64dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <!-- Sliding Active Indicator Pill -->
-                    <View
-                        android:id="@+id/navIndicatorPill"
-                        android:layout_width="56dp"
-                        android:layout_height="64dp"
-                        android:background="@drawable/bg_nav_item_selected" />
+                    <ImageView
+                        android:id="@+id/iconNavHome"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_nav_home_filled"
+                        android:tint="@color/nav_item_selected_content"
+                        android:contentDescription="@string/nav_tab_home" />
 
-                    <!-- Vertical Navigation Column -->
-                    <LinearLayout
-                        android:id="@+id/edgeNavTabsColumn"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/textNavHome"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_horizontal">
+                        android:layout_marginTop="2dp"
+                        android:text="@string/nav_tab_home"
+                        android:textColor="@color/nav_item_selected_content"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:gravity="center" />
+                </LinearLayout>
 
-                        <!-- Tab 0: Home -->
-                        <LinearLayout
-                            android:id="@+id/navHome"
-                            android:layout_width="56dp"
-                            android:layout_height="64dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:clickable="true"
-                            android:focusable="true">
+                <!-- Tab 1: Automate -->
+                <LinearLayout
+                    android:id="@+id/navAutomation"
+                    android:layout_width="56dp"
+                    android:layout_height="48dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                            <ImageView
-                                android:id="@+id/iconNavHome"
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_nav_setup_filled"
-                                android:tint="@color/nav_item_selected_content"
-                                android:contentDescription="@string/nav_tab_home" />
+                    <ImageView
+                        android:id="@+id/iconNavAutomation"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_nav_automate_outline"
+                        android:tint="@color/nav_item_unselected_icon"
+                        android:contentDescription="@string/nav_tab_automate" />
 
-                            <TextView
-                                android:id="@+id/textNavHome"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/nav_tab_home"
-                                android:textColor="@color/nav_item_selected_content"
-                                android:textSize="11sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:maxLines="1"
-                                android:gravity="center" />
-                        </LinearLayout>
+                    <TextView
+                        android:id="@+id/textNavAutomation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/nav_tab_automate"
+                        android:textColor="@color/nav_item_unselected_icon"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:gravity="center"
+                        android:visibility="gone" />
+                </LinearLayout>
 
-                        <!-- Tab 1: Automate -->
-                        <LinearLayout
-                            android:id="@+id/navAutomation"
-                            android:layout_width="56dp"
-                            android:layout_height="48dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:clickable="true"
-                            android:focusable="true">
+                <!-- Tab 2: Guides -->
+                <LinearLayout
+                    android:id="@+id/navGuides"
+                    android:layout_width="56dp"
+                    android:layout_height="48dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                            <ImageView
-                                android:id="@+id/iconNavAutomation"
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_nav_automate_outline"
-                                android:tint="@color/nav_item_unselected_icon"
-                                android:contentDescription="@string/nav_tab_automate" />
+                    <ImageView
+                        android:id="@+id/iconNavGuides"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_nav_guides_outline"
+                        android:tint="@color/nav_item_unselected_icon"
+                        android:contentDescription="@string/nav_tab_guides" />
 
-                            <TextView
-                                android:id="@+id/textNavAutomation"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/nav_tab_automate"
-                                android:textColor="@color/nav_item_unselected_icon"
-                                android:textSize="11sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:maxLines="1"
-                                android:gravity="center"
-                                android:visibility="gone" />
-                        </LinearLayout>
+                    <TextView
+                        android:id="@+id/textNavGuides"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/nav_tab_guides"
+                        android:textColor="@color/nav_item_unselected_icon"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:gravity="center"
+                        android:visibility="gone" />
+                </LinearLayout>
 
-                        <!-- Tab 2: Guides -->
-                        <LinearLayout
-                            android:id="@+id/navGuides"
-                            android:layout_width="56dp"
-                            android:layout_height="48dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:clickable="true"
-                            android:focusable="true">
-
-                            <ImageView
-                                android:id="@+id/iconNavGuides"
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_nav_guides_outline"
-                                android:tint="@color/nav_item_unselected_icon"
-                                android:contentDescription="@string/nav_tab_guides" />
-
-                            <TextView
-                                android:id="@+id/textNavGuides"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/nav_tab_guides"
-                                android:textColor="@color/nav_item_unselected_icon"
-                                android:textSize="11sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:maxLines="1"
-                                android:gravity="center"
-                                android:visibility="gone" />
-                        </LinearLayout>
-
-                    </LinearLayout>
-                </FrameLayout>
             </LinearLayout>
         </FrameLayout>
-    </LinearLayout>
+    </FrameLayout>
 
     <!-- Main Content Area Wrapper -->
     <LinearLayout
@@ -168,70 +148,11 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <!-- Top Action Bar (Visible only on Page 1) -->
-        <LinearLayout
-            android:id="@+id/topBar"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@color/card_surface"
-            android:paddingHorizontal="16dp"
-            android:elevation="4dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <FrameLayout
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/shape_app_icon_bg"
-                android:layout_marginEnd="10dp">
-                <ImageView
-                    android:contentDescription="@null"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_logo"
-                    android:tint="@color/brand_on_primary_container" />
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_title_net_toggle"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_desc_advanced"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/btnThemeToggle"
-                android:contentDescription="@string/change_theme"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="7dp"
-                android:src="@drawable/ic_theme_light"
-                android:tint="@color/text_primary" />
-        </LinearLayout>
-
         <!-- Main Content Area -->
         <FrameLayout
             android:id="@+id/mainContentFrame"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent">
 
             <include layout="@layout/layout_tab_home" />
             <include layout="@layout/layout_tab_automation" />
