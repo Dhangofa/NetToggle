@@ -57,6 +57,36 @@
             android:paddingVertical="4dp"
             android:visibility="gone" />
 
+        <LinearLayout
+            android:id="@+id/targetSimLockBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/shape_badge_locked"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:contentDescription="@null"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_lock"
+                android:tint="@color/setup_badge_locked_text"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/locked"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/setup_badge_locked_text" />
+        </LinearLayout>
+
     </RelativeLayout>
     
     <RadioGroup
