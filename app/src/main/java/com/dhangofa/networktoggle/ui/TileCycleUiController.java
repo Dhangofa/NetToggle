@@ -7,6 +7,8 @@ package com.dhangofa.networktoggle.ui;
 
 import android.app.Activity;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,11 +38,12 @@ public final class TileCycleUiController {
 
     private final TextView selectedCount;
     private final TextView cycleOrder;
+    private final View lockBadge;
     private boolean updatingUi;
 
     private AppPreferences.NetworkCapabilities currentCaps;
     private OnCycleChangedListener cycleChangedListener;
-    private boolean isAuthorized = true;
+    private Boolean isAuthorized = null;
 
     public interface OnCycleChangedListener {
         void onCycleChanged(List<NetworkMode> newCycle);
@@ -64,6 +67,7 @@ public final class TileCycleUiController {
 
         selectedCount = activity.findViewById(R.id.cycleSelectedCount);
         cycleOrder = activity.findViewById(R.id.cycleOrderText);
+        lockBadge = activity.findViewById(R.id.tileCycleLockBadge);
     }
 
     public void setOnCycleChangedListener(OnCycleChangedListener listener) {
@@ -74,8 +78,9 @@ public final class TileCycleUiController {
         refresh();
 
         android.view.View.OnTouchListener lockTouch = (v, event) -> {
-            if (!isAuthorized && event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-                showToast("Please authorize Root or Shizuku to configure toggles.");
+            boolean isAuth = isAuthorized != null && isAuthorized;
+            if (!isAuth && event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                showToast(activity.getString(R.string.toast_auth_required_tile));
                 return true; // Consume event to prevent visual change
             }
             return false;
@@ -102,13 +107,81 @@ public final class TileCycleUiController {
     }
 
     public void setAuthorized(boolean authorized) {
-        if (this.isAuthorized == authorized) return;
+        if (this.isAuthorized != null && this.isAuthorized == authorized) return;
+        boolean animate = (this.isAuthorized != null);
         this.isAuthorized = authorized;
-        float alpha = authorized ? 1.0f : 0.4f;
+        float alpha = authorized ? 1.0f : 0.75f;
 
         View card = activity.findViewById(R.id.cardTileCycle);
         if (card != null) {
-            card.setAlpha(alpha);
+            if (animate) {
+                if (authorized) {
+                    float offset = 6f * activity.getResources().getDisplayMetrics().density;
+                    card.setTranslationY(offset);
+                    card.animate()
+                            .alpha(alpha)
+                            .translationY(0f)
+                            .setDuration(320)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .start();
+                } else {
+                    card.animate()
+                            .alpha(alpha)
+                            .translationY(0f)
+                            .setDuration(320)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .start();
+                }
+            } else {
+                card.setAlpha(alpha);
+                card.setTranslationY(0f);
+            }
+        }
+        if (lockBadge != null) {
+            if (authorized) {
+                if (animate && lockBadge.getVisibility() == View.VISIBLE) {
+                    lockBadge.animate()
+                            .alpha(0f)
+                            .scaleX(0.4f)
+                            .scaleY(0.4f)
+                            .setDuration(220)
+                            .withEndAction(() -> {
+                                lockBadge.setVisibility(View.GONE);
+                                lockBadge.setScaleX(1f);
+                                lockBadge.setScaleY(1f);
+                                lockBadge.setAlpha(1f);
+                            })
+                            .start();
+                } else {
+                    lockBadge.setVisibility(View.GONE);
+                }
+            } else {
+                if (animate && lockBadge.getVisibility() != View.VISIBLE) {
+                    lockBadge.setVisibility(View.VISIBLE);
+                    lockBadge.setAlpha(0f);
+                    lockBadge.setScaleX(0.4f);
+                    lockBadge.setScaleY(0.4f);
+                    lockBadge.animate()
+                            .alpha(1f)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(250)
+                            .setInterpolator(new OvershootInterpolator(1.2f))
+                            .start();
+                } else {
+                    lockBadge.setVisibility(View.VISIBLE);
+                    lockBadge.setAlpha(1f);
+                    lockBadge.setScaleX(1f);
+                    lockBadge.setScaleY(1f);
+                }
+            }
+        }
+    }
+
+    private void animateAlpha(View view, float targetAlpha) {
+        if (view == null) return;
+        if (Math.abs(view.getAlpha() - targetAlpha) > 0.01f) {
+            view.animate().alpha(targetAlpha).setDuration(250).setInterpolator(new DecelerateInterpolator()).start();
         }
     }
 
@@ -116,12 +189,10 @@ public final class TileCycleUiController {
         if (caps == null) return;
         this.currentCaps = caps;
 
-        modePref5g.setAlpha(caps.supports5g ? 1.0f : 0.4f);
-        mode5gOnly.setAlpha(caps.supports5g ? 1.0f : 0.4f);
-
-        modePref3g.setAlpha(caps.supports3g ? 1.0f : 0.4f);
-
-        mode2gOnly.setAlpha(caps.supports2g ? 1.0f : 0.4f);
+        animateAlpha(modePref5g, caps.supports5g ? 1.0f : 0.4f);
+        animateAlpha(mode5gOnly, caps.supports5g ? 1.0f : 0.4f);
+        animateAlpha(modePref3g, caps.supports3g ? 1.0f : 0.4f);
+        animateAlpha(mode2gOnly, caps.supports2g ? 1.0f : 0.4f);
 
         if (cycleManager.forceRemoveUnsupportedAndAutoFill(caps)) {
             showToast("Cycle auto-adjusted for current SIM capabilities");
