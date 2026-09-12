@@ -28,6 +28,21 @@ public class PhoneStatePermissionManager {
         this.isGrantedCallbackDispatched = false;
     }
 
+    public boolean isPermissionGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return activity.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    public void requestPermissionDirectly() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!isPermissionGranted()) {
+                showPermissionBottomSheet();
+            }
+        }
+    }
+
     public void checkAndRequest() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean granted = activity.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
