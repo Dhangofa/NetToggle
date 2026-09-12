@@ -40,7 +40,6 @@ public class MainNavigationController {
     private View bottomNavPill;
     private View navIndicatorPill;
     private View mainContentFrame;
-    private View topBar;
     private float currentScrollOffset = 0f;
     private ValueAnimator pageScrollAnimator;
     private boolean isDraggingPage = false;
@@ -88,15 +87,6 @@ public class MainNavigationController {
     
 
 
-    private void debugToast(String msg) {
-        android.widget.TextView tv = this.activity.findViewById(android.R.id.text1);
-        if (tv != null) {
-            tv.setText(msg);
-        }
-        android.util.Log.d("SwipeDebug", msg);
-    }
-
-
     public int getCurrentTabIndex() {
         return currentTabIndex;
     }
@@ -130,9 +120,11 @@ public class MainNavigationController {
 
     public void initialize() {
         this.bottomNavPill = MainNavigationController.this.activity.findViewById(R.id.bottomNavPill);
+        if (this.bottomNavPill == null) {
+            this.bottomNavPill = MainNavigationController.this.activity.findViewById(R.id.edgeBarContainer);
+        }
         this.navIndicatorPill = MainNavigationController.this.activity.findViewById(R.id.navIndicatorPill);
         this.mainContentFrame = MainNavigationController.this.activity.findViewById(R.id.mainContentFrame);
-        this.topBar = MainNavigationController.this.activity.findViewById(R.id.topBar);
         this.touchSlop = ViewConfiguration.get(MainNavigationController.this.activity).getScaledTouchSlop();
         if (MainNavigationController.this.activity.isAmoled() && this.navIndicatorPill != null && this.navIndicatorPill.getBackground() instanceof GradientDrawable) {
             ((GradientDrawable) this.navIndicatorPill.getBackground().mutate())
@@ -219,11 +211,6 @@ public class MainNavigationController {
                         this.tabGuides.setVisibility(this.currentTabIndex == 2 ? android.view.View.VISIBLE : android.view.View.GONE);
                         this.tabGuides.setAlpha(this.currentTabIndex == 2 ? 1f : 0f);
                     }
-                    if (this.topBar != null) {
-                        this.topBar.setVisibility(this.currentTabIndex == 0 ? android.view.View.VISIBLE : android.view.View.GONE);
-                        this.topBar.setAlpha(this.currentTabIndex == 0 ? 1f : 0f);
-                        this.topBar.setTranslationY(0f);
-                    }
                     MainNavigationController.this.updateLandscapeEdgeNavProgress((float) this.currentTabIndex);
                     MainNavigationController.this.onTabSettled(this.currentTabIndex);
                 } else {
@@ -237,6 +224,46 @@ public class MainNavigationController {
                 }
             });
         }
+        this.setupLandscapeHomeHeightSync();
+    }
+
+    public void setupLandscapeHomeHeightSync() {
+        if (!isLandscape()) {
+            return;
+        }
+        View tabHomeView = this.tabHome != null ? this.tabHome : this.activity.findViewById(R.id.tabHome);
+        if (tabHomeView == null) {
+            return;
+        }
+        View leftCol = tabHomeView.findViewById(R.id.homeLeftColumn);
+        View rightCol = tabHomeView.findViewById(R.id.homeRightColumn);
+        View cardTargetSim = tabHomeView.findViewById(R.id.cardTargetSim);
+        View cardTileCycle = tabHomeView.findViewById(R.id.cardTileCycle);
+        if (leftCol == null || rightCol == null || cardTileCycle == null) {
+            return;
+        }
+
+        tabHomeView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!MainNavigationController.this.isLandscape() || MainNavigationController.this.isDestroyed) {
+                    return;
+                }
+                int leftH = leftCol.getHeight();
+                int rightH = rightCol.getHeight();
+                int maxH = Math.max(leftH, rightH);
+                if (maxH <= 0) {
+                    return;
+                }
+
+                int simH = cardTargetSim != null ? cardTargetSim.getHeight() : 0;
+                int margin = (int) (12 * MainNavigationController.this.activity.getResources().getDisplayMetrics().density);
+                int targetTileCycleH = maxH - simH - margin;
+                if (targetTileCycleH > 0 && cardTileCycle.getHeight() < targetTileCycleH) {
+                    cardTileCycle.setMinimumHeight(targetTileCycleH);
+                }
+            }
+        });
     }
 
     public void setupKeyboardListener() {
@@ -393,7 +420,7 @@ public class MainNavigationController {
 
 
                     if (canDrag) {
-                        debugToast("DRAG START!");
+                        android.util.Log.d("SwipeDebug", "DRAG START!");
 
 
                         this.isDraggingPage = true;
@@ -489,29 +516,10 @@ public class MainNavigationController {
             this.tabGuides.setVisibility(Math.abs(tx) < width ? View.VISIBLE : View.INVISIBLE);
         }
 
-        // 2. Action bar behavior: slides upwards and hides when moving from Home to Automate,
-        // and slides downwards and sits when moving from Automate to Home
-        if (this.topBar != null) {
-            int topBarHeight = this.topBar.getHeight();
-            if (topBarHeight <= 0) {
-                topBarHeight = (int) (72 * MainNavigationController.this.activity.getResources().getDisplayMetrics().density);
-            }
-            if (pagePosition <= 1.0f) {
-                float p = Math.max(0f, Math.min(1f, pagePosition));
-                this.topBar.setTranslationY(-topBarHeight * p);
-                this.topBar.setAlpha(1.0f - p);
-                this.topBar.setVisibility(p >= 0.99f ? View.GONE : View.VISIBLE);
-            } else {
-                this.topBar.setTranslationY(-topBarHeight);
-                this.topBar.setAlpha(0f);
-                this.topBar.setVisibility(View.GONE);
-            }
-        }
-
-        // 3. Synchronize sliding nav pill & icon/text colors
+        // 2. Synchronize sliding nav pill & icon/text colors
         this.updateNavPillProgress(pagePosition);
 
-        // 4. In portrait mode, fade the FAB if we swipe away from the automation tab
+        // 3. In portrait mode, fade the FAB if we swipe away from the automation tab
         if (!MainNavigationController.this.isLandscape() && MainNavigationController.this.activity.getShortcutTabHelper() != null) {
             View btnAdd = MainNavigationController.this.activity.findViewById(R.id.btnAddShortcut);
             if (btnAdd != null) {
@@ -643,7 +651,7 @@ public class MainNavigationController {
 
         if (this.iconNavHome != null) {
             this.iconNavHome.setColorFilter(c0);
-            this.iconNavHome.setImageResource(w0 > 0.5f ? R.drawable.ic_nav_setup_filled : R.drawable.ic_nav_setup_outline);
+            this.iconNavHome.setImageResource(w0 > 0.5f ? R.drawable.ic_nav_home_filled : R.drawable.ic_nav_home_outline);
         }
         if (this.textNavHome != null) {
             this.textNavHome.setTextColor(c0);
@@ -749,11 +757,6 @@ public class MainNavigationController {
     private void onTabSettled(int index) {
         if (MainNavigationController.this.isLandscape()) {
             MainNavigationController.this.updateLandscapeEdgeNavProgress((float) index);
-            if (this.topBar != null) {
-                this.topBar.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
-                this.topBar.setTranslationY(0f);
-                this.topBar.setAlpha(index == 0 ? 1f : 0f);
-            }
             for (int i = 0; i < 3; i++) {
                 View v = this.getTabViewByIndex(i);
                 if (v != null) {
@@ -784,7 +787,7 @@ public class MainNavigationController {
         }
     }
 
-    private void switchTab(int index) {
+    public void switchTab(int index) {
         View currentFocus = MainNavigationController.this.activity.getCurrentFocus();
         if (currentFocus != null) {
             InputMethodManager imm = (InputMethodManager) MainNavigationController.this.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -908,20 +911,6 @@ public class MainNavigationController {
             toView.bringToFront();
         }
 
-        // Top action bar: visible only on Page 0 (Home)
-        if (this.topBar != null) {
-            this.topBar.animate().cancel();
-            if (toIndex == 0) {
-                this.topBar.setVisibility(View.VISIBLE);
-                this.topBar.setTranslationY(0f);
-                this.topBar.setAlpha(1f);
-            } else {
-                this.topBar.setVisibility(View.GONE);
-                this.topBar.setTranslationY(0f);
-                this.topBar.setAlpha(0f);
-            }
-        }
-
         // Edge nav bar morphing & continuous progress
         this.pageScrollAnimator = ValueAnimator.ofFloat((float) fromIndex, (float) toIndex);
         this.pageScrollAnimator.setDuration(240);
@@ -1004,7 +993,7 @@ public class MainNavigationController {
 
         if (this.iconNavHome != null) {
             this.iconNavHome.setColorFilter(c0);
-            this.iconNavHome.setImageResource(w0 > 0.5f ? R.drawable.ic_nav_setup_filled : R.drawable.ic_nav_setup_outline);
+            this.iconNavHome.setImageResource(w0 > 0.5f ? R.drawable.ic_nav_home_filled : R.drawable.ic_nav_home_outline);
         }
         if (this.textNavHome != null) {
             this.textNavHome.setTextColor(c0);
@@ -1078,9 +1067,6 @@ public class MainNavigationController {
 
     private boolean isTouchInsideInteractiveChild(float rawX, float rawY) {
         if (this.isViewUnder(this.bottomNavPill, rawX, rawY)) {
-            return true;
-        }
-        if (this.isViewUnder(this.topBar, rawX, rawY)) {
             return true;
         }
         View currentTabView = null;
