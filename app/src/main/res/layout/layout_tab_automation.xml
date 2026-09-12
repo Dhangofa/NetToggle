@@ -80,6 +80,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/shape_exec_card_bg"
                 android:elevation="8dp"
+                android:padding="16dp"
                 android:orientation="vertical">
 
                 <LinearLayout
