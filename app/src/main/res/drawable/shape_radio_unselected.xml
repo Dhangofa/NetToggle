@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size android:width="22dp" android:height="22dp" />
+    <stroke android:width="2dp" android:color="@color/setup_radio_ring" />
+    <solid android:color="@android:color/transparent" />
+</shape>
