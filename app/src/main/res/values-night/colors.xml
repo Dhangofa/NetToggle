@@ -23,6 +23,11 @@
     <color name="status_warning_bg">#4A3210</color>
     <color name="status_warning_text">#E0AD60</color>
 
+    <!-- Live Status Dot Icons -->
+    <color name="status_error_icon">#E07873</color>
+    <color name="status_warning_icon">#E0AD60</color>
+    <color name="status_success_icon">#83B86E</color>
+
     <!-- Controls -->
     <color name="social_button_bg">#36332F</color>
     <color name="dialog_bg">#24221F</color>
@@ -78,6 +83,27 @@
     <color name="broadcast_chip_unselected_stroke">#36332F</color>
     <color name="broadcast_container_stroke">#272522</color>
 
+    <!-- Setup Hero Theme & Badges -->
+    <color name="setup_icon_bg">#2D2336</color>
+    <color name="setup_icon_tint">#B39DDB</color>
+    <color name="setup_option_selected_bg">#25202D</color>
+    <color name="setup_option_selected_stroke">#B8A3CC</color>
+    <color name="setup_option_unselected_bg">#24221F</color>
+    <color name="setup_option_unselected_stroke">#36332F</color>
+    <color name="setup_option_icon_bg">#33302B</color>
+    <color name="setup_badge_pending_bg">#3E2C15</color>
+    <color name="setup_badge_pending_text">#E0AD60</color>
+    <color name="setup_badge_recommended_bg">#23381B</color>
+    <color name="setup_badge_recommended_text">#81C784</color>
+    <color name="setup_badge_superuser_bg">#33302B</color>
+    <color name="setup_badge_superuser_text">#A39F98</color>
+    <color name="setup_badge_locked_bg">#33302B</color>
+    <color name="setup_badge_locked_text">#A39F98</color>
+    <color name="setup_btn_bg">#F0EFEA</color>
+    <color name="setup_btn_text">#181715</color>
+    <color name="setup_radio_dot">#B39DDB</color>
+    <color name="setup_radio_ring">#4D4944</color>
+
     <!-- Warm Charcoal & Sand Navigation Bar Specifications (Dark Mode) -->
     <color name="nav_pill_bg">#24221F</color>
     <color name="nav_pill_stroke">#33302B</color>
@@ -86,7 +112,6 @@
     <color name="nav_item_unselected_icon">#736F68</color>
 
     <!-- AMOLED Nav Bar Colors -->
-    <color name="nav_pill_bg_amoled">#000000</color>
     <color name="nav_pill_stroke_amoled">#2E2C28</color>
     <color name="nav_item_selected_bg_amoled">#1E1D1B</color>
     <color name="nav_item_selected_content_amoled">#FFFFFF</color>
