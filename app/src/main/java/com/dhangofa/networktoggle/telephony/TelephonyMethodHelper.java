@@ -15,7 +15,7 @@ final class TelephonyMethodHelper {
 	 * Attempts to find a method within a given class by iterating through a prioritized list
 	 * of potential method signatures. This gracefully handles OEM-specific framework modifications
 	 * (e.g., Samsung or Xiaomi appending extra parameters like a calling package string).
-	 *
+	 * 
 	 * @param type       The class to inspect (e.g., ITelephony.class).
 	 * @param name       The exact string name of the target method.
 	 * @param signatures A varargs array of potential parameter type arrays to check, in order of preference.
@@ -54,7 +54,7 @@ final class TelephonyMethodHelper {
 	 * Reflection failures often bury the actual error (like a SecurityException) inside an 
 	 * InvocationTargetException. This method drills down to the root Throwable to generate
 	 * readable error messages for diagnostics.
-	 *
+	 * 
 	 * @param throwable The exception caught during reflection.
 	 * @return A clean string describing the root cause class name and message.
 	 */
