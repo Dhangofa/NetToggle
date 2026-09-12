@@ -8,6 +8,8 @@ import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -33,9 +35,10 @@ public final class TargetSimUiController {
     private final View sep1;
     private final View sep2;
     private final View sep3;
+    private final View lockBadge;
 
     private boolean updating;
-    private boolean authorized;
+    private Boolean authorized = null;
 
     public TargetSimUiController(Activity activity, AppPreferences prefs, Runnable changed) {
         this.activity = activity;
@@ -48,6 +51,7 @@ public final class TargetSimUiController {
         this.sim2 = activity.findViewById(R.id.radioSim2);
         this.simBoth = activity.findViewById(R.id.radioSimBoth);
         this.warning = activity.findViewById(R.id.autoSimWarningText);
+        this.lockBadge = activity.findViewById(R.id.targetSimLockBadge);
         this.sep1 = activity.findViewById(R.id.separatorAutoSim1);
         this.sep2 = activity.findViewById(R.id.separatorSim1Sim2);
         this.sep3 = activity.findViewById(R.id.separatorSim2Both);
@@ -67,8 +71,9 @@ public final class TargetSimUiController {
         }
 
         View.OnTouchListener lock = (v, e) -> {
-            if (!authorized && e.getAction() == MotionEvent.ACTION_DOWN) {
-                Toast.makeText(activity, activity.getString(R.string.toast_auth_required), Toast.LENGTH_SHORT).show();
+            boolean isAuth = authorized != null && authorized;
+            if (!isAuth && e.getAction() == MotionEvent.ACTION_DOWN) {
+                Toast.makeText(activity, activity.getString(R.string.toast_auth_required_sim), Toast.LENGTH_SHORT).show();
                 return true;
             }
             return false;
@@ -153,11 +158,73 @@ public final class TargetSimUiController {
     }
 
     public void setAuthorized(boolean value) {
+        if (this.authorized != null && this.authorized == value) return;
+        boolean animate = (this.authorized != null);
         this.authorized = value;
-        float alpha = value ? 1f : 0.4f;
+        float alpha = value ? 1.0f : 0.75f;
         View card = activity.findViewById(R.id.cardTargetSim);
         if (card != null) {
-            card.setAlpha(alpha);
+            if (animate) {
+                if (value) {
+                    float offset = 6f * activity.getResources().getDisplayMetrics().density;
+                    card.setTranslationY(offset);
+                    card.animate()
+                            .alpha(alpha)
+                            .translationY(0f)
+                            .setDuration(320)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .start();
+                } else {
+                    card.animate()
+                            .alpha(alpha)
+                            .translationY(0f)
+                            .setDuration(320)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .start();
+                }
+            } else {
+                card.setAlpha(alpha);
+                card.setTranslationY(0f);
+            }
+        }
+        if (this.lockBadge != null) {
+            if (value) {
+                if (animate && lockBadge.getVisibility() == View.VISIBLE) {
+                    this.lockBadge.animate()
+                            .alpha(0f)
+                            .scaleX(0.4f)
+                            .scaleY(0.4f)
+                            .setDuration(220)
+                            .withEndAction(() -> {
+                                this.lockBadge.setVisibility(View.GONE);
+                                this.lockBadge.setScaleX(1f);
+                                this.lockBadge.setScaleY(1f);
+                                this.lockBadge.setAlpha(1f);
+                            })
+                            .start();
+                } else {
+                    this.lockBadge.setVisibility(View.GONE);
+                }
+            } else {
+                if (animate && lockBadge.getVisibility() != View.VISIBLE) {
+                    this.lockBadge.setVisibility(View.VISIBLE);
+                    this.lockBadge.setAlpha(0f);
+                    this.lockBadge.setScaleX(0.4f);
+                    this.lockBadge.setScaleY(0.4f);
+                    this.lockBadge.animate()
+                            .alpha(1f)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(250)
+                            .setInterpolator(new OvershootInterpolator(1.2f))
+                            .start();
+                } else {
+                    this.lockBadge.setVisibility(View.VISIBLE);
+                    this.lockBadge.setAlpha(1f);
+                    this.lockBadge.setScaleX(1f);
+                    this.lockBadge.setScaleY(1f);
+                }
+            }
         }
     }
 
