@@ -160,8 +160,9 @@ public class NetworkTileService extends TileService {
         boolean shouldRefresh = (cachedMode == NetworkMode.UNKNOWN);
         long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
 
-        // 5 minute micro-cooldown before passively re-checking modem
-        if (!shouldRefresh && (System.currentTimeMillis() - lastCheck > 5 * 60 * 1000L)) {
+        // 5 minute micro-cooldown before passively re-checking modem (or immediately if auto-restore is enabled)
+        boolean autoRestoreEnabled = appPreferences.isAutoRestorePreferredModeEnabled();
+        if (!shouldRefresh && (autoRestoreEnabled || System.currentTimeMillis() - lastCheck > 5 * 60 * 1000L)) {
             shouldRefresh = true;
         }
 
@@ -185,6 +186,20 @@ public class NetworkTileService extends TileService {
                 if (realMode != NetworkMode.UNKNOWN) {
                     appPreferences.setCachedNetworkMode(realMode);
                     appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
+
+                    // Auto-restore preferred mode if user enabled it and OS/carrier changed mode
+                    NetworkMode preferredMode = appPreferences.getLastUserSelectedMode();
+                    if (appPreferences.isAutoRestorePreferredModeEnabled()
+                            && preferredMode != NetworkMode.UNKNOWN
+                            && realMode != preferredMode
+                            && IS_SWITCHING.compareAndSet(false, true)) {
+                        updateTileSwitchingUI();
+                        AppExecutors.executeTelephony(() -> {
+                            applyModeInternal(preferredMode, appPreferences.getExecutionMode(), true);
+                        });
+                        return;
+                    }
+
                     updateTileUI(realMode);
                 }
             });
@@ -212,107 +227,115 @@ public class NetworkTileService extends TileService {
         updateTileSwitchingUI();
 
         AppExecutors.executeTelephony(() -> {
-            CommandResult result;
+            applyModeInternal(nextMode, executionMode, false);
+        });
+    }
 
-            // Cold-start binder latch: wait briefly (up to 300ms) for Shizuku binder to attach if needed
-            if (executionMode == ExecutionMode.SHIZUKU && !Shizuku.pingBinder()) {
-                for (int i = 0; i < 6 && !Shizuku.pingBinder(); i++) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ignored) {}
-                }
-            }
+    private void applyModeInternal(NetworkMode targetMode, ExecutionMode executionMode, boolean isAutoRestore) {
+        CommandResult result;
 
-            if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
-                CommandResult result1 = null;
-                CommandResult result2 = null;
+        // Cold-start binder latch: wait briefly (up to 300ms) for Shizuku binder to attach if needed
+        if (executionMode == ExecutionMode.SHIZUKU && !Shizuku.pingBinder()) {
+            for (int i = 0; i < 6 && !Shizuku.pingBinder(); i++) {
                 try {
-                    simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
-                    result1 = networkModeController.apply(nextMode, executionMode);
+                    Thread.sleep(50);
+                } catch (InterruptedException ignored) {}
+            }
+        }
 
-                    simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
-                    result2 = networkModeController.apply(nextMode, executionMode);
-                } finally {
-                    simResolver.setOverrideTargetSim(null);
-                }
+        if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
+            CommandResult result1 = null;
+            CommandResult result2 = null;
+            try {
+                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+                result1 = networkModeController.apply(targetMode, executionMode);
 
-                if (result1.isSuccess() && result2.isSuccess()) {
-                    result = CommandResult.completed("", 0, "Applied to both SIMs", "");
-                } else if (result1.isSuccess()) {
-                    result = CommandResult.failed("", "Failed to apply to SIM 2. Err: " + result2.getStderr());
-                } else if (result2.isSuccess()) {
-                    result = CommandResult.failed("", "Failed to apply to SIM 1. Err: " + result1.getStderr());
-                } else {
-                    result = result1;
-                }
-            } else {
-                int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
-                if (!simResolver.isValidSlotIndex(slotIndex)) {
-                    mainHandler.post(() -> {
-                        Toast.makeText(getApplicationContext(), getString(R.string.toast_no_sim_target_slot), Toast.LENGTH_SHORT).show();
-                        appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
-                        updateTileUI(appPreferences.getCachedNetworkMode());
-                        IS_SWITCHING.set(false);
-                    });
-                    return;
-                }
-
-                result = networkModeController.apply(
-                        nextMode,
-                        executionMode
-                );
+                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+                result2 = networkModeController.apply(targetMode, executionMode);
+            } finally {
+                simResolver.setOverrideTargetSim(null);
             }
 
-            if (result.isSuccess()) {
-                appPreferences.setCachedNetworkMode(nextMode);
-                appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
-                appPreferences.setAutoSimError(false);
-                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+            if (result1.isSuccess() && result2.isSuccess()) {
+                result = CommandResult.completed("", 0, "Applied to both SIMs", "");
+            } else if (result1.isSuccess()) {
+                result = CommandResult.failed("", "Failed to apply to SIM 2. Err: " + result2.getStderr());
+            } else if (result2.isSuccess()) {
+                result = CommandResult.failed("", "Failed to apply to SIM 1. Err: " + result1.getStderr());
+            } else {
+                result = result1;
+            }
+        } else {
+            int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
+            if (!simResolver.isValidSlotIndex(slotIndex)) {
                 mainHandler.post(() -> {
-                    updateTileUI(nextMode);
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_no_sim_target_slot), Toast.LENGTH_SHORT).show();
+                    appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
+                    updateTileUI(appPreferences.getCachedNetworkMode());
                     IS_SWITCHING.set(false);
                 });
-            } else {
-                // Command failed! Check for permission failures first.
-                boolean isAuthError = false;
-                if (executionMode == ExecutionMode.SHIZUKU) {
-                    try {
-                        if (!Shizuku.pingBinder() || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-                            isAuthError = true;
-                            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
-                        }
-                    } catch (Throwable t) {
+                return;
+            }
+
+            result = networkModeController.apply(
+                    targetMode,
+                    executionMode
+            );
+        }
+
+        if (result.isSuccess()) {
+            appPreferences.setCachedNetworkMode(targetMode);
+            if (!isAutoRestore) {
+                appPreferences.setLastUserSelectedMode(targetMode);
+            }
+            appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
+            appPreferences.setAutoSimError(false);
+            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+            mainHandler.post(() -> {
+                updateTileUI(targetMode);
+                IS_SWITCHING.set(false);
+            });
+        } else {
+            // Command failed! Check for permission failures first.
+            boolean isAuthError = false;
+            if (executionMode == ExecutionMode.SHIZUKU) {
+                try {
+                    if (!Shizuku.pingBinder() || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
                         isAuthError = true;
                         appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
                     }
-                } else if (executionMode == ExecutionMode.ROOT) {
-                    try {
-                        Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", "true"});
-                        int exitCode = p.waitFor();
-                        if (exitCode != 0) {
-                            isAuthError = true;
-                            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
-                        }
-                    } catch (Exception e) {
+                } catch (Throwable t) {
+                    isAuthError = true;
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                }
+            } else if (executionMode == ExecutionMode.ROOT) {
+                try {
+                    Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", "true"});
+                    int exitCode = p.waitFor();
+                    if (exitCode != 0) {
                         isAuthError = true;
                         appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
                     }
+                } catch (Exception e) {
+                    isAuthError = true;
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
                 }
-
-                if (!isAuthError) {
-                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
-                    appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), result.getExceptionMessage());
-                }
-
-                mainHandler.post(() -> {
-                    updateTileUI(currentMode);
-                    if (appPreferences.hasAutoSimError()) {
-                        showAutoSimErrorToast();
-                    }
-                    IS_SWITCHING.set(false);
-                });
             }
-        });
+
+            if (!isAuthError) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
+                appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), result.getExceptionMessage());
+            }
+
+            NetworkMode fallbackMode = appPreferences.getCachedNetworkMode();
+            mainHandler.post(() -> {
+                updateTileUI(fallbackMode);
+                if (appPreferences.hasAutoSimError()) {
+                    showAutoSimErrorToast();
+                }
+                IS_SWITCHING.set(false);
+            });
+        }
     }
 
     private void updateTileSwitchingUI() {
