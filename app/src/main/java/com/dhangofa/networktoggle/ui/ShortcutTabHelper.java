@@ -614,9 +614,7 @@ public class ShortcutTabHelper {
     }
 
     public void destroy() {
-        if (pendingTitleSync != null) {
-            titleDebounceHandler.removeCallbacks(pendingTitleSync);
-            pendingTitleSync = null;
-        }
+        titleDebounceHandler.removeCallbacksAndMessages(null);
+        pendingTitleSync = null;
     }
 }
