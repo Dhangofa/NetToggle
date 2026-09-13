@@ -13,10 +13,11 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.graphics.DashPathEffect;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class TileIconManager {
-    private static final HashMap<String, Icon> iconCache = new HashMap<>();
+    private static final Map<String, Icon> iconCache = new ConcurrentHashMap<>();
 
     private TileIconManager() {}
 
@@ -77,9 +78,6 @@ public final class TileIconManager {
 
     public static Icon getCachedIcon(String text, String badge, boolean isAuto) {
         String cacheKey = text + "_" + badge + "_" + isAuto;
-        if (!iconCache.containsKey(cacheKey)) {
-            iconCache.put(cacheKey, createTextOnlyIcon(text, badge, isAuto));
-        }
-        return iconCache.get(cacheKey);
+        return iconCache.computeIfAbsent(cacheKey, k -> createTextOnlyIcon(text, badge, isAuto));
     }
 }
