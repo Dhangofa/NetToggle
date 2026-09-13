@@ -46,12 +46,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end">
+        android:gravity="center_vertical">
 
         <Button
             android:id="@+id/btnDismissPermission"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:text="@string/dismiss"
             style="?android:attr/borderlessButtonStyle"
             android:textColor="@color/text_secondary"
@@ -59,10 +63,14 @@
 
         <Button
             android:id="@+id/btnGrantPermission"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:text="@string/grant_permission"
-            android:paddingHorizontal="24dp"
+            android:paddingHorizontal="12dp"
             android:background="@drawable/shape_button_primary"
             android:textColor="@color/card_surface" />
     </LinearLayout>
