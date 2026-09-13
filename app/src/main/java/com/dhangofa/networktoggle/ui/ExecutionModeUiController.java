@@ -205,6 +205,10 @@ public class ExecutionModeUiController {
                 }
                 this.updateSeparatorVisibility();
                 
+                if (checkedId != R.id.radioRoot && checkedId != R.id.radioShizuku) {
+                    return;
+                }
+                
                 ExecutionMode newMode = (checkedId == R.id.radioRoot) ? ExecutionMode.ROOT : ExecutionMode.SHIZUKU;
                 ExecutionMode oldMode = this.appPreferences.getExecutionMode();
                 
