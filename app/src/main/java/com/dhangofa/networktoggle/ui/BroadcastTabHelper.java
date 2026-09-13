@@ -33,8 +33,8 @@ import java.util.UUID;
 
 public class BroadcastTabHelper {
 
-    private static String selectedMode = "5G";
-    private static int selectedSim = 1;
+    private String selectedMode = "5G";
+    private int selectedSim = 1;
 
     private final Activity activity;
     private final AppPreferences prefs;
@@ -99,7 +99,11 @@ public class BroadcastTabHelper {
             }
         }
         if (slots.isEmpty()) {
+            // When phone-state permission is missing or subscription query returns empty,
+            // fall back to offering SIM 1 and SIM 2 (and multi-SIM "Both") so dual-SIM users
+            // can generate external automation broadcasts.
             slots.add(1);
+            slots.add(2);
         }
         return slots;
     }
@@ -137,7 +141,9 @@ public class BroadcastTabHelper {
         View btnCopyIntent = activity.findViewById(R.id.btnCopyIntent);
         View blockShellCommand = activity.findViewById(R.id.blockShellCommand);
         TextView textShellCommand = activity.findViewById(R.id.textShellCommand);
-        EditText editToken = activity.findViewById(R.id.editAutomationToken);
+        TextView editToken = activity.findViewById(R.id.editAutomationToken);
+        View btnCopyToken = activity.findViewById(R.id.btnCopyToken);
+        View containerToken = activity.findViewById(R.id.containerAutomationToken);
         TextView btnGen = activity.findViewById(R.id.btnGenerateToken);
 
         // Map mode chips
@@ -194,6 +200,16 @@ public class BroadcastTabHelper {
                     Toast.makeText(activity, R.string.toast_auth_required_automation, Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if (isCheckedVal) {
+                    String currentToken = prefs.getAutomationToken();
+                    if (currentToken == null || currentToken.trim().isEmpty()) {
+                        currentToken = UUID.randomUUID().toString().replace("-", "");
+                        prefs.setAutomationToken(currentToken);
+                    }
+                    if (editToken != null) {
+                        editToken.setText(currentToken);
+                    }
+                }
                 prefs.setExternalAutomationEnabled(isCheckedVal);
                 updateStatusBadge();
                 updateTestButtonState();
@@ -211,27 +227,40 @@ public class BroadcastTabHelper {
             });
         }
 
-        // Token input
+        // Token display & actions (non-editable, copy & regenerate)
         if (editToken != null) {
             editToken.setText(prefs.getAutomationToken());
-            editToken.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                @Override public void afterTextChanged(Editable s) {
-                    prefs.setAutomationToken(s.toString());
-                    updateShellPreview(activity, prefs, textShellCommand);
-                }
-            });
+        }
+
+        View.OnClickListener copyTokenAction = v -> {
+            String token = prefs.getAutomationToken();
+            ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null && token != null && !token.isEmpty()) {
+                ClipData clip = ClipData.newPlainText(activity.getString(R.string.clipboard_label_automation_token), token);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(activity, R.string.token_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if (btnCopyToken != null) {
+            btnCopyToken.setOnClickListener(copyTokenAction);
+        }
+        if (editToken != null) {
+            editToken.setOnClickListener(copyTokenAction);
+        }
+        if (containerToken != null) {
+            containerToken.setOnClickListener(copyTokenAction);
         }
 
         if (btnGen != null) {
             btnGen.setOnClickListener(v -> {
-                String randomToken = UUID.randomUUID().toString().substring(0, 8);
+                String randomToken = UUID.randomUUID().toString().replace("-", "");
+                prefs.setAutomationToken(randomToken);
                 if (editToken != null) {
                     editToken.setText(randomToken);
                 }
-                prefs.setAutomationToken(randomToken);
-                updateShellPreview(activity, prefs, textShellCommand);
+                updateShellPreview(textShellCommand);
+                Toast.makeText(activity, R.string.token_generated, Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -353,7 +382,7 @@ public class BroadcastTabHelper {
                 else selectedMode = "4G";
             }
             updateModeChips.run();
-            updateShellPreview(activity, prefs, textShellCommand);
+            updateShellPreview(textShellCommand);
         };
 
         for (Map.Entry<String, TextView> entry : modeChips.entrySet()) {
@@ -362,7 +391,7 @@ public class BroadcastTabHelper {
                 chip.setOnClickListener(v -> {
                     selectedMode = entry.getKey();
                     updateModeChips.run();
-                    updateShellPreview(activity, prefs, textShellCommand);
+                    updateShellPreview(textShellCommand);
                 });
             }
         }
@@ -380,14 +409,14 @@ public class BroadcastTabHelper {
         refreshCapabilitiesRunnable.run();
 
         // Shell command initial update
-        updateShellPreview(activity, prefs, textShellCommand);
+        updateShellPreview(textShellCommand);
 
         // Copy shell command on tap
         if (blockShellCommand != null) {
             blockShellCommand.setOnClickListener(v -> {
-                String cmd = getShellCommand(prefs);
-                copyToClipboard(activity, "ADB Command", cmd);
-                Toast.makeText(activity, "ADB command copied", Toast.LENGTH_SHORT).show();
+                String cmd = getShellCommand();
+                copyToClipboard(activity.getString(R.string.clipboard_label_adb_cmd), cmd);
+                Toast.makeText(activity, R.string.toast_adb_cmd_copied, Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -396,17 +425,17 @@ public class BroadcastTabHelper {
             btnCopyIntent.setOnClickListener(v -> {
                 String token = prefs.getAutomationToken();
                 if (token == null) token = "";
-                String specs = "Action Type: Send Intent\n"
-                        + "Target: Broadcast\n"
-                        + "Action: com.dhangofa.networktoggle.SET_MODE\n"
-                        + "Package: com.dhangofa.networktoggle\n"
-                        + "Class: com.dhangofa.networktoggle.AutomationReceiver\n"
-                        + "Extra 1: mode: " + selectedMode + "\n"
-                        + "Extra 2: sim: " + selectedSim + "\n"
-                        + "Extra 3: token: " + token;
+                String specs = activity.getString(R.string.spec_action_type) + ": Send Intent\n"
+                        + activity.getString(R.string.spec_target) + ": Broadcast\n"
+                        + activity.getString(R.string.action_label) + " com.dhangofa.networktoggle.SET_MODE\n"
+                        + activity.getString(R.string.spec_package) + ": com.dhangofa.networktoggle\n"
+                        + activity.getString(R.string.spec_class) + ": com.dhangofa.networktoggle.AutomationReceiver\n"
+                        + activity.getString(R.string.spec_extra) + " 1: mode: " + selectedMode + "\n"
+                        + activity.getString(R.string.spec_extra) + " 2: sim: " + selectedSim + "\n"
+                        + activity.getString(R.string.spec_extra) + " 3: token: " + token;
 
-                copyToClipboard(activity, "Broadcast Specifications", specs);
-                Toast.makeText(activity, "Broadcast specifications copied", Toast.LENGTH_SHORT).show();
+                copyToClipboard(activity.getString(R.string.clipboard_label_broadcast_specs), specs);
+                Toast.makeText(activity, R.string.toast_broadcast_specs_copied, Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -433,19 +462,22 @@ public class BroadcastTabHelper {
                 }
                 activity.sendBroadcast(intent);
 
-                String simLabel = (selectedSim == 3) ? "Both" : "SIM " + selectedSim;
-                Toast.makeText(activity, "Broadcast sent: " + selectedMode + " (" + simLabel + ")", Toast.LENGTH_SHORT).show();
+                String simLabel = (selectedSim == 3)
+                        ? activity.getString(R.string.sim_both)
+                        : String.format(activity.getString(R.string.sim_label_format), selectedSim);
+                String message = String.format(activity.getString(R.string.toast_broadcast_sent), selectedMode, simLabel);
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
             });
         }
     }
 
-    private static String getShellCommand(AppPreferences prefs) {
+    private String getShellCommand() {
         String token = prefs.getAutomationToken();
         if (token == null) token = "";
         return "am broadcast -a com.dhangofa.networktoggle.SET_MODE -n com.dhangofa.networktoggle/.AutomationReceiver --es mode " + selectedMode + " --ei sim " + selectedSim + " --es token " + token;
     }
 
-    private static Spanned getShellCommandHtml(AppPreferences prefs) {
+    private Spanned getShellCommandHtml() {
         String token = prefs.getAutomationToken();
         if (token == null) token = "";
         String html = "<font color='#FF8A65'>am broadcast</font> "
@@ -462,14 +494,14 @@ public class BroadcastTabHelper {
         return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
 
-    private static void updateShellPreview(Context context, AppPreferences prefs, TextView textShellCommand) {
+    private void updateShellPreview(TextView textShellCommand) {
         if (textShellCommand != null) {
-            textShellCommand.setText(getShellCommandHtml(prefs));
+            textShellCommand.setText(getShellCommandHtml());
         }
     }
 
-    private static void copyToClipboard(Context context, String label, String text) {
-        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+    private void copyToClipboard(String label, String text) {
+        ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard != null) {
             ClipData clip = ClipData.newPlainText(label, text);
             clipboard.setPrimaryClip(clip);
