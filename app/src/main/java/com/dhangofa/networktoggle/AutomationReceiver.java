@@ -34,11 +34,9 @@ public class AutomationReceiver extends BroadcastReceiver {
         String expectedToken = prefs.getAutomationToken();
         String receivedToken = intent.getStringExtra(EXTRA_TOKEN);
 
-        if (expectedToken != null && !expectedToken.trim().isEmpty()) {
-            if (receivedToken == null || !receivedToken.equals(expectedToken)) {
-                Log.e(TAG, "Automation token mismatch or missing. Action blocked.");
-                return;
-            }
+        if (expectedToken == null || expectedToken.trim().isEmpty() || receivedToken == null || !receivedToken.equals(expectedToken)) {
+            Log.e(TAG, "Automation token mismatch, missing, or not configured. Action blocked.");
+            return;
         }
 
         String modeString = intent.getStringExtra(EXTRA_MODE);
