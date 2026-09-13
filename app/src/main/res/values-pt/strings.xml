@@ -4,6 +4,8 @@
     <string name="nettoggle_operates_faster_if_it_can_dire">O NetToggle opera mais rápido se puder ler diretamente o estado do seu SIM. Conceda a permissão de Telefone para eliminar atrasos e habilitar a resolução instantânea.</string>
     <string name="dismiss">Descartar</string>
     <string name="grant_permission">Conceder permissão</string>
+    <string name="open_settings">Abrir configurações</string>
+    <string name="permission_permanently_denied_desc">A permissão de telefone foi negada permanentemente. Ative a permissão de Telefone nas Configurações do app para desbloquear o desempenho máximo.</string>
     <string name="routine_shortcuts">Atalhos de rotina</string>
     <string name="add_shortcut">+ Adicionar atalho</string>
     <string name="execution_mode">Modo de execução</string>
