@@ -142,19 +142,22 @@
         <!-- Test Shortcut Button -->
         <LinearLayout
             android:id="@+id/btnTestShortcut"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="38dp"
             android:background="@drawable/shape_btn_test_broadcast"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:layout_marginEnd="8dp">
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="6dp"
+            android:layout_marginEnd="6dp">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
                 android:src="@drawable/ic_play_arrow"
                 android:tint="@color/status_success_text"
                 android:contentDescription="@null"
@@ -165,21 +168,27 @@
                 android:layout_height="wrap_content"
                 android:text="@string/test_shortcut"
                 android:textColor="@color/status_success_text"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:gravity="center" />
         </LinearLayout>
 
         <!-- Pin to Home Button -->
         <LinearLayout
             android:id="@+id/btnPinShortcut"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="38dp"
             android:background="@drawable/shape_btn_pin_shortcut"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:paddingHorizontal="12dp">
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="6dp">
 
             <ImageView
                 android:layout_width="15dp"
@@ -194,22 +203,20 @@
                 android:layout_height="wrap_content"
                 android:text="@string/pin_to_home"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:gravity="center" />
         </LinearLayout>
 
-        <!-- Spacer -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <!-- Delete Button -->
+        <!-- Delete Button (Permanently anchored, never pushed off-screen) -->
         <ImageView
             android:id="@+id/btnRemoveShortcut"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="7dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
             android:src="@drawable/ic_delete"
             android:tint="@color/text_tertiary"
             android:background="?android:attr/selectableItemBackgroundBorderless"
