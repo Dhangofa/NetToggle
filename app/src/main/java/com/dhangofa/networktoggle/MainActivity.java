@@ -169,6 +169,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (this.broadcastTabHelper != null) {
             this.broadcastTabHelper.refreshCapabilities();
         }
+        if (this.shortcutTabHelper != null) {
+            this.shortcutTabHelper.refreshCapabilities();
+        }
         if (this.diagnosticUiController != null) this.diagnosticUiController.updateErrorBanner();
     }
 
@@ -218,6 +221,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 }
                 if (!this.activityDestroyed && this.broadcastTabHelper != null) {
                     this.broadcastTabHelper.refreshCapabilities();
+                }
+                if (!this.activityDestroyed && this.shortcutTabHelper != null) {
+                    this.shortcutTabHelper.refreshCapabilities();
                 }
                 TileService.requestListeningState((Context)this, (ComponentName)new ComponentName((Context)this, NetworkTileService.class));
             });
