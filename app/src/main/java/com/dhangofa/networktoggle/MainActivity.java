@@ -13,6 +13,9 @@ import android.widget.RadioGroup;
 
 import com.dhangofa.networktoggle.NetworkTileService;
 import com.dhangofa.networktoggle.R;
+import com.dhangofa.networktoggle.automation.AutomationExecutor;
+import com.dhangofa.networktoggle.automation.AutomationRequest;
+import com.dhangofa.networktoggle.automation.AutomationResult;
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.cycle.TileCycleManager;
 import com.dhangofa.networktoggle.model.NetworkMode;
@@ -178,23 +181,26 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         TargetSim newTarget = this.appPreferences.getTargetSim();
         if (this.lastTargetSim != TargetSim.BOTH && newTarget == TargetSim.BOTH) {
             AppExecutors.executeTelephony(() -> {
-                this.simResolver.setOverrideTargetSim(TargetSim.SIM_1);
-                NetworkMode mode1 = this.modeReader.readCurrentMode();
-                this.simResolver.setOverrideTargetSim(TargetSim.SIM_2);
-                NetworkMode mode2 = this.modeReader.readCurrentMode();
-                this.simResolver.setOverrideTargetSim(null);
-                if (mode1 != NetworkMode.UNKNOWN && mode2 != NetworkMode.UNKNOWN && mode1 != mode2) {
-                    TileCycleManager tileCycleManager = new TileCycleManager(this.appPreferences);
-                    AppPreferences.NetworkCapabilities combinedCaps = this.capabilityResolver.getCapabilities(this.appPreferences.getExecutionMode());
-                    tileCycleManager.forceRemoveUnsupportedAndAutoFill(combinedCaps);
-                    List<NetworkMode> cycle = tileCycleManager.getCycle();
-                    NetworkMode modeToApply = cycle.contains((Object)mode1) ? mode1 : (cycle.contains((Object)mode2) ? mode2 : cycle.get(0));
-                    this.simResolver.setOverrideTargetSim(TargetSim.SIM_1);
-                    this.modeController.apply(modeToApply, this.appPreferences.getExecutionMode());
-                    this.simResolver.setOverrideTargetSim(TargetSim.SIM_2);
-                    this.modeController.apply(modeToApply, this.appPreferences.getExecutionMode());
+                try {
+                    NetworkMode mode1 = this.modeReader.readCurrentMode(TargetSim.SIM_1);
+                    NetworkMode mode2 = this.modeReader.readCurrentMode(TargetSim.SIM_2);
+                    if (mode1 != NetworkMode.UNKNOWN && mode2 != NetworkMode.UNKNOWN && mode1 != mode2) {
+                        TileCycleManager tileCycleManager = new TileCycleManager(this.appPreferences);
+                        AppPreferences.NetworkCapabilities combinedCaps = this.capabilityResolver.getCapabilities(this.appPreferences.getExecutionMode());
+                        tileCycleManager.forceRemoveUnsupportedAndAutoFill(combinedCaps);
+                        List<NetworkMode> cycle = tileCycleManager.getCycle();
+                        NetworkMode modeToApply = cycle.contains((Object)mode1) ? mode1 : (cycle.contains((Object)mode2) ? mode2 : cycle.get(0));
+
+                        AutomationRequest request = new AutomationRequest(
+                                modeToApply,
+                                TargetSim.BOTH,
+                                false,
+                                "TargetSimSync"
+                        );
+                        AutomationExecutor.execute(this, request);
+                    }
+                } finally {
                     this.simResolver.setOverrideTargetSim(null);
-                    this.appPreferences.setCachedNetworkMode(NetworkMode.UNKNOWN);
                 }
                 this.updateCapabilities();
             });
