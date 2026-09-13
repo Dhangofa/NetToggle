@@ -178,4 +178,29 @@
     <!-- Auto-restore preferred mode -->
     <string name="auto_restore_preferred_mode">Auto-Restore on shade pull</string>
     <string name="auto_restore_preferred_mode_description">Automatically re-applies your last toggled mode when shade is pulled if carrier or thermals downgraded or the system altered it</string>
+    <string name="validation_token_required">Security token cannot be empty</string>
+    <string name="copy_token">Copy Token</string>
+    <string name="token_copied_to_clipboard">Token copied to clipboard</string>
+    <string name="token_generated">New token generated</string>
+    <string name="toast_adb_cmd_copied">ADB command copied</string>
+    <string name="toast_broadcast_specs_copied">Broadcast specifications copied</string>
+    <string name="toast_broadcast_sent">Broadcast sent: %1$s (%2$s)</string>
+    <string name="sim_both">Both</string>
+    <string name="sim_label_format">SIM %1$d</string>
+    <string name="clipboard_label_adb_cmd">ADB Command</string>
+    <string name="clipboard_label_broadcast_specs">Broadcast Specifications</string>
+    <string name="clipboard_label_automation_token">Automation Token</string>
+    <string name="spec_action_type">Action Type</string>
+    <string name="spec_target">Target</string>
+    <string name="spec_package">Package</string>
+    <string name="spec_class">Class</string>
+    <string name="spec_extra">Extra</string>
+
+    <!-- Execution state status strings -->
+    <string name="status_root_checking">Checking root permission…</string>
+    <string name="status_shizuku_not_running">Shizuku is not running</string>
+    <string name="status_shizuku_authorized">Shizuku mode active &amp; authorized!</string>
+    <string name="status_shizuku_not_granted">Shizuku permission not granted</string>
+    <string name="status_shizuku_requesting">Requesting Shizuku permission…</string>
+    <string name="status_shizuku_check_failed">Shizuku check failed</string>
 </resources>
