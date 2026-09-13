@@ -56,12 +56,19 @@ public final class SimResolver {
         this.overrideTargetSim = targetSim;
     }
 
+    public TargetSim getOverrideTargetSim() {
+        return overrideTargetSim;
+    }
+
     public SimInfo resolveTargetSimInfo(ExecutionMode executionMode) {
         TargetSim targetSim = overrideTargetSim != null ? overrideTargetSim : appPreferences.getTargetSim();
         return resolveTargetSimInfo(executionMode, targetSim);
     }
 
     public SimInfo resolveTargetSimInfo(ExecutionMode executionMode, TargetSim targetSim) {
+        if (targetSim == null) {
+            targetSim = overrideTargetSim != null ? overrideTargetSim : appPreferences.getTargetSim();
+        }
         if (targetSim == TargetSim.BOTH) {
             return null;
         }
@@ -155,6 +162,11 @@ public final class SimResolver {
 
     public int resolveTargetSubId(ExecutionMode executionMode) {
         SimInfo info = resolveTargetSimInfo(executionMode);
+        return info != null ? info.subId : INVALID_SUB_ID;
+    }
+
+    public int resolveTargetSubId(ExecutionMode executionMode, TargetSim targetSim) {
+        SimInfo info = resolveTargetSimInfo(executionMode, targetSim);
         return info != null ? info.subId : INVALID_SUB_ID;
     }
 
