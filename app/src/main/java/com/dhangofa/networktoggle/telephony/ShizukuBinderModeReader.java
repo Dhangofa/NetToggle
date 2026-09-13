@@ -27,11 +27,17 @@ final class ShizukuBinderModeReader {
     }
 
     NetworkMode readCurrentMode(ExecutionMode executionMode) {
+        return readCurrentMode(executionMode, null);
+    }
+
+    NetworkMode readCurrentMode(ExecutionMode executionMode, com.dhangofa.networktoggle.model.TargetSim targetSim) {
         if (executionMode != ExecutionMode.SHIZUKU) {
             return NetworkMode.UNKNOWN;
         }
 
-        int subId = simResolver.resolveTargetSubId(executionMode);
+        int subId = targetSim != null
+                ? simResolver.resolveTargetSubId(executionMode, targetSim)
+                : simResolver.resolveTargetSubId(executionMode);
 
         if (!simResolver.isValidSubId(subId)) {
             return NetworkMode.UNKNOWN;
