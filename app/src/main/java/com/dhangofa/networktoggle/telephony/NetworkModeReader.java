@@ -21,39 +21,37 @@ public final class NetworkModeReader {
 	}
 
 	public NetworkMode readCurrentMode() {
+		return readCurrentMode(appPreferences.getTargetSim());
+	}
+
+	public NetworkMode readCurrentMode(TargetSim targetSim) {
 		ExecutionMode executionMode = appPreferences.getExecutionMode();
-		if (executionMode == ExecutionMode.NONE) return NetworkMode.UNKNOWN;
-
-		TargetSim originalTarget = appPreferences.getTargetSim();
-
-		if (originalTarget == TargetSim.BOTH) {
-			simResolver.setOverrideTargetSim(TargetSim.SIM_1);
-			NetworkMode mode1 = readSingleMode(executionMode, TargetSim.SIM_1);
-
-			simResolver.setOverrideTargetSim(TargetSim.SIM_2);
-			NetworkMode mode2 = readSingleMode(executionMode, TargetSim.SIM_2);
-
-			simResolver.setOverrideTargetSim(null);
-
-			if (mode1 != NetworkMode.UNKNOWN && mode1 == mode2) {
-				return mode1;
-			}
+		if (executionMode == ExecutionMode.NONE) {
 			return NetworkMode.UNKNOWN;
 		}
 
-		return readSingleMode(executionMode, originalTarget);
+		if (targetSim == TargetSim.BOTH) {
+			NetworkMode mode1 = readCurrentMode(TargetSim.SIM_1);
+			NetworkMode mode2 = readCurrentMode(TargetSim.SIM_2);
+
+			return mode1 != NetworkMode.UNKNOWN && mode1 == mode2
+					? mode1
+					: NetworkMode.UNKNOWN;
+		}
+
+		return readSingleMode(executionMode, targetSim);
 	}
 
-	private NetworkMode readSingleMode(ExecutionMode executionMode, TargetSim originalTarget) {
+	private NetworkMode readSingleMode(ExecutionMode executionMode, TargetSim targetSim) {
 		NetworkMode mode = NetworkMode.UNKNOWN;
 		// 1. Shizuku Fast-Path (Binder IPC)
 		if (executionMode == ExecutionMode.SHIZUKU) {
-			mode = shizukuBinderReader.readCurrentMode(executionMode);
+			mode = shizukuBinderReader.readCurrentMode(executionMode, targetSim);
 		}
 
 		// 2. Root/Shizuku privileged shell fallback path
 		if (mode == NetworkMode.UNKNOWN) {
-			mode = privilegedModeReader.readCurrentMode(executionMode, originalTarget);
+			mode = privilegedModeReader.readCurrentMode(executionMode, targetSim);
 		}
 		return mode;
 	}
