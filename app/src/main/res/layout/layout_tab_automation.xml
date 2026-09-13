@@ -352,7 +352,9 @@
                             android:text="@string/test_broadcast_btn"
                             android:textColor="@color/status_success_text"
                             android:textSize="12sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -781,8 +783,9 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Token Input Container -->
+                <!-- Token Container (Read-Only Token, Copy & Regenerate Actions) -->
                 <LinearLayout
+                    android:id="@+id/containerAutomationToken"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -792,30 +795,49 @@
                     android:paddingVertical="6dp"
                     android:layout_marginBottom="16dp">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/editAutomationToken"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:hint="@string/security_token"
-                        android:inputType="textVisiblePassword"
+                        android:singleLine="true"
+                        android:ellipsize="middle"
                         android:background="@null"
                         android:fontFamily="monospace"
                         android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:focusable="false"
+                        android:clickable="true" />
+
+                    <ImageView
+                        android:id="@+id/btnCopyToken"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_copy"
+                        android:tint="@color/text_secondary"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/copy_token"
+                        android:clickable="true"
+                        android:focusable="true" />
 
                     <TextView
                         android:id="@+id/btnGenerateToken"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="4dp"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="6dp"
                         android:text="@string/generate_uppercase"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:textColor="@color/brand_primary"
-                        android:background="@drawable/shape_btn_chip" />
+                        android:background="@drawable/shape_btn_chip"
+                        android:singleLine="true"
+                        android:clickable="true"
+                        android:focusable="true" />
                 </LinearLayout>
 
                 <!-- Shell / ADB Command Header -->
