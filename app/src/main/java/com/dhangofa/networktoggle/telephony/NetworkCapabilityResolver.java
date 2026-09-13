@@ -34,17 +34,15 @@ public final class NetworkCapabilityResolver {
     }
 
     public NetworkCapabilities getCapabilities(ExecutionMode mode) {
+        return getCapabilities(mode, appPreferences.getTargetSim());
+    }
+
+    public NetworkCapabilities getCapabilities(ExecutionMode mode, com.dhangofa.networktoggle.model.TargetSim targetSim) {
         if (mode == ExecutionMode.NONE) return NetworkCapabilities.assumeAll();
 
-        com.dhangofa.networktoggle.model.TargetSim targetSim = appPreferences.getTargetSim();
         if (targetSim == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
-            simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
-            NetworkCapabilities caps1 = getSingleSimCapabilities(mode);
-
-            simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
-            NetworkCapabilities caps2 = getSingleSimCapabilities(mode);
-
-            simResolver.setOverrideTargetSim(null);
+            NetworkCapabilities caps1 = getSingleSimCapabilities(mode, com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+            NetworkCapabilities caps2 = getSingleSimCapabilities(mode, com.dhangofa.networktoggle.model.TargetSim.SIM_2);
 
             return new NetworkCapabilities(
                     caps1.supports2g && caps2.supports2g,
@@ -54,12 +52,12 @@ public final class NetworkCapabilityResolver {
             );
         }
 
-        return getSingleSimCapabilities(mode);
+        return getSingleSimCapabilities(mode, targetSim);
     }
 
-    private NetworkCapabilities getSingleSimCapabilities(ExecutionMode mode) {
+    private NetworkCapabilities getSingleSimCapabilities(ExecutionMode mode, com.dhangofa.networktoggle.model.TargetSim targetSim) {
         // ONE SINGLE CALL to get slotIndex, subId, and carrierName!
-        SimResolver.SimInfo simInfo = simResolver.resolveTargetSimInfo(mode);
+        SimResolver.SimInfo simInfo = simResolver.resolveTargetSimInfo(mode, targetSim);
 
         if (simInfo == null || !simResolver.isValidSlotIndex(simInfo.slotIndex) || !simResolver.isValidSubId(simInfo.subId)) {
             return NetworkCapabilities.assumeAll();
