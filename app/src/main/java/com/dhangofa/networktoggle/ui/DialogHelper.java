@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,13 +29,60 @@ public final class DialogHelper {
     private DialogHelper() {}
 
     public static Dialog buildPermissionBottomSheet(Activity activity, Runnable onGrantClicked) {
+        return buildPermissionBottomSheet(activity, false, onGrantClicked, null);
+    }
+
+    public static Dialog buildPermissionBottomSheet(
+            Activity activity,
+            boolean isPermanentlyDenied,
+            Runnable onActionClicked,
+            Runnable onDismissClicked
+    ) {
         Dialog dialog = new Dialog(activity, R.style.TransparentBottomSheetStyle);
         View view = activity.getLayoutInflater().inflate(R.layout.bottom_sheet_permission, null);
 
-        view.findViewById(R.id.btnDismissPermission).setOnClickListener(v -> dialog.dismiss());
-        view.findViewById(R.id.btnGrantPermission).setOnClickListener(v -> {
-            dialog.dismiss();
-            onGrantClicked.run();
+        TextView txtDesc = view.findViewById(R.id.txtPermissionDesc);
+        Button btnGrant = view.findViewById(R.id.btnGrantPermission);
+        Button btnDismiss = view.findViewById(R.id.btnDismissPermission);
+
+        if (isPermanentlyDenied) {
+            if (txtDesc != null) {
+                txtDesc.setText(R.string.permission_permanently_denied_desc);
+            }
+            if (btnGrant != null) {
+                btnGrant.setText(R.string.open_settings);
+            }
+        } else {
+            if (txtDesc != null) {
+                txtDesc.setText(R.string.nettoggle_operates_faster_if_it_can_dire);
+            }
+            if (btnGrant != null) {
+                btnGrant.setText(R.string.grant_permission);
+            }
+        }
+
+        if (btnDismiss != null) {
+            btnDismiss.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onDismissClicked != null) {
+                    onDismissClicked.run();
+                }
+            });
+        }
+
+        if (btnGrant != null) {
+            btnGrant.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onActionClicked != null) {
+                    onActionClicked.run();
+                }
+            });
+        }
+
+        dialog.setOnCancelListener(d -> {
+            if (onDismissClicked != null) {
+                onDismissClicked.run();
+            }
         });
 
         dialog.setContentView(view);
