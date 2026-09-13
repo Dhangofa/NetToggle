@@ -175,4 +175,29 @@
     <string name="shortcut_hash_format">#%d</string>
     <string name="auto_restore_preferred_mode">Автовосстановление при открытии шторки</string>
     <string name="auto_restore_preferred_mode_description">Автоматически повторно применяет последний выбранный режим при открытии шторки, если оператор или температура понизили его</string>
+    <string name="validation_token_required">Токен безопасности не может быть пустым</string>
+    <string name="copy_token">Скопировать токен</string>
+    <string name="token_copied_to_clipboard">Токен скопирован в буфер обмена</string>
+    <string name="token_generated">Создан новый токен</string>
+    <string name="toast_adb_cmd_copied">Команда ADB скопирована</string>
+    <string name="toast_broadcast_specs_copied">Спецификации трансляции скопированы</string>
+    <string name="toast_broadcast_sent">Трансляция отправлена: %1$s (%2$s)</string>
+    <string name="sim_both">Обе</string>
+    <string name="sim_label_format">SIM %1$d</string>
+    <string name="clipboard_label_adb_cmd">Команда ADB</string>
+    <string name="clipboard_label_broadcast_specs">Спецификации трансляции</string>
+    <string name="clipboard_label_automation_token">Токен автоматизации</string>
+    <string name="spec_action_type">Тип действия</string>
+    <string name="spec_target">Цель</string>
+    <string name="spec_package">Пакет</string>
+    <string name="spec_class">Класс</string>
+    <string name="spec_extra">Экстра</string>
+
+    <!-- Execution state status strings -->
+    <string name="status_root_checking">Проверка root-доступа…</string>
+    <string name="status_shizuku_not_running">Shizuku не запущен</string>
+    <string name="status_shizuku_authorized">Режим Shizuku активен &amp; авторизован!</string>
+    <string name="status_shizuku_not_granted">Разрешение Shizuku не предоставлено</string>
+    <string name="status_shizuku_requesting">Запрос разрешения Shizuku…</string>
+    <string name="status_shizuku_check_failed">Ошибка проверки Shizuku</string>
 </resources>
