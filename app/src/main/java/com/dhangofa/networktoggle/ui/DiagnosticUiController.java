@@ -42,9 +42,7 @@ public class DiagnosticUiController {
             return;
         }
         if (this.diagnosticDialog != null && this.diagnosticDialog.isShowing()) {
-            this.diagnosticDialog.dismiss();
-            this.appPreferences.clearLastError();
-            this.updateErrorBanner();
+            return;
         }
         this.diagnosticDialog = DialogHelper.buildDiagnosticDialog(activity, this.appPreferences, new SimResolver(activity, this.appPreferences), () -> {
             this.appPreferences.clearLastError();
