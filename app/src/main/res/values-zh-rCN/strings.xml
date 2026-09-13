@@ -4,6 +4,8 @@
     <string name="nettoggle_operates_faster_if_it_can_dire">如果能够直接读取您的 SIM 卡状态，NetToggle 的运行速度会更快。请授予“电话”权限以消除系统延迟并实现即时解析。</string>
     <string name="dismiss">忽略</string>
     <string name="grant_permission">授予权限</string>
+    <string name="open_settings">打开设置</string>
+    <string name="permission_permanently_denied_desc">电话权限已被永久拒绝。请在应用设置中开启“电话”权限以解锁最高性能并消除延迟。</string>
     <string name="routine_shortcuts">日常快捷方式</string>
     <string name="add_shortcut">+ 添加快捷方式</string>
     <string name="execution_mode">执行模式</string>
