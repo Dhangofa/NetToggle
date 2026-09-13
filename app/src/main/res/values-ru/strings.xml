@@ -4,6 +4,8 @@
     <string name="nettoggle_operates_faster_if_it_can_dire">NetToggle работает быстрее, если может напрямую читать состояние SIM-карты. Предоставьте разрешение на Телефон, чтобы устранить задержку системы и включить мгновенное переключение.</string>
     <string name="dismiss">Отклонить</string>
     <string name="grant_permission">Предоставить разрешение</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="permission_permanently_denied_desc">Разрешение на телефон было окончательно отклонено. Пожалуйста, включите разрешение «Телефон» в настройках приложения для максимальной производительности.</string>
     <string name="routine_shortcuts">Ярлыки сценариев</string>
     <string name="add_shortcut">+ Добавить ярлык</string>
     <string name="execution_mode">Режим выполнения</string>
