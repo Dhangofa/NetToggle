@@ -175,4 +175,29 @@
     <string name="shortcut_hash_format">#%d</string>
     <string name="auto_restore_preferred_mode">Restaurar automaticamente ao puxar barra</string>
     <string name="auto_restore_preferred_mode_description">Reaplica automaticamente o último modo selecionado quando o painel de notificações é puxado, caso a operadora ou térmicas tenham rebaixado</string>
+    <string name="validation_token_required">O token de segurança não pode estar vazio</string>
+    <string name="copy_token">Copiar token</string>
+    <string name="token_copied_to_clipboard">Token copiado para a área de transferência</string>
+    <string name="token_generated">Novo token gerado</string>
+    <string name="toast_adb_cmd_copied">Comando ADB copiado</string>
+    <string name="toast_broadcast_specs_copied">Especificações de broadcast copiadas</string>
+    <string name="toast_broadcast_sent">Broadcast enviado: %1$s (%2$s)</string>
+    <string name="sim_both">Ambos</string>
+    <string name="sim_label_format">SIM %1$d</string>
+    <string name="clipboard_label_adb_cmd">Comando ADB</string>
+    <string name="clipboard_label_broadcast_specs">Especificações de Broadcast</string>
+    <string name="clipboard_label_automation_token">Token de automação</string>
+    <string name="spec_action_type">Tipo de ação</string>
+    <string name="spec_target">Destino</string>
+    <string name="spec_package">Pacote</string>
+    <string name="spec_class">Classe</string>
+    <string name="spec_extra">Extra</string>
+
+    <!-- Execution state status strings -->
+    <string name="status_root_checking">Verificando permissão de root…</string>
+    <string name="status_shizuku_not_running">O Shizuku não está em execução</string>
+    <string name="status_shizuku_authorized">Modo Shizuku ativo &amp; autorizado!</string>
+    <string name="status_shizuku_not_granted">Permissão do Shizuku não concedida</string>
+    <string name="status_shizuku_requesting">Solicitando permissão do Shizuku…</string>
+    <string name="status_shizuku_check_failed">Falha na verificação do Shizuku</string>
 </resources>
