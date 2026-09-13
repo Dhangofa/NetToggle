@@ -34,6 +34,7 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/txtPermissionDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/nettoggle_operates_faster_if_it_can_dire"
