@@ -7,6 +7,7 @@ import android.os.Build;
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.DiagnosticError;
 import com.dhangofa.networktoggle.model.ExecutionMode;
+import com.dhangofa.networktoggle.model.TargetSim;
 import com.dhangofa.networktoggle.telephony.SimResolver;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -43,9 +44,23 @@ public class DiagnosticReporter {
             sb.append("App Version: Unknown\n");
         }
         sb.append("Execution Mode: ").append(prefs.getExecutionMode().name()).append("\n");
-        sb.append("Target SIM Setting: ").append(prefs.getTargetSim().name()).append("\n");
-        int slotIndex = simResolver.resolveTargetSlotIndex(prefs.getExecutionMode());
-        sb.append("Resolved Slot Index: ").append(slotIndex).append("\n\n");
+        TargetSim targetSim = prefs.getTargetSim();
+        sb.append("Target SIM Setting: ").append(targetSim.name()).append("\n");
+        if (targetSim == TargetSim.BOTH) {
+            SimResolver.SimInfo sim1 = simResolver.resolveTargetSimInfo(prefs.getExecutionMode(), TargetSim.SIM_1);
+            SimResolver.SimInfo sim2 = simResolver.resolveTargetSimInfo(prefs.getExecutionMode(), TargetSim.SIM_2);
+            sb.append("SIM 1: slot ").append(sim1 != null ? sim1.slotIndex : -1)
+                    .append(", subId ").append(sim1 != null ? sim1.subId : -1)
+                    .append(sim1 != null && sim1.carrierName != null && !sim1.carrierName.isEmpty() ? " (" + sim1.carrierName + ")" : "")
+                    .append("\n");
+            sb.append("SIM 2: slot ").append(sim2 != null ? sim2.slotIndex : -1)
+                    .append(", subId ").append(sim2 != null ? sim2.subId : -1)
+                    .append(sim2 != null && sim2.carrierName != null && !sim2.carrierName.isEmpty() ? " (" + sim2.carrierName + ")" : "")
+                    .append("\n\n");
+        } else {
+            int slotIndex = simResolver.resolveTargetSlotIndex(prefs.getExecutionMode());
+            sb.append("Resolved Slot Index: ").append(slotIndex).append("\n\n");
+        }
 
         ExecutionMode selectedMode = prefs.getExecutionMode();
         if (selectedMode == ExecutionMode.ROOT) {
