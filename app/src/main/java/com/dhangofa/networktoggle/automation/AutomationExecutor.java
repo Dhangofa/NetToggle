@@ -23,13 +23,14 @@ public class AutomationExecutor {
         if (execMode == ExecutionMode.NONE) {
             String err = "Rejected: Execution mode is NONE.";
             Log.e(TAG, err);
-            return new AutomationResult(false, false, err);
+            prefs.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
+            return new AutomationResult(false, false, err, request.mode, request.target, false, false);
         }
 
         if (request.external && !prefs.isExternalAutomationEnabled()) {
             String err = "Rejected: External automation is disabled.";
             Log.e(TAG, err);
-            return new AutomationResult(false, false, err);
+            return new AutomationResult(false, false, err, request.mode, request.target, false, false);
         }
 
         SimResolver simResolver = new SimResolver(context, prefs);
@@ -41,8 +42,10 @@ public class AutomationExecutor {
             if (info == null || info.slotIndex < 0) {
                 String err = "Rejected: Auto SIM resolution failed.";
                 Log.e(TAG, err);
+                prefs.setAutoSimError(true);
+                saveFailure(prefs, null, err);
                 simResolver.setOverrideTargetSim(null);
-                return new AutomationResult(false, false, err);
+                return new AutomationResult(false, false, err, request.mode, TargetSim.AUTO, false, false);
             }
             targetSim = info.slotIndex == 0 ? TargetSim.SIM_1 : TargetSim.SIM_2;
             simResolver.setOverrideTargetSim(null);
@@ -95,31 +98,39 @@ public class AutomationExecutor {
         if (!supported) {
             String err = "Rejected requested mode " + request.mode.getDisplayName() + " as it is not supported by the selected SIM(s).";
             Log.e(TAG, err);
-            return new AutomationResult(false, false, err);
+            saveFailure(prefs, null, err);
+            return new AutomationResult(false, false, err, request.mode, targetSim, false, false);
         }
 
         NetworkModeController controller = new NetworkModeController(simResolver);
         boolean success = false;
         boolean isPartial = false;
+        boolean sim1Success = false;
+        boolean sim2Success = false;
         String errorMessage = "";
 
         try {
             if (targetSim == TargetSim.BOTH) {
-                simResolver.setOverrideTargetSim(TargetSim.SIM_1);
-                SimResolver.SimInfo info1 = simResolver.resolveTargetSimInfo(execMode);
-                simResolver.setOverrideTargetSim(TargetSim.SIM_2);
-                SimResolver.SimInfo info2 = simResolver.resolveTargetSimInfo(execMode);
+                SimResolver.SimInfo info1 = simResolver.resolveTargetSimInfo(execMode, TargetSim.SIM_1);
+                SimResolver.SimInfo info2 = simResolver.resolveTargetSimInfo(execMode, TargetSim.SIM_2);
 
                 if (info1 == null || info2 == null) {
                     errorMessage = "Rejected: One or both SIMs are not available.";
                     Log.e(TAG, errorMessage);
-                    return new AutomationResult(false, false, errorMessage);
+                    saveFailure(prefs, null, errorMessage);
+                    return new AutomationResult(false, false, errorMessage, request.mode, targetSim, false, false);
                 }
 
+                CommandResult r1 = CommandResult.failed("", "SIM 1 was not attempted.");
+                CommandResult r2 = CommandResult.failed("", "SIM 2 was not attempted.");
+
                 simResolver.setOverrideTargetSim(TargetSim.SIM_1);
-                CommandResult r1 = controller.apply(request.mode, execMode);
+                r1 = controller.apply(request.mode, execMode);
                 simResolver.setOverrideTargetSim(TargetSim.SIM_2);
-                CommandResult r2 = controller.apply(request.mode, execMode);
+                r2 = controller.apply(request.mode, execMode);
+
+                sim1Success = r1.isSuccess();
+                sim2Success = r2.isSuccess();
 
                 if (r1.isSuccess() && r2.isSuccess()) {
                     success = true;
@@ -129,11 +140,11 @@ public class AutomationExecutor {
                                    " | SIM 1 err: " + r1.getStderr() + " | SIM 2 err: " + r2.getStderr();
                     Log.e(TAG, errorMessage);
                     CommandResult failedResult = r1.isSuccess() ? r2 : r1;
-                    prefs.setLastError(failedResult.getCommand(), failedResult.getExitCode(), failedResult.getStdout(), failedResult.getStderr(), errorMessage);
+                    saveFailure(prefs, failedResult, errorMessage);
                 } else {
                     errorMessage = "Failed on both SIMs. SIM 1 err: " + r1.getStderr() + " | SIM 2 err: " + r2.getStderr();
                     Log.e(TAG, errorMessage);
-                    prefs.setLastError(r1.getCommand(), r1.getExitCode(), r1.getStdout(), r1.getStderr(), errorMessage);
+                    saveFailure(prefs, r1, errorMessage);
                 }
             } else {
                 simResolver.setOverrideTargetSim(targetSim);
@@ -141,16 +152,23 @@ public class AutomationExecutor {
                 if (info == null || info.slotIndex != targetSim.getManualSlotIndex()) {
                     errorMessage = "Rejected: Requested SIM " + (targetSim.getManualSlotIndex() + 1) + " is not available or removed.";
                     Log.e(TAG, errorMessage);
-                    return new AutomationResult(false, false, errorMessage);
+                    saveFailure(prefs, null, errorMessage);
+                    return new AutomationResult(false, false, errorMessage, request.mode, targetSim, false, false);
                 }
 
                 CommandResult result = controller.apply(request.mode, execMode);
+                boolean isSlot0 = targetSim == TargetSim.SIM_1;
                 if (result.isSuccess()) {
                     success = true;
+                    if (isSlot0) {
+                        sim1Success = true;
+                    } else {
+                        sim2Success = true;
+                    }
                 } else {
                     errorMessage = "Failed to change network mode via automation: " + result.getStderr();
                     Log.e(TAG, errorMessage);
-                    prefs.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), errorMessage);
+                    saveFailure(prefs, result, errorMessage);
                 }
             }
 
@@ -159,9 +177,14 @@ public class AutomationExecutor {
                 prefs.setLastNetworkCheckTimestamp(System.currentTimeMillis());
                 prefs.setAutoSimError(false);
                 prefs.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                if (request.updatePreferredMode) {
+                    prefs.setLastUserSelectedMode(request.mode);
+                }
             } else if (isPartial) {
                 prefs.setCachedNetworkMode(com.dhangofa.networktoggle.model.NetworkMode.UNKNOWN);
                 prefs.setLastNetworkCheckTimestamp(System.currentTimeMillis());
+                prefs.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
+            } else {
                 prefs.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
             }
         } finally {
@@ -169,6 +192,15 @@ public class AutomationExecutor {
             TileService.requestListeningState(context, new ComponentName(context, NetworkTileService.class));
         }
 
-        return new AutomationResult(success, isPartial, errorMessage);
+        return new AutomationResult(success, isPartial, errorMessage, request.mode, targetSim, sim1Success, sim2Success);
+    }
+
+    private static void saveFailure(AppPreferences prefs, CommandResult result, String context) {
+        if (result != null) {
+            prefs.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), context);
+        } else {
+            prefs.setLastError("", -1, "", context, context);
+        }
+        prefs.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
     }
 }
