@@ -9,10 +9,13 @@ import android.content.pm.ShortcutManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Icon;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +40,7 @@ import com.dhangofa.networktoggle.util.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ShortcutTabHelper {
 
@@ -47,6 +51,8 @@ public class ShortcutTabHelper {
     private boolean isRestoringState = false;
     private String lastSyncedSignature = null;
     private boolean isKeyboardOpen = false;
+    private final Handler titleDebounceHandler = new Handler(Looper.getMainLooper());
+    private Runnable pendingTitleSync = null;
 
     public ShortcutTabHelper(Activity activity, AppPreferences prefs) {
         this.activity = activity;
@@ -71,6 +77,17 @@ public class ShortcutTabHelper {
                 btnTestShortcut.setAlpha(alpha);
             }
         }
+    }
+
+    private void scheduleDebouncedSync(Runnable syncShortcuts) {
+        if (pendingTitleSync != null) {
+            titleDebounceHandler.removeCallbacks(pendingTitleSync);
+        }
+        pendingTitleSync = () -> {
+            pendingTitleSync = null;
+            syncShortcuts.run();
+        };
+        titleDebounceHandler.postDelayed(pendingTitleSync, 400);
     }
 
     public void setup() {
@@ -146,6 +163,11 @@ public class ShortcutTabHelper {
 
         // Auto-save runnable that syncs preferences and system ShortcutManager
         Runnable syncShortcuts = () -> {
+            if (pendingTitleSync != null) {
+                titleDebounceHandler.removeCallbacks(pendingTitleSync);
+                pendingTitleSync = null;
+            }
+
             if (isRestoringState) return;
 
             int count = rows.size();
@@ -183,7 +205,6 @@ public class ShortcutTabHelper {
             if (currentSignature.equals(lastSyncedSignature)) {
                 return;
             }
-            lastSyncedSignature = currentSignature;
 
             List<ShortcutInfo> dynamicShortcuts = new ArrayList<>();
 
@@ -242,8 +263,11 @@ public class ShortcutTabHelper {
                     if (sm != null) {
                         sm.setDynamicShortcuts(dynamicShortcuts);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    Log.e("ShortcutTabHelper", "Failed to update dynamic shortcuts", e);
+                }
             }
+            lastSyncedSignature = currentSignature;
         };
 
         Runnable updateIndicesAndStyles = () -> {
@@ -383,7 +407,7 @@ public class ShortcutTabHelper {
                 public void onNothingSelected(AdapterView<?> parent) {}
             });
 
-            // Auto-save title on edit
+            // Auto-save title on edit with debounce to prevent excessive disk and ShortcutManager operations
             editTitle.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -394,7 +418,7 @@ public class ShortcutTabHelper {
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (isRestoringState) return;
-                    syncShortcuts.run();
+                    scheduleDebouncedSync(syncShortcuts);
                 }
             });
 
@@ -423,7 +447,7 @@ public class ShortcutTabHelper {
                 else if (simValue == 2) targetSim = TargetSim.SIM_2;
                 else if (simValue == 3) targetSim = TargetSim.BOTH;
 
-                NetworkMode networkMode = parseNetworkMode(selectedMode);
+                NetworkMode networkMode = NetworkMode.fromString(selectedMode);
                 if (networkMode != NetworkMode.UNKNOWN) {
                     final TargetSim finalTargetSim = targetSim;
                     AppExecutors.executeTelephony(() -> {
@@ -448,9 +472,14 @@ public class ShortcutTabHelper {
 
                         @SuppressWarnings("unchecked")
                         List<String> validModes = (List<String>) row.getTag(R.id.spinnerMode);
-                        String selectedMode = (validModes != null && !validModes.isEmpty())
-                                ? validModes.get(Math.max(0, spinnerMode.getSelectedItemPosition()))
-                                : "5G_ONLY";
+                        String selectedMode = "5G_ONLY";
+                        if (validModes != null && !validModes.isEmpty()) {
+                            int modePos = spinnerMode.getSelectedItemPosition();
+                            if (modePos < 0 || modePos >= validModes.size()) {
+                                modePos = 0;
+                            }
+                            selectedMode = validModes.get(modePos);
+                        }
 
                         String title = editTitle.getText().toString().trim();
                         if (title.isEmpty()) title = "Routine #" + slot;
@@ -461,7 +490,8 @@ public class ShortcutTabHelper {
                         intent.putExtra("sim", simValue);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                        ShortcutInfo pinShortcut = new ShortcutInfo.Builder(activity, "routine_slot_" + slot)
+                        String pinnedId = "pinned_" + selectedMode.toLowerCase() + "_sim" + simValue + "_" + UUID.randomUUID().toString().substring(0, 8);
+                        ShortcutInfo pinShortcut = new ShortcutInfo.Builder(activity, pinnedId)
                                 .setShortLabel(title)
                                 .setIcon(Icon.createWithResource(activity, R.drawable.ic_magic_wand))
                                 .setIntent(intent)
@@ -528,7 +558,7 @@ public class ShortcutTabHelper {
         }
 
         // If newly installed and empty, pre-populate 2 helpful default shortcuts on very first app run
-        if (loadedCount == 0) {
+        if (loadedCount == 0 && !prefs.isRoutineShortcutsInitialized()) {
             addRow.add("Home Ultra 5G", "5G_ONLY", 1);
             addRow.add("Office Battery Saver", "4G_ONLY", 1);
             prefs.setRoutineShortcutsInitialized(true);
@@ -579,33 +609,5 @@ public class ShortcutTabHelper {
 
     public int getShortcutCount() {
         return rows.size();
-    }
-
-    private static NetworkMode parseNetworkMode(String modeString) {
-        if (modeString == null) return NetworkMode.UNKNOWN;
-        modeString = modeString.toUpperCase().trim();
-        switch (modeString) {
-            case "5G_ONLY":
-            case "5G":
-                return NetworkMode.FIVE_G_ONLY;
-            case "4G_ONLY":
-            case "4G":
-            case "LTE":
-                return NetworkMode.FOUR_G_ONLY;
-            case "PREF_5G":
-            case "PREFERRED_5G":
-                return NetworkMode.PREFERRED_5G;
-            case "PREF_4G":
-            case "PREFERRED_4G":
-                return NetworkMode.PREFERRED_4G;
-            case "PREF_3G":
-            case "PREFERRED_3G":
-                return NetworkMode.PREFERRED_3G;
-            case "2G_ONLY":
-            case "2G":
-                return NetworkMode.TWO_G_ONLY;
-            default:
-                return NetworkMode.UNKNOWN;
-        }
     }
 }
