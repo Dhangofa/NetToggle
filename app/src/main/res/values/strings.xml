@@ -4,6 +4,8 @@
     <string name="nettoggle_operates_faster_if_it_can_dire">NetToggle operates faster if it can directly read your SIM state. Please grant the Phone permission to eliminate system lag and enable instant resolution.</string>
     <string name="dismiss">Dismiss</string>
     <string name="grant_permission">Grant Permission</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="permission_permanently_denied_desc">Phone permission was permanently denied. Please enable Phone permission in App Settings to unlock maximum performance and eliminate lag.</string>
     <string name="routine_shortcuts">Routine Shortcuts</string>
     <string name="add_shortcut">+ Add Shortcut</string>
     <string name="execution_mode">Execution Mode</string>
