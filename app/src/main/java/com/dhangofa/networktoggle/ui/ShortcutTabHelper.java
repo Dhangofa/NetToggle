@@ -48,12 +48,15 @@ public class ShortcutTabHelper {
     private final Activity activity;
     private final AppPreferences prefs;
     private final List<View> rows = new ArrayList<>();
+    private final List<String> simDisplayList = new ArrayList<>();
+    private final List<Integer> simValueList = new ArrayList<>();
     private boolean isAuthorized = false;
     private boolean isRestoringState = false;
     private String lastSyncedSignature = null;
     private boolean isKeyboardOpen = false;
     private final Handler titleDebounceHandler = new Handler(Looper.getMainLooper());
     private Runnable pendingTitleSync = null;
+    private Runnable syncShortcutsRunnable = null;
 
     public ShortcutTabHelper(Activity activity, AppPreferences prefs) {
         this.activity = activity;
@@ -78,6 +81,7 @@ public class ShortcutTabHelper {
                 btnTestShortcut.setAlpha(alpha);
             }
         }
+        refreshCapabilities();
     }
 
     private void scheduleDebouncedSync(Runnable syncShortcuts) {
@@ -91,17 +95,9 @@ public class ShortcutTabHelper {
         titleDebounceHandler.postDelayed(pendingTitleSync, 400);
     }
 
-    public void setup() {
-        ViewGroup container = activity.findViewById(R.id.shortcutsContainer);
-        View btnAdd = activity.findViewById(R.id.btnAddShortcut);
-        TextView badgeCount = activity.findViewById(R.id.badgeShortcutCount);
-        View bannerLimitReached = activity.findViewById(R.id.bannerLimitReached);
-
-        if (container == null || btnAdd == null) return;
-
-        LayoutInflater inflater = LayoutInflater.from(activity);
-        rows.clear();
-        container.removeAllViews();
+    private void rebuildSimLists() {
+        simDisplayList.clear();
+        simValueList.clear();
 
         boolean hasSim1 = false;
         boolean hasSim2 = false;
@@ -128,9 +124,6 @@ public class ShortcutTabHelper {
             hasSim1 = true;
         }
 
-        List<String> simDisplayList = new ArrayList<>();
-        List<Integer> simValueList = new ArrayList<>();
-
         if (hasSim1) {
             simDisplayList.add(activity.getString(R.string.sim_1));
             simValueList.add(1);
@@ -143,6 +136,15 @@ public class ShortcutTabHelper {
             simDisplayList.add(activity.getString(R.string.both));
             simValueList.add(3);
         }
+    }
+
+    private void updateModesForRow(View row, String preferredMode) {
+        Spinner spinnerSim = row.findViewById(R.id.spinnerSim);
+        Spinner spinnerMode = row.findViewById(R.id.spinnerMode);
+        if (spinnerSim == null || spinnerMode == null) return;
+
+        int simPos = spinnerSim.getSelectedItemPosition();
+        int simValue = (simPos >= 0 && simPos < simValueList.size()) ? simValueList.get(simPos) : 1;
 
         AppPreferences.NetworkCapabilities deviceCaps = prefs.getDeviceCapabilities();
         if (deviceCaps == null) deviceCaps = AppPreferences.NetworkCapabilities.assumeAll();
@@ -151,16 +153,107 @@ public class ShortcutTabHelper {
         AppPreferences.NetworkCapabilities sim2Caps = prefs.getSlotCapabilities(1);
         if (sim2Caps == null) sim2Caps = deviceCaps;
 
-        AppPreferences.NetworkCapabilities bothCaps = new AppPreferences.NetworkCapabilities(
-            sim1Caps.supports2g && sim2Caps.supports2g,
-            sim1Caps.supports3g && sim2Caps.supports3g,
-            sim1Caps.supports4g && sim2Caps.supports4g,
-            sim1Caps.supports5g && sim2Caps.supports5g
-        );
+        AppPreferences.NetworkCapabilities caps;
+        if (simValue == 1) {
+            caps = sim1Caps;
+        } else if (simValue == 2) {
+            caps = sim2Caps;
+        } else {
+            caps = new AppPreferences.NetworkCapabilities(
+                sim1Caps.supports2g && sim2Caps.supports2g,
+                sim1Caps.supports3g && sim2Caps.supports3g,
+                sim1Caps.supports4g && sim2Caps.supports4g,
+                sim1Caps.supports5g && sim2Caps.supports5g
+            );
+        }
 
-        final AppPreferences.NetworkCapabilities finalSim1Caps = sim1Caps;
-        final AppPreferences.NetworkCapabilities finalSim2Caps = sim2Caps;
-        final AppPreferences.NetworkCapabilities finalBothCaps = bothCaps;
+        List<String> validModes = new ArrayList<>();
+        List<String> validDisplays = new ArrayList<>();
+
+        if (caps.supports5g) {
+            validModes.add("5G_ONLY"); validDisplays.add(activity.getString(R.string.text_5g_only));
+            validModes.add("PREF_5G"); validDisplays.add(activity.getString(R.string.pref_5g));
+        }
+        if (caps.supports4g) {
+            validModes.add("4G_ONLY"); validDisplays.add(activity.getString(R.string.text_4g_only));
+            validModes.add("PREF_4G"); validDisplays.add(activity.getString(R.string.pref_4g));
+        }
+        if (caps.supports3g) {
+            validModes.add("PREF_3G"); validDisplays.add(activity.getString(R.string.pref_3g));
+        }
+        if (caps.supports2g) {
+            validModes.add("2G_ONLY"); validDisplays.add(activity.getString(R.string.text_2g_only));
+        }
+
+        if (validModes.isEmpty()) {
+            validModes.add("PREF_4G");
+            validDisplays.add(activity.getString(R.string.pref_4g));
+        }
+
+        String currentSelectedMode = preferredMode;
+        if (currentSelectedMode == null) {
+            @SuppressWarnings("unchecked")
+            List<String> oldValidModes = (List<String>) row.getTag(R.id.spinnerMode);
+            if (oldValidModes != null && !oldValidModes.isEmpty()) {
+                int oldModePos = spinnerMode.getSelectedItemPosition();
+                if (oldModePos >= 0 && oldModePos < oldValidModes.size()) {
+                    currentSelectedMode = oldValidModes.get(oldModePos);
+                }
+            }
+        }
+
+        row.setTag(R.id.spinnerMode, validModes);
+
+        ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, validDisplays);
+        spinnerMode.setAdapter(modeAdapter);
+
+        int targetPos = -1;
+        if (currentSelectedMode != null) {
+            targetPos = validModes.indexOf(currentSelectedMode);
+        }
+        if (targetPos < 0) {
+            targetPos = 0;
+        }
+        spinnerMode.setSelection(targetPos);
+        spinnerMode.setTag(R.id.spinnerMode, targetPos);
+    }
+
+    public void refreshCapabilities() {
+        activity.runOnUiThread(() -> {
+            rebuildSimLists();
+            for (View row : rows) {
+                Spinner spinnerSim = row.findViewById(R.id.spinnerSim);
+                if (spinnerSim != null) {
+                    int currSimPos = spinnerSim.getSelectedItemPosition();
+                    int currSimVal = (currSimPos >= 0 && currSimPos < simValueList.size()) ? simValueList.get(currSimPos) : 1;
+                    ArrayAdapter<String> simAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, simDisplayList);
+                    spinnerSim.setAdapter(simAdapter);
+                    int newSimPos = simValueList.indexOf(currSimVal);
+                    if (newSimPos < 0) newSimPos = 0;
+                    spinnerSim.setSelection(newSimPos);
+                    spinnerSim.setTag(R.id.spinnerSim, newSimPos);
+                }
+                updateModesForRow(row, null);
+            }
+            if (syncShortcutsRunnable != null && !isRestoringState) {
+                syncShortcutsRunnable.run();
+            }
+        });
+    }
+
+    public void setup() {
+        ViewGroup container = activity.findViewById(R.id.shortcutsContainer);
+        View btnAdd = activity.findViewById(R.id.btnAddShortcut);
+        TextView badgeCount = activity.findViewById(R.id.badgeShortcutCount);
+        View bannerLimitReached = activity.findViewById(R.id.bannerLimitReached);
+
+        if (container == null || btnAdd == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        rows.clear();
+        container.removeAllViews();
+
+        rebuildSimLists();
 
         // Auto-save runnable that syncs preferences and system ShortcutManager
         Runnable syncShortcuts = () -> {
@@ -277,6 +370,7 @@ public class ShortcutTabHelper {
                 lastSyncedSignature = currentSignature;
             }
         };
+        this.syncShortcutsRunnable = syncShortcuts;
 
         Runnable updateIndicesAndStyles = () -> {
             for (int i = 0; i < rows.size(); i++) {
@@ -329,58 +423,8 @@ public class ShortcutTabHelper {
             if (initialSimPos < 0) initialSimPos = 0;
             spinnerSim.setSelection(initialSimPos);
 
-            Runnable populateModesForSim = () -> {
-                int simPos = spinnerSim.getSelectedItemPosition();
-                int simValue = (simPos >= 0 && simPos < simValueList.size()) ? simValueList.get(simPos) : 1;
-                AppPreferences.NetworkCapabilities caps;
-                if (simValue == 1) caps = finalSim1Caps;
-                else if (simValue == 2) caps = finalSim2Caps;
-                else caps = finalBothCaps;
-
-                List<String> validModes = new ArrayList<>();
-                List<String> validDisplays = new ArrayList<>();
-
-                if (caps.supports5g) {
-                    validModes.add("5G_ONLY"); validDisplays.add(activity.getString(R.string.text_5g_only));
-                    validModes.add("PREF_5G"); validDisplays.add(activity.getString(R.string.pref_5g));
-                }
-                if (caps.supports4g) {
-                    validModes.add("4G_ONLY"); validDisplays.add(activity.getString(R.string.text_4g_only));
-                    validModes.add("PREF_4G"); validDisplays.add(activity.getString(R.string.pref_4g));
-                }
-                if (caps.supports3g) {
-                    validModes.add("PREF_3G"); validDisplays.add(activity.getString(R.string.pref_3g));
-                }
-                if (caps.supports2g) {
-                    validModes.add("2G_ONLY"); validDisplays.add(activity.getString(R.string.text_2g_only));
-                }
-
-                if (validModes.isEmpty()) {
-                    validModes.add("PREF_4G");
-                    validDisplays.add(activity.getString(R.string.pref_4g));
-                }
-
-                row.setTag(R.id.spinnerMode, validModes);
-
-                ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, validDisplays);
-                spinnerMode.setAdapter(modeAdapter);
-
-                String modeToRestore = (String) row.getTag(R.id.btnRemoveShortcut);
-                if (modeToRestore != null) {
-                    int idx = validModes.indexOf(modeToRestore);
-                    if (idx >= 0) {
-                        spinnerMode.setSelection(idx);
-                    }
-                    row.setTag(R.id.btnRemoveShortcut, null);
-                }
-            };
-
-            if (pendingMode != null) {
-                row.setTag(R.id.btnRemoveShortcut, pendingMode);
-            }
-
-            // Immediately populate modes synchronously so validModes is never null
-            populateModesForSim.run();
+            // Immediately populate modes synchronously based on dynamic capabilities
+            updateModesForRow(row, pendingMode);
             spinnerSim.setTag(R.id.spinnerSim, initialSimPos);
             spinnerMode.setTag(R.id.spinnerMode, spinnerMode.getSelectedItemPosition());
 
@@ -391,7 +435,7 @@ public class ShortcutTabHelper {
                     Object lastSim = spinnerSim.getTag(R.id.spinnerSim);
                     if (lastSim instanceof Integer && (Integer) lastSim == position) return;
                     spinnerSim.setTag(R.id.spinnerSim, position);
-                    populateModesForSim.run();
+                    updateModesForRow(row, null);
                     syncShortcuts.run();
                 }
 
