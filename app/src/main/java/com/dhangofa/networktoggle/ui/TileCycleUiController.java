@@ -1,8 +1,8 @@
 package com.dhangofa.networktoggle.ui;
 
 /**
- * UI controller to render and manage the drag-and-drop network cycle list in the app.
- * It handles adding, removing, and reordering the network modes that the QS tile will cycle through.
+ * UI controller to render and manage the network cycle list in the app, preserving selection order.
+ * It handles adding, removing, and toggling the network modes that the QS tile will cycle through.
  */
 
 import android.app.Activity;
