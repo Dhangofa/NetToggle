@@ -610,4 +610,11 @@ public class ShortcutTabHelper {
     public int getShortcutCount() {
         return rows.size();
     }
+
+    public void destroy() {
+        if (pendingTitleSync != null) {
+            titleDebounceHandler.removeCallbacks(pendingTitleSync);
+            pendingTitleSync = null;
+        }
+    }
 }
