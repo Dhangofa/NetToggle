@@ -4,6 +4,8 @@
     <string name="nettoggle_operates_faster_if_it_can_dire">NetToggle দ্রুত কাজ করে যদি এটি সরাসরি আপনার সিমের অবস্থা পড়তে পারে। সিস্টেমের বিলম্ব দূর করতে এবং তাত্ক্ষণিক সমাধানের জন্য অনুগ্রহ করে ফোনের অনুমতি দিন।</string>
     <string name="dismiss">বাতিল করুন</string>
     <string name="grant_permission">অনুমতি দিন</string>
+    <string name="open_settings">সেটিংস খুলুন</string>
+    <string name="permission_permanently_denied_desc">ফোন অনুমতি স্থায়ীভাবে অস্বীকার করা হয়েছে। সর্বোচ্চ কর্মক্ষমতা আনলক করতে অনুগ্রহ করে অ্যাপ সেটিংসে ফোন অনুমতি সক্ষম করুন।</string>
     <string name="routine_shortcuts">রুটিন শর্টকাট</string>
     <string name="add_shortcut">+ শর্টকাট যোগ করুন</string>
     <string name="execution_mode">এক্সিকিউশন মোড</string>
