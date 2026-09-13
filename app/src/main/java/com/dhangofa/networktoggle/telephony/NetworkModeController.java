@@ -24,6 +24,10 @@ public final class NetworkModeController {
     }
 
     public CommandResult apply(NetworkMode networkMode, ExecutionMode executionMode) {
+        if (executionMode == null || executionMode == ExecutionMode.NONE) {
+            return CommandResult.failed("", "No execution mode selected.");
+        }
+
         // 1. Shizuku Fast-Path (Binder IPC)
         if (executionMode == ExecutionMode.SHIZUKU) {
             return shizukuBinderController.apply(networkMode, executionMode);
