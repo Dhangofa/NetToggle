@@ -160,9 +160,12 @@ public class NetworkTileService extends TileService {
         boolean shouldRefresh = (cachedMode == NetworkMode.UNKNOWN);
         long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
 
-        // 5 minute micro-cooldown before passively re-checking modem (or immediately if auto-restore is enabled)
+        // Balanced cooldown before passively re-checking modem:
+        // 30 seconds when auto-restore is enabled, 5 minutes for standard passive refresh.
+        // Prevents rapid-fire privileged Binder or shell reads on repeated notification shade pulls.
         boolean autoRestoreEnabled = appPreferences.isAutoRestorePreferredModeEnabled();
-        if (!shouldRefresh && (autoRestoreEnabled || System.currentTimeMillis() - lastCheck > 5 * 60 * 1000L)) {
+        long refreshInterval = autoRestoreEnabled ? 30_000L : 5 * 60_000L;
+        if (!shouldRefresh && (System.currentTimeMillis() - lastCheck > refreshInterval)) {
             shouldRefresh = true;
         }
 
@@ -244,8 +247,21 @@ public class NetworkTileService extends TileService {
         }
 
         if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
-            CommandResult result1 = null;
-            CommandResult result2 = null;
+            SimResolver.SimInfo info1 = simResolver.resolveTargetSimInfo(executionMode, com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+            SimResolver.SimInfo info2 = simResolver.resolveTargetSimInfo(executionMode, com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+
+            if (info1 == null || info2 == null) {
+                mainHandler.post(() -> {
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_no_sim_target_slot), Toast.LENGTH_SHORT).show();
+                    appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
+                    updateTileUI(appPreferences.getCachedNetworkMode());
+                    IS_SWITCHING.set(false);
+                });
+                return;
+            }
+
+            CommandResult result1 = CommandResult.failed("", "SIM 1 was not attempted.");
+            CommandResult result2 = CommandResult.failed("", "SIM 2 was not attempted.");
             try {
                 simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
                 result1 = networkModeController.apply(targetMode, executionMode);
@@ -324,7 +340,15 @@ public class NetworkTileService extends TileService {
 
             if (!isAuthError) {
                 appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
-                appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), result.getExceptionMessage());
+                String exceptionMsg = result.getExceptionMessage();
+                if (isAutoRestore) {
+                    if (exceptionMsg != null && !exceptionMsg.isEmpty()) {
+                        exceptionMsg = exceptionMsg + " (Source: Auto Restore)";
+                    } else {
+                        exceptionMsg = "Source: Auto Restore";
+                    }
+                }
+                appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), exceptionMsg);
             }
 
             NetworkMode fallbackMode = appPreferences.getCachedNetworkMode();
@@ -410,7 +434,11 @@ public class NetworkTileService extends TileService {
 
             if (isAuto) {
                 int activeSlot = simResolver.resolveTargetSlotIndex(appPreferences.getExecutionMode());
-                badge = String.valueOf(activeSlot + 1);
+                if (simResolver.isValidSlotIndex(activeSlot)) {
+                    badge = String.valueOf(activeSlot + 1);
+                } else {
+                    badge = "";
+                }
             } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_1) {
                 badge = "1";
             } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_2) {
