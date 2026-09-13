@@ -175,4 +175,29 @@
     <string name="shortcut_hash_format">#%d</string>
     <string name="auto_restore_preferred_mode">下拉通知栏时自动恢复</string>
     <string name="auto_restore_preferred_mode_description">当因运营商、发热或系统更改导致网络降级时，下拉通知栏会自动重新应用您上次切换的模式</string>
+    <string name="validation_token_required">安全令牌不能为空</string>
+    <string name="copy_token">复制令牌</string>
+    <string name="token_copied_to_clipboard">令牌已复制到剪贴板</string>
+    <string name="token_generated">已生成新令牌</string>
+    <string name="toast_adb_cmd_copied">ADB 命令已复制</string>
+    <string name="toast_broadcast_specs_copied">广播规格已复制</string>
+    <string name="toast_broadcast_sent">广播已发送：%1$s (%2$s)</string>
+    <string name="sim_both">两张</string>
+    <string name="sim_label_format">SIM %1$d</string>
+    <string name="clipboard_label_adb_cmd">ADB 命令</string>
+    <string name="clipboard_label_broadcast_specs">广播规格</string>
+    <string name="clipboard_label_automation_token">自动化令牌</string>
+    <string name="spec_action_type">操作类型</string>
+    <string name="spec_target">目标</string>
+    <string name="spec_package">包名</string>
+    <string name="spec_class">类名</string>
+    <string name="spec_extra">附加参数</string>
+
+    <!-- Execution state status strings -->
+    <string name="status_root_checking">正在检查 Root 权限…</string>
+    <string name="status_shizuku_not_running">Shizuku 未运行</string>
+    <string name="status_shizuku_authorized">Shizuku 模式已激活 &amp; 获授权！</string>
+    <string name="status_shizuku_not_granted">未授予 Shizuku 权限</string>
+    <string name="status_shizuku_requesting">正在请求 Shizuku 权限…</string>
+    <string name="status_shizuku_check_failed">Shizuku 检查失败</string>
 </resources>
