@@ -11,13 +11,11 @@ public final class NetworkModeReader {
 	private final AppPreferences appPreferences;
 	private final ShizukuBinderModeReader shizukuBinderReader;
 	private final PrivilegedModeReader privilegedModeReader;
-	private final SimResolver simResolver;
 
 	public NetworkModeReader(Context context, AppPreferences appPreferences, SimResolver simResolver) {
 		this.appPreferences = appPreferences;
 		this.shizukuBinderReader = new ShizukuBinderModeReader(simResolver);
 		this.privilegedModeReader = new PrivilegedModeReader(context, simResolver);
-		this.simResolver = simResolver;
 	}
 
 	public NetworkMode readCurrentMode() {
