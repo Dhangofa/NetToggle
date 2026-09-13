@@ -40,6 +40,7 @@ import com.dhangofa.networktoggle.util.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class ShortcutTabHelper {
@@ -257,17 +258,23 @@ public class ShortcutTabHelper {
                 prefs.saveRoutineShortcut(i, "", "NONE", 1);
             }
 
+            boolean shortcutUpdateSucceeded = true;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                 try {
                     ShortcutManager sm = activity.getSystemService(ShortcutManager.class);
                     if (sm != null) {
                         sm.setDynamicShortcuts(dynamicShortcuts);
+                    } else {
+                        shortcutUpdateSucceeded = false;
                     }
                 } catch (Exception e) {
+                    shortcutUpdateSucceeded = false;
                     Log.e("ShortcutTabHelper", "Failed to update dynamic shortcuts", e);
                 }
             }
-            lastSyncedSignature = currentSignature;
+            if (shortcutUpdateSucceeded) {
+                lastSyncedSignature = currentSignature;
+            }
         };
 
         Runnable updateIndicesAndStyles = () -> {
@@ -298,7 +305,6 @@ public class ShortcutTabHelper {
         RowAdder addRow = (savedName, pendingMode, savedSimValue) -> {
             if (rows.size() >= 4) return;
 
-            int slotIndex = rows.size() + 1;
             View row = inflater.inflate(R.layout.item_routine_shortcut, container, false);
             TextView slotLabel = row.findViewById(R.id.slotLabel);
             EditText editTitle = row.findViewById(R.id.editShortcutTitle);
@@ -490,7 +496,7 @@ public class ShortcutTabHelper {
                         intent.putExtra("sim", simValue);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                        String pinnedId = "pinned_" + selectedMode.toLowerCase() + "_sim" + simValue + "_" + UUID.randomUUID().toString().substring(0, 8);
+                        String pinnedId = "pinned_" + selectedMode.toLowerCase(Locale.ROOT) + "_sim" + simValue + "_" + UUID.randomUUID().toString().substring(0, 8);
                         ShortcutInfo pinShortcut = new ShortcutInfo.Builder(activity, pinnedId)
                                 .setShortLabel(title)
                                 .setIcon(Icon.createWithResource(activity, R.drawable.ic_magic_wand))
@@ -514,10 +520,6 @@ public class ShortcutTabHelper {
                 updateIndicesAndStyles.run();
                 syncShortcuts.run();
             });
-
-            if (pendingMode != null) {
-                row.setTag(R.id.btnRemoveShortcut, pendingMode);
-            }
 
             if (container instanceof GridLayout) {
                 GridLayout.LayoutParams glp = new GridLayout.LayoutParams();
