@@ -175,4 +175,29 @@
     <string name="shortcut_hash_format">#%d</string>
     <string name="auto_restore_preferred_mode">নোটিফিকেশন প্যানেল টানলে স্বয়ংক্রিয় পুনরুদ্ধার</string>
     <string name="auto_restore_preferred_mode_description">অপারেটর, তাপমাত্রা বা সিস্টেম পরিবর্তনের কারণে নেটওয়ার্ক ডাউনগ্রেড হলে নোটিফিকেশন প্যানেল টানলে শেষ নির্বাচিত মোডটি পুনরায় প্রয়োগ করে</string>
+    <string name="validation_token_required">সুরক্ষা টোকেন খালি হতে পারে না</string>
+    <string name="copy_token">টোকেন কপি করুন</string>
+    <string name="token_copied_to_clipboard">টোকেন ক্লিপবোর্ডে কপি করা হয়েছে</string>
+    <string name="token_generated">নতুন টোকেন তৈরি হয়েছে</string>
+    <string name="toast_adb_cmd_copied">ADB কমান্ড অনুলিপি করা হয়েছে</string>
+    <string name="toast_broadcast_specs_copied">ব্রডকাস্ট স্পেসিফিকেশন অনুলিপি করা হয়েছে</string>
+    <string name="toast_broadcast_sent">ব্রডকাস্ট পাঠানো হয়েছে: %1$s (%2$s)</string>
+    <string name="sim_both">উভয়</string>
+    <string name="sim_label_format">SIM %1$d</string>
+    <string name="clipboard_label_adb_cmd">ADB কমান্ড</string>
+    <string name="clipboard_label_broadcast_specs">ব্রডকাস্ট স্পেসিফিকেশন</string>
+    <string name="clipboard_label_automation_token">অটোমেশন টোকেন</string>
+    <string name="spec_action_type">অ্যাকশন টাইপ</string>
+    <string name="spec_target">টার্গেট</string>
+    <string name="spec_package">প্যাকেজ</string>
+    <string name="spec_class">ক্লাস</string>
+    <string name="spec_extra">অতিরিক্ত</string>
+
+    <!-- Execution state status strings -->
+    <string name="status_root_checking">রুট অনুমতি পরীক্ষা করা হচ্ছে…</string>
+    <string name="status_shizuku_not_running">Shizuku চলছে না</string>
+    <string name="status_shizuku_authorized">Shizuku মোড সক্রিয় &amp; অনুমোদিত!</string>
+    <string name="status_shizuku_not_granted">Shizuku অনুমতি দেওয়া হয়নি</string>
+    <string name="status_shizuku_requesting">Shizuku অনুমতির অনুরোধ করা হচ্ছে…</string>
+    <string name="status_shizuku_check_failed">Shizuku পরীক্ষা ব্যর্থ হয়েছে</string>
 </resources>
