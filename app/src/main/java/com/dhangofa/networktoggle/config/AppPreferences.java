@@ -353,4 +353,12 @@ public final class AppPreferences {
     public void setRoutineShortcutsInitialized(boolean initialized) {
         preferences.edit().putBoolean("routine_shortcuts_initialized", initialized).apply();
     }
+
+    public boolean hasRequestedPhonePermission() {
+        return preferences.getBoolean("phone_permission_requested", false);
+    }
+
+    public void setPhonePermissionRequested(boolean requested) {
+        preferences.edit().putBoolean("phone_permission_requested", requested).apply();
+    }
 }
