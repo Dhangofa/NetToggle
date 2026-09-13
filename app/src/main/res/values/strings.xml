@@ -8,7 +8,6 @@
     <string name="add_shortcut">+ Add Shortcut</string>
     <string name="execution_mode">Execution Mode</string>
     <string name="authorized">Authorized</string>
-    <string name="status_authorized_badge">● AUTHORIZED</string>
     <string name="setup_required">Setup Required</string>
     <string name="pending_auth">PENDING AUTH</string>
     <string name="setup_hero_subtitle">Choose your privileged execution mode</string>
@@ -21,12 +20,10 @@
     <string name="root_access_title">Root Access</string>
     <string name="superuser">Superuser</string>
     <string name="root_access_desc">Direct privilege via Magisk, KernelSU or APatch</string>
-    <string name="root_status_desc">Requires root manager installed</string>
     <string name="root_status_not_granted">Not granted • Provide privilege in root manager app</string>
     <string name="root_status_checking">Checking • Confirm prompt in root manager app...</string>
     <string name="root_status_denied">Denied / Not found • Provide privilege in root manager</string>
     <string name="root_status_active">Root granted &amp; active</string>
-    <string name="toast_requesting_root">Requesting root access. Provide privilege in root manager app (Magisk / KernelSU / APatch).</string>
     <string name="toast_root_denied">Root privilege not granted. Please provide superuser access in your root manager app.</string>
     <string name="status_root_authorized">Root mode active &amp; authorized</string>
     <string name="status_root_denied">Root permission denied or unavailable</string>
@@ -177,15 +174,6 @@
     <string name="test_broadcast_btn">Test Broadcast</string>
     <string name="standard_intent_specs">Standard Android Intent specifications</string>
     <string name="shortcut_hash_format">#%d</string>
-
-    <!-- Overall Status Card -->
-    <string name="app_not_work">App will not work</string>
-    <string name="app_work_basic">App will work</string>
-    <string name="app_ready">NetToggle is ready</string>
-    <string name="overall_status_permissions_missing">Privileged execution permissions missing</string>
-    <string name="overall_status_no_auth_desc">Authorize Root or Shizuku below to enable switching</string>
-    <string name="overall_status_no_phone_desc">Grant Phone permission to enable instant multi-SIM detection</string>
-    <string name="overall_status_ready_desc">All privileged and system permissions are active</string>
 
     <!-- Auto-restore preferred mode -->
     <string name="auto_restore_preferred_mode">Auto-Restore on shade pull</string>
