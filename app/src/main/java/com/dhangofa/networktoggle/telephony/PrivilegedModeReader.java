@@ -24,7 +24,9 @@ final class PrivilegedModeReader {
     }
 
     NetworkMode readCurrentMode(ExecutionMode executionMode, TargetSim targetSim) {
-        int targetSubId = simResolver.resolveTargetSubId(executionMode);
+        int targetSubId = targetSim != null
+                ? simResolver.resolveTargetSubId(executionMode, targetSim)
+                : simResolver.resolveTargetSubId(executionMode);
 
         // NATIVE API FAST-PATH:
         // Only works reliably on Android 9 (Pie) and below. Android 10+ will throw SecurityException.
