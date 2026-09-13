@@ -125,7 +125,7 @@ public final class AppPreferences {
     public String getAutomationToken() {
         String token = preferences.getString(KEY_AUTOMATION_TOKEN, "");
         if (token == null || token.trim().isEmpty()) {
-            token = java.util.UUID.randomUUID().toString().substring(0, 8);
+            token = java.util.UUID.randomUUID().toString().replace("-", "");
             preferences.edit().putString(KEY_AUTOMATION_TOKEN, token).apply();
         }
         return token;
