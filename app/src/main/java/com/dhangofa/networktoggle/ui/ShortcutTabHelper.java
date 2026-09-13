@@ -173,7 +173,7 @@ public class ShortcutTabHelper {
 
             int count = rows.size();
             if (badgeCount != null) {
-                badgeCount.setText(String.format(activity.getString(R.string.routine_shortcuts_count_format), count));
+                badgeCount.setText(activity.getString(R.string.routine_shortcuts_count_format, count));
             }
 
             if (bannerLimitReached != null) {
@@ -266,6 +266,7 @@ public class ShortcutTabHelper {
                         sm.setDynamicShortcuts(dynamicShortcuts);
                     } else {
                         shortcutUpdateSucceeded = false;
+                        Log.e("ShortcutTabHelper", "ShortcutManager service is unavailable");
                     }
                 } catch (Exception e) {
                     shortcutUpdateSucceeded = false;
@@ -306,7 +307,6 @@ public class ShortcutTabHelper {
             if (rows.size() >= 4) return;
 
             View row = inflater.inflate(R.layout.item_routine_shortcut, container, false);
-            TextView slotLabel = row.findViewById(R.id.slotLabel);
             EditText editTitle = row.findViewById(R.id.editShortcutTitle);
             Spinner spinnerSim = row.findViewById(R.id.spinnerSim);
             Spinner spinnerMode = row.findViewById(R.id.spinnerMode);
@@ -575,9 +575,7 @@ public class ShortcutTabHelper {
 
     public void setKeyboardOpen(boolean open) {
         this.isKeyboardOpen = open;
-        if (open) {
-            this.updateFabVisibility();
-        }
+        this.updateFabVisibility();
     }
 
     public boolean isShortcutTabActive() {
