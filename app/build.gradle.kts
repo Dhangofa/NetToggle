@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId = "com.dhangofa.networktoggle"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 33
         versionName = "1.1.0"
     }
