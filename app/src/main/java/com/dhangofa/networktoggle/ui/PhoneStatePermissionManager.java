@@ -47,6 +47,7 @@ public class PhoneStatePermissionManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean granted = activity.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
             if (!granted) {
+                isGrantedCallbackDispatched = false;
                 boolean shouldShowRationale = activity.shouldShowRequestPermissionRationale(android.Manifest.permission.READ_PHONE_STATE);
                 if (shouldShowRationale) {
                     showPermissionBottomSheet();
@@ -88,10 +89,12 @@ public class PhoneStatePermissionManager {
         if (requestCode == reqCode) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (permissionDialog != null && permissionDialog.isShowing()) permissionDialog.dismiss();
+                isGrantedCallbackDispatched = true;
                 if (onGranted != null) {
                     onGranted.run();
                 }
             } else {
+                isGrantedCallbackDispatched = false;
                 showPermissionBottomSheet();
             }
         }
