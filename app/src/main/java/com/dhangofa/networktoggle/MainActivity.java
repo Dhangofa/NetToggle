@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         this.tileCycleUiController = new TileCycleUiController(this, tileCycleManager, this.appPreferences);
         this.modeController = new NetworkModeController(this.simResolver);
         this.modeReader = new NetworkModeReader((Context)this, this.appPreferences, this.simResolver);
-        this.permissionManager = new PhoneStatePermissionManager(this, REQ_CODE_PHONE_STATE, this::updateCapabilities);
+        this.permissionManager = new PhoneStatePermissionManager(this, REQ_CODE_PHONE_STATE, this.appPreferences, this::updateCapabilities);
         
         this.executionStateController = new ExecutionStateController(this, this.appPreferences, (text, color) -> {
             if (this.executionModeUiController != null) {
