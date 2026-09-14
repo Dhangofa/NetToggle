@@ -1,37 +1,49 @@
-NetToggle is a lightweight Android Quick Settings (QS) tile app for switching cellular network modes directly from Quick Settings. Many phones and carrier configurations hide or limit advanced network mode options, especially strict 5G/4G switching. NetToggle uses privileged shell access through Root or Shizuku to run Android telephony commands and apply selected network modes where supported by the device, ROM, modem, and carrier.<br><br>
-
-<b>⚙️ NETWORK MODES</b><br>
-<b>5G Only</b> Attempts to keep the selected SIM on 5G-only mode where supported.<br>
-<b>4G Only</b>: Attempts to keep the selected SIM on 4G/LTE-only mode where supported.<br>
-<b>Preferred 5G</b>: Sets 5G as the preferred network type with fallback behavior controlled by the device and carrier.<br>
-<b>Preferred 4G</b>: Sets 4G/LTE as the preferred network type with fallback behavior controlled by the device and carrier.<br>
-<b>Preferred 3G</b>: Sets 3G (WCDMA/UMTS) as the preferred network type for legacy connectivity.<br>
-<b>2G Only</b>: Locks the device to 2G (GSM) for maximum battery savings where legacy networks still exist.<br><br>
-
-<b>🔄 QUICK TILE CYCLE</b><br>
-<b>Configurable Sequence</b>: Completely customize your QS tile behavior. Pick a cycle of 2 or 3 of your most-used network modes.<br>
-<b>Dynamic Filtering</b>: NetToggle's smart capability resolver automatically evaluates your hardware and global carrier configurations. It dynamically hides 2G or 3G options if your carrier has sunset those legacy networks (utilizing a built-in global LTE-and-above registry covering the USA, Japan, Australia, Taiwan, Singapore, and South Korea).<br><br>
-
-<b>📱 TARGET SIM</b><br>
-<b>Auto</b>: Uses native API fast-paths to instantly resolve your active data subscription and map it to the correct physical SIM slot.<br>
-<b>SIM 1 & SIM 2</b>: Manually bypass auto-detection and apply network mode changes explicitly to physical slot 1 or 2.<br><br>
-
-<b>🔌 REQUIREMENTS</b><br>
-<b>Root Mode</b>: Uses su access from solutions such as Magisk, APatch, or KernelSU.<br>
-<b>Shizuku Mode</b>: Uses Shizuku's ADB shell permission path without requiring full system root, complete with passive background binder checks.<br><br>
-
-<b>🛠️ DESIGN & FEATURES></b><br>
-<b>Modern UI Overhaul</b>: A lightweight, single-screen interface built with a native morphing carousel, edge-to-edge layout, adaptive 3D icons (API 26+), and pill-shaped segmented controls. No heavy bloat.<br>
-<b>Interactive Setup Guide</b>: A visually polished onboarding carousel guides you through Execution Modes, Target SIMs & Tile Cycle, and QS tile setup.<br>
-<b>Deep Diagnostic Engine</b>: Instantly troubleshoot failures. NetToggle now captures deep telemetry (exit codes, stdout, stderr, exceptions) when a Root or Shizuku command fails, viewable in a copyable diagnostic dialog.<br>
-<b>Lightweight Operation</b>: No background polling and no continuous service.<br><br>
-
+NetToggle is a lightweight Android Quick Settings (QS) tile app for cellular network control. Create custom tile cycles, target one or both SIMs, build shortcuts, automate changes, and troubleshoot failures with detailed diagnostics.<br><br>
+<b>⚙️ NETWORK MODES</b>
+<ul>
+<li><b>Preferred 5G (5G/4G/3G/2G)</b>: Recommended for daily use. Allows 5G SA and NSA, including UW, UC, 5G+, or 5G++ where supported, with LTE and legacy fallback.</li>
+<li><b>5G Only (NR Only)</b>: Disables 4G, 3G, and 2G. Intended for 5G SA networks. Service and calls may fail on NSA networks or without SA and VoNR.</li>
+<li><b>Preferred 4G (4G/3G/2G)</b>: Disables 5G while retaining LTE and legacy fallback. Useful for battery saving, reduced heat, or unstable 5G.</li>
+<li><b>4G Only (LTE/LTE-A)</b>: Locks to LTE without 3G/2G fallback. Calls require VoLTE; carrier aggregation is controlled by the modem and network.</li>
+<li><b>Preferred 3G (3G/2G)</b>: Disables 4G and 5G while allowing supported 3G and 2G networks.</li>
+<li><b>2G Only (GSM/EDGE)</b>: Locks to 2G where legacy service remains available.</li>
+</ul>
+If calls or service fail in an Only mode, return to Preferred 5G or Preferred 4G.<br><br>
+<b>🔄 QUICK TILE CYCLE</b>
+<ul>
+<li><b>Custom Sequence</b>: Choose an ordered cycle of 2 or 3 modes.</li>
+<li><b>Live State</b>: Shows the active mode with an Auto, SIM 1, SIM 2, or Both badge.</li>
+<li><b>Auto Restore</b>: Optionally restores the last selected mode if Android, thermal management, or the carrier changes it.</li>
+<li><b>Efficient Refresh</b>: Controlled checks avoid continuous polling.</li>
+</ul>
+<b>📱 TARGET SIM</b>
+<ul>
+<li><b>Auto</b>: Resolves the active data subscription and physical SIM slot.</li>
+<li><b>SIM 1 or SIM 2</b>: Applies changes to the selected SIM.</li>
+<li><b>Both SIMs</b>: Offers mutually supported modes, applies changes to both, and reports partial failures.</li>
+</ul>
+If Auto detection fails, select a SIM manually.<br><br>
+<b>🪄 SHORTCUTS & ROUTINES</b><br>
+Create up to 4 capability-aware actions with custom names, modes, and SIM targets. Use app shortcuts, pin actions, or integrate with supported OEM routines.<br><br>
+<b>📡 BROADCAST AUTOMATION</b><br>
+Integrate with Tasker, MacroDroid, Automate, and similar tools. External automation is disabled by default and requires opt-in.<br><br>
+<b>🔌 REQUIREMENTS & PERMISSIONS</b>
+<ul>
+<li><b>Root or Shizuku Required</b>: Either must be active and authorized. Shizuku is recommended and can run through Root, ADB, or Wireless Debugging. Trusted forks may add start on boot, watchdog, or TCP mode. Root supports Magisk, KernelSU, APatch, and compatible su solutions.</li>
+<li><b>Read Phone State</b>: Optional permission for faster native SIM and capability detection. Without it, privileged shell fallbacks are used where available.</li>
+<li><b>Run at Startup</b>: Briefly clears stale tile state after boot or app update. No persistent background service is used.</li>
+</ul>
+Some root managers require manual authorization. Shizuku users must authorize NetToggle.<br><br>
+<b>🧠 SMART CAPABILITY FILTERING</b><br>
+Evaluates device, SIM, and carrier information to hide unsupported modes. Both-SIM operation offers mutually supported modes. A registry helps hide legacy options on known 2G/3G sunset networks.<br><br>
+<b>🎨 DESIGN & THEMES</b><br>
+Portrait and landscape layouts include guided setup and Auto, Light, Dark, and AMOLED themes.<br><br>
+<b>🛠️ DIAGNOSTICS</b><br>
+Copyable reports include commands, exit codes, output, exceptions, execution state, and SIM resolution.<br><br>
 <b>💻 COMPATIBILITY</b><br>
-<b>Seamless Legacy Support (Android 7-11)</b>: Bypasses missing framework commands on older devices by utilizing a standalone, headless Java reflection payload executed natively via app_process.<br>
-<b>Broad Android Support</b>: Fully supports Android 7.0 (API 24) through Android 16 (API 36).<br><br>
-
-Network mode support may vary depending on Android version, OEM skin, ROM, modem, SIM setup, and carrier restrictions.<br><br>
-
-<b>🛡️ PRIVACY</b><br>
-<b>No Trackers</b>: No ads, analytics, telemetry, or tracking SDKs.<br>
-<b>No Internet Permission</b>: NetToggle works completely offline. It does not collect, store, or transmit user data.
+Supports Android 7.0 and newer. Availability varies by Android version, OEM, ROM, modem, SIM, local network, and carrier.<br><br>
+<b>🛡️ PRIVACY</b>
+<ul>
+<li>No advertisements, analytics, telemetry, or trackers.</li>
+<li>No Internet permission or transmission of user data.</li>
+</ul>
