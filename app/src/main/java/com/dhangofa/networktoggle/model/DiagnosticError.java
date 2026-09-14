@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.model;
 
+/**
+ * Tracks diagnostic errors (like Shizuku Binder death, or Root permission denied)
+ * to display meaningful error banners in the app.
+ */
+
 public class DiagnosticError {
     public final String command;
     public final int exitCode;

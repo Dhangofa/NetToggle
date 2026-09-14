@@ -1,18 +1,16 @@
 package com.dhangofa.networktoggle;
-import android.os.Build;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.graphics.drawable.Icon;
+/**
+ * Quick Settings (QS) Tile Service.
+ * This handles the actual toggle button that sits in the Android notification shade.
+ * When tapped, it reads the current network mode, figures out the next mode based on the configured cycle,
+ * and executes the change using the chosen backend (Root/Shizuku).
+ * It also dynamically draws the tile icon to reflect the currently active mode.
+ */
 import android.os.Handler;
 import android.os.Looper;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import android.content.Intent;
-import android.app.PendingIntent;
 import rikka.shizuku.Shizuku;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
@@ -25,24 +23,15 @@ import com.dhangofa.networktoggle.telephony.NetworkModeController;
 import com.dhangofa.networktoggle.telephony.NetworkModeReader;
 import com.dhangofa.networktoggle.telephony.SimResolver;
 import com.dhangofa.networktoggle.cycle.TileCycleManager;
+import com.dhangofa.networktoggle.util.AppExecutors;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.dhangofa.networktoggle.ui.TileIconManager;
+
 public class NetworkTileService extends TileService {
-    private static final ExecutorService EXECUTOR =
-            Executors.newSingleThreadExecutor();
     private static final AtomicBoolean IS_SWITCHING =
             new AtomicBoolean(false);
-
-    private static Icon icon4g;
-    private static Icon icon5g;
-    private static Icon iconP5g;
-    private static Icon iconP4g;
-    private static Icon iconP3g;
-    private static Icon icon2g;
-    private static Icon iconUnknown;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -51,6 +40,55 @@ public class NetworkTileService extends TileService {
     private NetworkModeController networkModeController;
     private TileCycleManager tileCycleManager;
     private com.dhangofa.networktoggle.telephony.SimResolver simResolver;
+
+    private final Runnable shizukuGraceCheckRunnable = () -> {
+        if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+            boolean isShizukuOk = false;
+            try {
+                isShizukuOk = Shizuku.pingBinder()
+                        && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+            } catch (Throwable t) {
+                isShizukuOk = false;
+            }
+
+            int currentError = appPreferences.getTileErrorState();
+            if (!isShizukuOk && currentError != AppPreferences.TILE_ERROR_SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                updateTileUI(appPreferences.getCachedNetworkMode());
+            } else if (isShizukuOk && currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                updateTileUI(appPreferences.getCachedNetworkMode());
+            }
+        }
+    };
+
+    private final Shizuku.OnBinderReceivedListener binderReceivedListener = () ->
+        mainHandler.post(() -> {
+            mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+            if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                boolean isShizukuOk = false;
+                try {
+                    isShizukuOk = Shizuku.pingBinder()
+                            && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+                } catch (Throwable ignored) {}
+
+                if (isShizukuOk) {
+                    if (appPreferences.getTileErrorState() == AppPreferences.TILE_ERROR_SHIZUKU) {
+                        appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                    }
+                    updateTileUI(appPreferences.getCachedNetworkMode());
+                }
+            }
+        });
+
+    private final Shizuku.OnBinderDeadListener binderDeadListener = () ->
+        mainHandler.post(() -> {
+            mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+            if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                updateTileUI(appPreferences.getCachedNetworkMode());
+            }
+        });
 
     @Override
     public void onCreate() {
@@ -62,38 +100,80 @@ public class NetworkTileService extends TileService {
         simResolver = new com.dhangofa.networktoggle.telephony.SimResolver(this, appPreferences);
         networkModeReader = new com.dhangofa.networktoggle.telephony.NetworkModeReader(this, appPreferences, simResolver);
         networkModeController = new NetworkModeController(simResolver);
+
+        try {
+            Shizuku.addBinderReceivedListenerSticky(binderReceivedListener);
+            Shizuku.addBinderDeadListener(binderDeadListener);
+        } catch (Throwable ignored) {}
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mainHandler.removeCallbacksAndMessages(null);
+        try {
+            Shizuku.removeBinderReceivedListener(binderReceivedListener);
+            Shizuku.removeBinderDeadListener(binderDeadListener);
+        } catch (Throwable ignored) {}
+    }
+
+    @Override
+    public void onStopListening() {
+        super.onStopListening();
+        mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
     }
 
     @Override
     public void onStartListening() {
         super.onStartListening();
-        
+
         // Passive Shizuku Check
         if (appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
             boolean isShizukuOk = false;
             try {
-                isShizukuOk = rikka.shizuku.Shizuku.pingBinder() && rikka.shizuku.Shizuku.checkSelfPermission() == android.content.pm.PackageManager.PERMISSION_GRANTED;
+                isShizukuOk = Shizuku.pingBinder()
+                        && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
             } catch (Throwable t) {
                 isShizukuOk = false;
             }
-        
+
             int currentError = appPreferences.getTileErrorState();
-            if (!isShizukuOk && currentError != AppPreferences.TILE_ERROR_SHIZUKU) {
-                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
-            } else if (isShizukuOk && currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
-                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+            if (isShizukuOk) {
+                if (currentError == AppPreferences.TILE_ERROR_SHIZUKU) {
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                }
+            } else {
+                // On cold start, Shizuku IPC handshake takes ~20-50ms to bind.
+                // Do not prematurely mark tile as dead; give it a 500ms grace check.
+                mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+                mainHandler.postDelayed(shizukuGraceCheckRunnable, 500);
             }
         }
 
         NetworkMode cachedMode = appPreferences.getCachedNetworkMode();
         updateTileUI(cachedMode);
 
-        if (appPreferences.getExecutionMode() == ExecutionMode.NONE
-                || cachedMode != NetworkMode.UNKNOWN) {
+        if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
             return;
         }
 
-        EXECUTOR.execute(() -> {
+        boolean shouldRefresh = (cachedMode == NetworkMode.UNKNOWN);
+        long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
+
+        // Balanced cooldown before passively re-checking modem:
+        // 30 seconds when auto-restore is enabled, 5 minutes for standard passive refresh.
+        // Prevents rapid-fire privileged Binder or shell reads on repeated notification shade pulls.
+        boolean autoRestoreEnabled = appPreferences.isAutoRestorePreferredModeEnabled();
+        long refreshInterval = autoRestoreEnabled ? 30_000L : 5 * 60_000L;
+        if (!shouldRefresh && (System.currentTimeMillis() - lastCheck > refreshInterval)) {
+            shouldRefresh = true;
+        }
+
+        if (!shouldRefresh) {
+            return;
+        }
+
+        AppExecutors.executeTelephony(() -> {
             NetworkMode realMode = networkModeReader.readCurrentMode();
 
             mainHandler.post(() -> {
@@ -101,13 +181,28 @@ public class NetworkTileService extends TileService {
                  * A tile click or another operation may have updated the state
                  * while this asynchronous readback was running.
                  */
-                if (appPreferences.getCachedNetworkMode()
-                        != NetworkMode.UNKNOWN) {
+                long newCheck = appPreferences.getLastNetworkCheckTimestamp();
+                if (newCheck > lastCheck && cachedMode != NetworkMode.UNKNOWN) {
                     return;
                 }
 
                 if (realMode != NetworkMode.UNKNOWN) {
                     appPreferences.setCachedNetworkMode(realMode);
+                    appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
+
+                    // Auto-restore preferred mode if user enabled it and OS/carrier changed mode
+                    NetworkMode preferredMode = appPreferences.getLastUserSelectedMode();
+                    if (appPreferences.isAutoRestorePreferredModeEnabled()
+                            && preferredMode != NetworkMode.UNKNOWN
+                            && realMode != preferredMode
+                            && IS_SWITCHING.compareAndSet(false, true)) {
+                        updateTileSwitchingUI();
+                        AppExecutors.executeTelephony(() -> {
+                            applyModeInternal(preferredMode, appPreferences.getExecutionMode(), true);
+                        });
+                        return;
+                    }
+
                     updateTileUI(realMode);
                 }
             });
@@ -134,11 +229,30 @@ public class NetworkTileService extends TileService {
         NetworkMode nextMode = tileCycleManager.getNextMode(currentMode);
         updateTileSwitchingUI();
 
-        EXECUTOR.execute(() -> {
-            int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
-            if (!simResolver.isValidSlotIndex(slotIndex)) {
+        AppExecutors.executeTelephony(() -> {
+            applyModeInternal(nextMode, executionMode, false);
+        });
+    }
+
+    private void applyModeInternal(NetworkMode targetMode, ExecutionMode executionMode, boolean isAutoRestore) {
+        CommandResult result;
+
+        // Cold-start binder latch: wait briefly (up to 300ms) for Shizuku binder to attach if needed
+        if (executionMode == ExecutionMode.SHIZUKU && !Shizuku.pingBinder()) {
+            for (int i = 0; i < 6 && !Shizuku.pingBinder(); i++) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignored) {}
+            }
+        }
+
+        if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.BOTH) {
+            SimResolver.SimInfo info1 = simResolver.resolveTargetSimInfo(executionMode, com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+            SimResolver.SimInfo info2 = simResolver.resolveTargetSimInfo(executionMode, com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+
+            if (info1 == null || info2 == null) {
                 mainHandler.post(() -> {
-                    Toast.makeText(getApplicationContext(), "No SIM card found in target slot.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_no_sim_target_slot), Toast.LENGTH_SHORT).show();
                     appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
                     updateTileUI(appPreferences.getCachedNetworkMode());
                     IS_SWITCHING.set(false);
@@ -146,117 +260,105 @@ public class NetworkTileService extends TileService {
                 return;
             }
 
-            CommandResult result = networkModeController.apply(
-                    nextMode,
-                    executionMode
-            );
+            CommandResult result1 = CommandResult.failed("", "SIM 1 was not attempted.");
+            CommandResult result2 = CommandResult.failed("", "SIM 2 was not attempted.");
+            try {
+                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_1);
+                result1 = networkModeController.apply(targetMode, executionMode);
 
-            if (result.isSuccess()) {
-                appPreferences.setCachedNetworkMode(nextMode);
-                appPreferences.setAutoSimError(false);
-                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                simResolver.setOverrideTargetSim(com.dhangofa.networktoggle.model.TargetSim.SIM_2);
+                result2 = networkModeController.apply(targetMode, executionMode);
+            } finally {
+                simResolver.setOverrideTargetSim(null);
+            }
+
+            if (result1.isSuccess() && result2.isSuccess()) {
+                result = CommandResult.completed("", 0, "Applied to both SIMs", "");
+            } else if (result1.isSuccess()) {
+                result = CommandResult.failed("", "Failed to apply to SIM 2. Err: " + result2.getStderr());
+            } else if (result2.isSuccess()) {
+                result = CommandResult.failed("", "Failed to apply to SIM 1. Err: " + result1.getStderr());
+            } else {
+                result = result1;
+            }
+        } else {
+            int slotIndex = simResolver.resolveTargetSlotIndex(executionMode);
+            if (!simResolver.isValidSlotIndex(slotIndex)) {
                 mainHandler.post(() -> {
-                    updateTileUI(nextMode);
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_no_sim_target_slot), Toast.LENGTH_SHORT).show();
+                    appPreferences.onTargetSimChanged(com.dhangofa.networktoggle.model.TargetSim.AUTO);
+                    updateTileUI(appPreferences.getCachedNetworkMode());
                     IS_SWITCHING.set(false);
                 });
-            } else {
-                // Command failed! Check for permission failures first.
-                boolean isAuthError = false;
-                if (executionMode == ExecutionMode.SHIZUKU) {
-                    try {
-                        if (!Shizuku.pingBinder() || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-                            isAuthError = true;
-                            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
-                        }
-                    } catch (Throwable t) {
+                return;
+            }
+
+            result = networkModeController.apply(
+                    targetMode,
+                    executionMode
+            );
+        }
+
+        if (result.isSuccess()) {
+            appPreferences.setCachedNetworkMode(targetMode);
+            if (!isAutoRestore) {
+                appPreferences.setLastUserSelectedMode(targetMode);
+            }
+            appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
+            appPreferences.setAutoSimError(false);
+            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+            mainHandler.post(() -> {
+                updateTileUI(targetMode);
+                IS_SWITCHING.set(false);
+            });
+        } else {
+            // Command failed! Check for permission failures first.
+            boolean isAuthError = false;
+            if (executionMode == ExecutionMode.SHIZUKU) {
+                try {
+                    if (!Shizuku.pingBinder() || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
                         isAuthError = true;
                         appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
                     }
-                } else if (executionMode == ExecutionMode.ROOT) {
-                    try {
-                        Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", "true"});
-                        int exitCode = p.waitFor();
-                        if (exitCode != 0) {
-                            isAuthError = true;
-                            appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
-                        }
-                    } catch (Exception e) {
+                } catch (Throwable t) {
+                    isAuthError = true;
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_SHIZUKU);
+                }
+            } else if (executionMode == ExecutionMode.ROOT) {
+                try {
+                    Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", "true"});
+                    int exitCode = p.waitFor();
+                    if (exitCode != 0) {
                         isAuthError = true;
                         appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
                     }
+                } catch (Exception e) {
+                    isAuthError = true;
+                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_ROOT);
                 }
-
-                if (!isAuthError) {
-                    appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
-                    appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), result.getExceptionMessage());
-                }
-
-                mainHandler.post(() -> {
-                    updateTileUI(currentMode);
-                    if (appPreferences.hasAutoSimError()) {
-                        showAutoSimErrorToast();
-                    }
-                    IS_SWITCHING.set(false);
-                });
             }
-        });
-    }
 
-    private Icon createTextOnlyIcon(String text) {
-        int size = 256;
-        Bitmap bitmap = Bitmap.createBitmap(
-                size,
-                size,
-                Bitmap.Config.ARGB_8888
-        );
-        Canvas canvas = new Canvas(bitmap);
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
-        paint.setTypeface(Typeface.create(
-                "sans-serif-condensed",
-                Typeface.BOLD
-        ));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(190f);
-
-        float width = paint.measureText(text);
-        if (width > 240f) {
-            paint.setTextScaleX(240f / width);
-        }
-
-        Paint.FontMetrics metrics = paint.getFontMetrics();
-        float y = (size / 2f) - (metrics.descent + metrics.ascent) / 2f;
-        canvas.drawText(text, size / 2f, y, paint);
-
-        return Icon.createWithBitmap(bitmap);
-    }
-
-    private Icon getCachedIcon(String text) {
-        switch (text) {
-            case "4G":
-                if (icon4g == null) icon4g = createTextOnlyIcon("4G");
-                return icon4g;
-            case "5G":
-                if (icon5g == null) icon5g = createTextOnlyIcon("5G");
-                return icon5g;
-            case "P5G":
-                if (iconP5g == null) iconP5g = createTextOnlyIcon("P5G");
-                return iconP5g;
-            case "P4G":
-                if (iconP4g == null) iconP4g = createTextOnlyIcon("P4G");
-                return iconP4g;
-            case "P3G":
-                if (iconP3g == null) iconP3g = createTextOnlyIcon("P3G");
-                return iconP3g;
-            case "2G":
-                if (icon2g == null) icon2g = createTextOnlyIcon("2G");
-                return icon2g;
-            default:
-                if (iconUnknown == null) {
-                    iconUnknown = createTextOnlyIcon("?");
+            if (!isAuthError) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_CMD);
+                String exceptionMsg = result.getExceptionMessage();
+                if (isAutoRestore) {
+                    if (exceptionMsg != null && !exceptionMsg.isEmpty()) {
+                        exceptionMsg = exceptionMsg + " (Source: Auto Restore)";
+                    } else {
+                        exceptionMsg = "Source: Auto Restore";
+                    }
                 }
-                return iconUnknown;
+                appPreferences.setLastError(result.getCommand(), result.getExitCode(), result.getStdout(), result.getStderr(), exceptionMsg);
+            }
+
+            NetworkMode fallbackMode = appPreferences.getCachedNetworkMode();
+            mainHandler.post(() -> {
+                updateTileUI(fallbackMode);
+                if (appPreferences.hasAutoSimError()) {
+                    showAutoSimErrorToast();
+                }
+                IS_SWITCHING.set(false);
+            });
         }
     }
 
@@ -265,8 +367,8 @@ public class NetworkTileService extends TileService {
         if (tile == null) return;
 
         tile.setState(Tile.STATE_INACTIVE);
-        tile.setLabel("Switching...");
-        tile.setIcon(getCachedIcon("?"));
+        tile.setLabel(getString(R.string.tile_switching));
+        tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
         tile.updateTile();
     }
 
@@ -279,21 +381,32 @@ public class NetworkTileService extends TileService {
 
         int errorState = appPreferences.getTileErrorState();
         if (errorState == AppPreferences.TILE_ERROR_SHIZUKU) {
-            tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel("Shizuku Unavailable");
-            tile.setIcon(getCachedIcon("?"));
-            tile.updateTile();
-            return;
+            boolean isActuallyOk = false;
+            try {
+                isActuallyOk = Shizuku.pingBinder()
+                        && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+            } catch (Throwable ignored) {}
+
+            if (isActuallyOk) {
+                appPreferences.setTileErrorState(AppPreferences.TILE_ERROR_NONE);
+                errorState = AppPreferences.TILE_ERROR_NONE;
+            } else {
+                tile.setState(Tile.STATE_UNAVAILABLE);
+                tile.setLabel(getString(R.string.tile_shizuku_unavailable));
+                tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
+                tile.updateTile();
+                return;
+            }
         } else if (errorState == AppPreferences.TILE_ERROR_ROOT) {
             tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel("Root Unavailable");
-            tile.setIcon(getCachedIcon("?"));
+            tile.setLabel(getString(R.string.tile_root_unavailable));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
             tile.updateTile();
             return;
         } else if (errorState == AppPreferences.TILE_ERROR_CMD) {
             tile.setState(Tile.STATE_INACTIVE);
-            tile.setLabel("Error Check App");
-            tile.setIcon(getCachedIcon("?"));
+            tile.setLabel(getString(R.string.tile_error_check_app));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
             tile.updateTile();
             return;
         }
@@ -301,31 +414,49 @@ public class NetworkTileService extends TileService {
         if (mode == NetworkMode.UNKNOWN) {
             if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
                 tile.setState(Tile.STATE_UNAVAILABLE);
-                tile.setLabel("Setup Required");
+                tile.setLabel(getString(R.string.tile_setup_required));
             } else {
                 NetworkMode firstMode = tileCycleManager.getFirstMode();
 
                 tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel("Tap to Set " + firstMode.getTileLabel());
+                tile.setLabel(getString(R.string.tile_tap_to_set, firstMode.getTileLabel()));
             }
 
-            tile.setIcon(getCachedIcon("?"));
+            tile.setIcon(TileIconManager.getCachedIcon("?", "", false));
         } else {
             tile.setState(Tile.STATE_ACTIVE);
             tile.setLabel(mode.getTileLabel());
-            tile.setIcon(getCachedIcon(mode.getIconText()));
+
+            // Determine badge and auto state
+            com.dhangofa.networktoggle.model.TargetSim targetSim = appPreferences.getTargetSim();
+            String badge = "";
+            boolean isAuto = targetSim == com.dhangofa.networktoggle.model.TargetSim.AUTO;
+
+            if (isAuto) {
+                int activeSlot = simResolver.resolveTargetSlotIndex(appPreferences.getExecutionMode());
+                if (simResolver.isValidSlotIndex(activeSlot)) {
+                    badge = String.valueOf(activeSlot + 1);
+                } else {
+                    badge = "";
+                }
+            } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_1) {
+                badge = "1";
+            } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.SIM_2) {
+                badge = "2";
+            } else if (targetSim == com.dhangofa.networktoggle.model.TargetSim.BOTH) { // Future proofing for BOTH
+                badge = "+";
+            }
+
+            tile.setIcon(TileIconManager.getCachedIcon(mode.getIconText(), badge, isAuto));
         }
 
         tile.updateTile();
     }
 
-
-
     private void showAutoSimErrorToast() {
         Toast.makeText(
                 this,
-                "Unable to detect active data SIM automatically. "
-                        + "Please choose SIM from the app.",
+                getString(R.string.toast_auto_sim_failed),
                 Toast.LENGTH_LONG
         ).show();
     }

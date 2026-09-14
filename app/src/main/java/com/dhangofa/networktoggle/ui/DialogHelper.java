@@ -1,0 +1,131 @@
+package com.dhangofa.networktoggle.ui;
+
+/**
+ * Helper to build and show the various popup dialogs in the app
+ * (like the permission bottom sheet or the diagnostic error dialog).
+ */
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.dhangofa.networktoggle.R;
+import com.dhangofa.networktoggle.config.AppPreferences;
+import com.dhangofa.networktoggle.telephony.SimResolver;
+import com.dhangofa.networktoggle.util.DiagnosticReporter;
+
+public final class DialogHelper {
+
+    private DialogHelper() {}
+
+    public static Dialog buildPermissionBottomSheet(Activity activity, Runnable onGrantClicked) {
+        return buildPermissionBottomSheet(activity, false, onGrantClicked, null);
+    }
+
+    public static Dialog buildPermissionBottomSheet(
+            Activity activity,
+            boolean isPermanentlyDenied,
+            Runnable onActionClicked,
+            Runnable onDismissClicked
+    ) {
+        Dialog dialog = new Dialog(activity, R.style.TransparentBottomSheetStyle);
+        View view = activity.getLayoutInflater().inflate(R.layout.bottom_sheet_permission, null);
+
+        TextView txtDesc = view.findViewById(R.id.txtPermissionDesc);
+        Button btnGrant = view.findViewById(R.id.btnGrantPermission);
+        Button btnDismiss = view.findViewById(R.id.btnDismissPermission);
+
+        if (isPermanentlyDenied) {
+            if (txtDesc != null) {
+                txtDesc.setText(R.string.permission_permanently_denied_desc);
+            }
+            if (btnGrant != null) {
+                btnGrant.setText(R.string.open_settings);
+            }
+        } else {
+            if (txtDesc != null) {
+                txtDesc.setText(R.string.nettoggle_operates_faster_if_it_can_dire);
+            }
+            if (btnGrant != null) {
+                btnGrant.setText(R.string.grant_permission);
+            }
+        }
+
+        if (btnDismiss != null) {
+            btnDismiss.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onDismissClicked != null) {
+                    onDismissClicked.run();
+                }
+            });
+        }
+
+        if (btnGrant != null) {
+            btnGrant.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onActionClicked != null) {
+                    onActionClicked.run();
+                }
+            });
+        }
+
+        dialog.setOnCancelListener(d -> {
+            if (onDismissClicked != null) {
+                onDismissClicked.run();
+            }
+        });
+
+        dialog.setContentView(view);
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.setGravity(Gravity.BOTTOM);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        return dialog;
+    }
+
+    public static Dialog buildDiagnosticDialog(Activity activity, AppPreferences appPreferences, SimResolver simResolver, Runnable onClose) {
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_diagnostic);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        TextView reportText = dialog.findViewById(R.id.diagnosticReportText);
+        if (reportText != null) {
+            String report = DiagnosticReporter.generateReport(activity, appPreferences, simResolver);
+            reportText.setText(report);
+        }
+
+        View btnClose = dialog.findViewById(R.id.btnCloseDiagnostic);
+        if (btnClose != null) {
+            btnClose.setOnClickListener(v -> {
+                dialog.dismiss();
+                onClose.run();
+            });
+        }
+
+        View btnCopy = dialog.findViewById(R.id.btnCopyDiagnostic);
+        if (btnCopy != null) {
+            btnCopy.setOnClickListener(v -> {
+                ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Activity.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Diagnostic Report", reportText.getText());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(activity, activity.getString(R.string.toast_report_copied), Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        return dialog;
+    }
+}

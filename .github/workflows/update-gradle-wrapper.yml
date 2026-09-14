@@ -2,45 +2,55 @@ name: Update Gradle Wrapper
 
 on:
   workflow_dispatch:
+    inputs:
+      gradle_version:
+        description: 'Gradle version to update to'
+        required: false
+        default: '8.12.1'
+        type: string
 
 permissions:
   contents: write
 
 jobs:
   update-wrapper:
+    name: Update Gradle Wrapper
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v6
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up Java Development Kit (JDK 17)
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '8.7'
+          gradle-version: ${{ inputs.gradle_version || '8.12.1' }}
 
-      - name: Fetch official Gradle checksum
+      - name: Fetch Official Gradle Checksum
         id: checksum
         run: |
-          SHA=$(curl -fsSL https://services.gradle.org/distributions/gradle-8.7-bin.zip.sha256 | tr -d '[:space:]')
+          VERSION="${{ inputs.gradle_version || '8.12.1' }}"
+          SHA=$(curl -fsSL "https://services.gradle.org/distributions/gradle-${VERSION}-bin.zip.sha256" | tr -d '[:space:]')
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          echo "Gradle 8.7 bin checksum: $SHA"
+          echo "Gradle ${VERSION} bin checksum: $SHA"
 
-      - name: Regenerate Gradle Wrapper with checksum
+      - name: Regenerate Gradle Wrapper with Checksum
         run: |
+          VERSION="${{ inputs.gradle_version || '8.12.1' }}"
           gradle wrapper \
-            --gradle-version 8.7 \
+            --gradle-version "$VERSION" \
             --distribution-type bin \
             --gradle-distribution-sha256-sum "${{ steps.checksum.outputs.sha }}"
 
-      - name: Commit Gradle Wrapper changes
+      - name: Commit Gradle Wrapper Changes
         run: |
+          VERSION="${{ inputs.gradle_version || '8.12.1' }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -49,6 +59,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No Gradle Wrapper changes to commit."
           else
-            git commit -m "Add Gradle wrapper distribution checksum"
+            git commit -m "build(gradle): update Gradle wrapper to ${VERSION} with SHA-256 checksum"
             git push
           fi

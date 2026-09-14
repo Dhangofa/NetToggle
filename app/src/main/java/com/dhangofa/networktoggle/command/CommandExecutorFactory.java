@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.command;
 
+/**
+ * Factory class used to create the right CommandExecutor.
+ * It looks at the user's preferred execution mode (Root vs Shizuku) and returns the corresponding executor.
+ */
+
 import com.dhangofa.networktoggle.model.ExecutionMode;
 
 public final class CommandExecutorFactory {

@@ -16,7 +16,7 @@
         android:src="@drawable/ic_warning"
         android:tint="@color/status_error_text"
         android:layout_marginEnd="10dp"
-        android:contentDescription="Error Icon" />
+        android:contentDescription="@string/error_icon" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Command Failed"
+            android:text="@string/command_failed"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -36,12 +36,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tap to view diagnostic report"
+            android:text="@string/tap_to_view_diagnostic_report"
             android:textSize="12sp"
             android:textColor="@color/status_error_text" />
     </LinearLayout>
     
     <ImageView
+        android:contentDescription="@null"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/ic_arrow_right"

@@ -6,6 +6,8 @@
 
     <!-- Used only to clear stale cached QS tile state after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Strictly required to resolve active physical SIM slots via Android's native SubscriptionManager API -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -37,11 +39,32 @@
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
+        <!-- Automation Receiver for Tasker/Macrodroid -->
+        <receiver
+            android:name=".AutomationReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.dhangofa.networktoggle.SET_MODE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Invisible Activity for App Shortcuts -->
+        <activity
+            android:name=".ShortcutActionActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleInstance" />
+
         <!-- Main UI screen -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="NetToggle">
+            android:label="NetToggle"
+            android:theme="@style/Theme.NetToggle.Splash"
+            android:windowSoftInputMode="adjustResize">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,7 +76,7 @@
         <service
             android:name=".NetworkTileService"
             android:label="NetToggle"
-            android:icon="@drawable/ic_qs_network"
+            android:icon="@drawable/ic_qs_logo"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
 

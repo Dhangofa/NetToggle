@@ -1,5 +1,9 @@
 package com.dhangofa.networktoggle.model;
 
+/**
+ * Enum representing how the app to execute commands (Root, Shizuku, or None/Not setup yet).
+ */
+
 public enum ExecutionMode {
     NONE(0),
     ROOT(1),

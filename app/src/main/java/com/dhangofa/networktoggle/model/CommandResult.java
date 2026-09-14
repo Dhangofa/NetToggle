@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.model;
 
+/**
+ * Wrapper to pass back the results of shell commands (stdout, stderr, exit code).
+ * Helps easily check if a command succeeded or failed.
+ */
+
 public final class CommandResult {
     private final String command;
     private final int exitCode;

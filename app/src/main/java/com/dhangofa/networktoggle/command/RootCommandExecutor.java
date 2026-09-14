@@ -1,5 +1,10 @@
 package com.dhangofa.networktoggle.command;
 
+/**
+ * Implementation of CommandExecutor that uses standard su (Root) privileges.
+ * It spawns a root shell, runs the command, and collects the output via ProcessResultReader.
+ */
+
 import com.dhangofa.networktoggle.model.CommandResult;
 
 public final class RootCommandExecutor implements CommandExecutor {

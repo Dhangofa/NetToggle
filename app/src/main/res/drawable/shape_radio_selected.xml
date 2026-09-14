@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer ring -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="22dp" android:height="22dp" />
+            <stroke android:width="2dp" android:color="@color/setup_radio_dot" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- Inner filled dot -->
+    <item android:top="5dp" android:bottom="5dp" android:left="5dp" android:right="5dp">
+        <shape android:shape="oval">
+            <size android:width="12dp" android:height="12dp" />
+            <solid android:color="@color/setup_radio_dot" />
+        </shape>
+    </item>
+</layer-list>

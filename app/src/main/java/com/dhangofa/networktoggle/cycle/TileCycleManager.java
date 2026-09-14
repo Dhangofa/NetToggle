@@ -1,5 +1,11 @@
 package com.dhangofa.networktoggle.cycle;
 
+/**
+ * This handles the logic for the "cycle" of network modes.
+ * When tapping the Quick Settings tile, this class is used to figure out what the next mode
+ * in the sequence should be based on preferences.
+ */
+
 import com.dhangofa.networktoggle.config.AppPreferences;
 import com.dhangofa.networktoggle.model.NetworkMode;
 
@@ -79,15 +85,15 @@ public final class TileCycleManager {
         List<NetworkMode> cycle = getCycle();
         boolean changed = false;
 
-        if (!caps.supports5g) { 
-            changed |= cycle.remove(NetworkMode.PREFERRED_5G); 
-            changed |= cycle.remove(NetworkMode.FIVE_G_ONLY); 
+        if (!caps.supports5g) {
+            changed |= cycle.remove(NetworkMode.PREFERRED_5G);
+            changed |= cycle.remove(NetworkMode.FIVE_G_ONLY);
         }
-        if (!caps.supports3g) { 
-            changed |= cycle.remove(NetworkMode.PREFERRED_3G); 
+        if (!caps.supports3g) {
+            changed |= cycle.remove(NetworkMode.PREFERRED_3G);
         }
-        if (!caps.supports2g) { 
-            changed |= cycle.remove(NetworkMode.TWO_G_ONLY); 
+        if (!caps.supports2g) {
+            changed |= cycle.remove(NetworkMode.TWO_G_ONLY);
         }
 
         if (changed) {

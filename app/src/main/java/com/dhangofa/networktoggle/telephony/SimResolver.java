@@ -1,5 +1,11 @@
 package com.dhangofa.networktoggle.telephony;
 
+/**
+ * Helper to manage multi-SIM devices.
+ * It handles the logic for resolving "Auto" SIM to the active data slot, and finding the correct
+ * subId (subscription ID) and phoneId for a given physical SIM slot.
+ */
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -22,6 +28,8 @@ public final class SimResolver {
 
     private final Context context;
     private final AppPreferences appPreferences;
+    private volatile TargetSim overrideTargetSim = null;
+
     // Data class to hold all extracted variables in one place
     public static class SimInfo {
         public final int subId;
@@ -43,9 +51,27 @@ public final class SimResolver {
     Context getContext() {
         return context;
     }
-    
+
+    public void setOverrideTargetSim(TargetSim targetSim) {
+        this.overrideTargetSim = targetSim;
+    }
+
+    public TargetSim getOverrideTargetSim() {
+        return overrideTargetSim;
+    }
+
     public SimInfo resolveTargetSimInfo(ExecutionMode executionMode) {
-        TargetSim targetSim = appPreferences.getTargetSim();
+        TargetSim targetSim = overrideTargetSim != null ? overrideTargetSim : appPreferences.getTargetSim();
+        return resolveTargetSimInfo(executionMode, targetSim);
+    }
+
+    public SimInfo resolveTargetSimInfo(ExecutionMode executionMode, TargetSim targetSim) {
+        if (targetSim == null) {
+            targetSim = overrideTargetSim != null ? overrideTargetSim : appPreferences.getTargetSim();
+        }
+        if (targetSim == TargetSim.BOTH) {
+            return null;
+        }
         int targetSubId = INVALID_SUB_ID;
         int targetSlotIndex = INVALID_SLOT_INDEX;
         String carrierName = "";
@@ -137,6 +163,16 @@ public final class SimResolver {
     public int resolveTargetSubId(ExecutionMode executionMode) {
         SimInfo info = resolveTargetSimInfo(executionMode);
         return info != null ? info.subId : INVALID_SUB_ID;
+    }
+
+    public int resolveTargetSubId(ExecutionMode executionMode, TargetSim targetSim) {
+        SimInfo info = resolveTargetSimInfo(executionMode, targetSim);
+        return info != null ? info.subId : INVALID_SUB_ID;
+    }
+
+    public int resolveTargetSlotIndex(ExecutionMode executionMode, TargetSim targetSim) {
+        SimInfo info = resolveTargetSimInfo(executionMode, targetSim);
+        return info != null ? info.slotIndex : INVALID_SLOT_INDEX;
     }
 
     public boolean isValidSlotIndex(int slotIndex) {

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabGuides"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:paddingBottom="24dp"
+    android:overScrollMode="never"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Left Column: App Brand, Version & Developer Card -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginEnd="10dp"
+            android:clipToPadding="false"
+            android:clipChildren="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_exec_card_bg"
+                android:elevation="6dp"
+                android:padding="16dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <!-- App Logo Squircle -->
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/shape_guides_logo_squircle">
+
+                    <ImageView
+        android:contentDescription="@null"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_logo"
+                        android:tint="@color/text_primary" />
+                </FrameLayout>
+
+                <!-- App Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/app_name"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Version & License Row -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Version Badge -->
+                    <TextView
+                        android:id="@+id/appVersionText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_guides_version_badge"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="3dp"
+                        android:textColor="@color/brand_primary"
+                        android:textStyle="bold"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <!-- License Badge Pill -->
+                    <TextView
+                        android:id="@+id/appLicenseText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/shape_guides_version_badge"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="@string/app_license"
+                        android:textColor="@color/brand_primary"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Developer and Social Links Pill -->
+                <LinearLayout
+                    android:id="@+id/developerPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/shape_guides_developer_pill"
+                    android:elevation="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp">
+
+                    <ImageView
+        android:contentDescription="@null"
+                        android:id="@+id/developerPersonIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_person"
+                        android:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/developerNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/dhangofa"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@color/card_border" />
+
+                    <ImageView
+                        android:id="@+id/githubLink"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/social_icon_bg"
+                        android:clickable="true"
+                        android:contentDescription="@string/open_github"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_github"
+                        android:tint="@color/text_primary" />
+
+                    <ImageView
+                        android:id="@+id/telegramLink"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/social_icon_bg"
+                        android:clickable="true"
+                        android:contentDescription="@string/open_telegram"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_telegram"
+                        android:tint="@color/text_primary" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Right Column: Guides Grid -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp"
+            android:clipToPadding="false"
+            android:clipChildren="false">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/guides_header"
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <!-- Row 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:baselineAligned="false"
+                android:layout_marginBottom="10dp">
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:layout_marginEnd="5dp">
+                    <include layout="@layout/view_guide_tile" android:id="@+id/guideExecution" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:layout_marginStart="5dp">
+                    <include layout="@layout/view_guide_tile" android:id="@+id/guideSim" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:baselineAligned="false"
+                android:layout_marginBottom="10dp">
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:layout_marginEnd="5dp">
+                    <include layout="@layout/view_guide_tile" android:id="@+id/guideTile" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:layout_marginStart="5dp">
+                    <include layout="@layout/view_guide_tile" android:id="@+id/guideShortcuts" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:baselineAligned="false"
+                android:layout_marginBottom="12dp">
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:layout_marginEnd="5dp">
+                    <include layout="@layout/view_guide_tile" android:id="@+id/guideBroadcast" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:layout_marginStart="5dp">
+                    <include layout="@layout/view_guide_tile" android:id="@+id/guideTroubleshoot" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

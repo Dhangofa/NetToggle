@@ -1,0 +1,7 @@
+- Completely redesigned NetToggle with fluid animations and pill navigation across Home, Automate, and Guide
+- Added secure Tasker, MacroDroid, and Automate broadcasts
+- Added up to 4 customizable routine and launcher shortcuts
+- Added Both-SIM targeting, capability intersection along with Auto, SIM 1, SIM 2
+- Added Auto Restore and SIM badges for the QS tile
+- Improved Shizuku lifecycle handling and diagnostics
+- Added Bengali, Chinese, Portuguese, Russian, and Spanish translations

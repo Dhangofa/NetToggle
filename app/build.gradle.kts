@@ -9,9 +9,9 @@ android {
     defaultConfig {
         applicationId = "com.dhangofa.networktoggle"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 33
-        versionName = "1.1.0"
+        targetSdk = 37
+        versionCode = 34
+        versionName = "1.2.0"
     }
     // Suggested by IzzyOnDroid
     dependenciesInfo {
@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation("org.lsposed.hiddenapibypass:hiddenapibypass:4.3")
 
     // Shizuku API
     implementation("dev.rikka.shizuku:api:13.1.5")

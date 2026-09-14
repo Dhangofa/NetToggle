@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardTileCycle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/shape_cycle_card_bg"
     android:elevation="8dp"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,6 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/cycleSelectedCount"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -23,39 +25,78 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="6dp"
-                android:contentDescription="Quick Tile Cycle"
+                android:contentDescription="@string/quick_tile_cycle"
                 android:src="@drawable/ic_refresh"
-                android:tint="@color/accent_orange" />
+                android:tint="@color/cycle_accent" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="Quick Tile Cycle"
+                android:text="@string/quick_tile_cycle"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/cycleSelectedCount"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/shape_cycle_order_badge"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:text="3/3"
-            android:textColor="@color/accent_orange"
-            android:textSize="10sp"
-            android:textStyle="bold" />
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:id="@+id/tileCycleLockBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/shape_badge_locked"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:contentDescription="@null"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_lock"
+                    android:tint="@color/setup_badge_locked_text"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/locked"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/setup_badge_locked_text" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/cycleSelectedCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_cycle_order_badge"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/text_3_3"
+                android:textColor="@color/cycle_accent"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:text="Select 2 to 3 modes. Selection order becomes the tile cycle order."
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:text="@string/select_2_to_3_modes_selection_order_beco"
         android:textColor="@color/text_secondary"
         android:textSize="11sp" />
 
@@ -63,7 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/shape_segmented_container_rect"
+        android:background="@drawable/shape_cycle_segmented_container_rect"
         android:padding="4dp">
 
         <CheckBox
@@ -76,7 +117,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Pref 5G"
+            android:text="@string/pref_5g"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -87,7 +128,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cyclePreferred4g"
@@ -99,7 +140,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Pref 4G"
+            android:text="@string/pref_4g"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -110,7 +151,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cyclePreferred3g"
@@ -122,7 +163,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="Pref 3G"
+            android:text="@string/pref_3g"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -133,7 +174,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
-        android:background="@drawable/shape_segmented_container_rect"
+        android:background="@drawable/shape_cycle_segmented_container_rect"
         android:padding="4dp">
 
         <CheckBox
@@ -146,7 +187,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="5G Only"
+            android:text="@string/text_5g_only"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -157,7 +198,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cycle4gOnly"
@@ -169,7 +210,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="4G Only"
+            android:text="@string/text_4g_only"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -180,7 +221,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/segmented_separator" />
+            android:background="@color/cycle_segmented_separator" />
 
         <CheckBox
             android:id="@+id/cycle2gOnly"
@@ -192,7 +233,7 @@
             android:gravity="center"
             android:minHeight="40dp"
             android:paddingVertical="8dp"
-            android:text="2G Only"
+            android:text="@string/text_2g_only"
             android:textColor="@color/color_segmented_text_cycle"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -206,9 +247,70 @@
         android:background="@drawable/shape_cycle_order_badge"
         android:gravity="center"
         android:padding="10dp"
-        android:text="Cycle: 5G Only → 4G Only → Preferred 5G"
-        android:textColor="@color/accent_orange"
+        android:text="@string/cycle_5g_only_4g_only_preferred_5g"
+        android:textColor="@color/cycle_accent"
         android:textSize="11sp"
         android:textStyle="bold" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/cycle_segmented_separator" />
+
+    <!-- Auto-Restore Preferred Mode Toggle Row -->
+    <LinearLayout
+        android:id="@+id/rowAutoRestoreToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_restore_preferred_mode"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/auto_restore_preferred_mode_description"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2dp" />
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/switchAutoRestore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:track="@drawable/selector_switch_track_cycle"
+            android:thumb="@drawable/selector_switch_thumb"
+            android:splitTrack="false"
+            android:showText="false"
+            android:thumbTextPadding="0dp"
+            android:switchMinWidth="52dp" />
+    </LinearLayout>
 
 </LinearLayout>

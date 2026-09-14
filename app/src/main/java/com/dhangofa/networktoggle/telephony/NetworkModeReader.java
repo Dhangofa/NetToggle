@@ -1,91 +1,56 @@
 package com.dhangofa.networktoggle.telephony;
 
-import com.dhangofa.networktoggle.command.CommandExecutor;
-import com.dhangofa.networktoggle.command.CommandExecutorFactory;
+/** Main entry point for reading the current active network mode. */
+import android.content.Context;
 import com.dhangofa.networktoggle.config.AppPreferences;
-import com.dhangofa.networktoggle.model.CommandResult;
 import com.dhangofa.networktoggle.model.ExecutionMode;
 import com.dhangofa.networktoggle.model.NetworkMode;
 import com.dhangofa.networktoggle.model.TargetSim;
-import android.content.Context;
-import android.provider.Settings;
 
 public final class NetworkModeReader {
-    private final Context context;
-    private final AppPreferences appPreferences;
-    private final SimResolver simResolver;
+	private final AppPreferences appPreferences;
+	private final ShizukuBinderModeReader shizukuBinderReader;
+	private final PrivilegedModeReader privilegedModeReader;
 
-    public NetworkModeReader(
-            Context context,
-            AppPreferences appPreferences,
-            SimResolver simResolver
-    ) {
-        this.context = context;
-        this.appPreferences = appPreferences;
-        this.simResolver = simResolver;
-    }
+	public NetworkModeReader(Context context, AppPreferences appPreferences, SimResolver simResolver) {
+		this.appPreferences = appPreferences;
+		this.shizukuBinderReader = new ShizukuBinderModeReader(simResolver);
+		this.privilegedModeReader = new PrivilegedModeReader(context, simResolver);
+	}
 
-    public NetworkMode readCurrentMode() {
-        ExecutionMode executionMode = appPreferences.getExecutionMode();
-        if (executionMode == ExecutionMode.NONE) {
-            return NetworkMode.UNKNOWN;
-        }
+	public NetworkMode readCurrentMode() {
+		return readCurrentMode(appPreferences.getTargetSim());
+	}
 
-        TargetSim targetSim = appPreferences.getTargetSim();
-        int targetSubId = simResolver.resolveTargetSubId(executionMode);
+	public NetworkMode readCurrentMode(TargetSim targetSim) {
+		ExecutionMode executionMode = appPreferences.getExecutionMode();
+		if (executionMode == ExecutionMode.NONE) {
+			return NetworkMode.UNKNOWN;
+		}
 
-        // NATIVE API FAST-PATH:
-        // Try reading natively without spawning shell if we have a valid SubId
-        if (simResolver.isValidSubId(targetSubId)) {
-            try {
-                String nativeValue = Settings.Global.getString(
-                        context.getContentResolver(),
-                        "preferred_network_mode" + targetSubId
-                );
-                
-                if (nativeValue != null && !nativeValue.trim().isEmpty() && !nativeValue.equalsIgnoreCase("null")) {
-                    return NetworkMode.fromLegacyMode(ShellValueParser.extractFirstInt(nativeValue));
-                }
-            } catch (Exception ignored) {
-                // Ignore SecurityExceptions or null pointers, proceed to shell fallback
-            }
-        }
+		if (targetSim == TargetSim.BOTH) {
+			NetworkMode mode1 = readCurrentMode(TargetSim.SIM_1);
+			NetworkMode mode2 = readCurrentMode(TargetSim.SIM_2);
 
-        // SHELL FALLBACK:
-        String command;
-        if (simResolver.isValidSubId(targetSubId)) {
-            command = "value=$(settings get global preferred_network_mode"
-                    + targetSubId
-                    + "); if [ -n \"$value\" ] "
-                    + "&& [ \"$value\" != \"null\" ]; then "
-                    + "echo \"$value\"; else exit 1; fi";
-        } else if (targetSim == TargetSim.AUTO) {
-            // Very slow nested shell fallback if native SubId resolution entirely failed
-            command = "data_sim=$(settings get global multi_sim_data_call); "
-                    + "[ \"$data_sim\" -gt 0 ] 2>/dev/null || exit 1; "
-                    + "settings get global preferred_network_mode${data_sim}";
-        } else {
-            return NetworkMode.UNKNOWN;
-        }
+			return mode1 != NetworkMode.UNKNOWN && mode1 == mode2
+					? mode1
+					: NetworkMode.UNKNOWN;
+		}
 
-        CommandResult result = execute(executionMode, command);
-        if (!result.isSuccess()) {
-            return NetworkMode.UNKNOWN;
-        }
+		return readSingleMode(executionMode, targetSim);
+	}
 
-        return NetworkMode.fromLegacyMode(
-                ShellValueParser.extractFirstInt(result.getStdout())
-        );
-    }
+	private NetworkMode readSingleMode(ExecutionMode executionMode, TargetSim targetSim) {
+		NetworkMode mode = NetworkMode.UNKNOWN;
+		// 1. Shizuku Fast-Path (Binder IPC)
+		if (executionMode == ExecutionMode.SHIZUKU) {
+			mode = shizukuBinderReader.readCurrentMode(executionMode, targetSim);
+		}
 
-    private CommandResult execute(
-            ExecutionMode executionMode,
-            String command
-    ) {
-        CommandExecutor executor = CommandExecutorFactory.forMode(executionMode);
-        if (executor == null) {
-            return CommandResult.failed(command, "No execution mode selected.");
-        }
-        return executor.execute(command);
-    }
+		// 2. Root/Shizuku privileged shell fallback path
+		if (mode == NetworkMode.UNKNOWN) {
+			mode = privilegedModeReader.readCurrentMode(executionMode, targetSim);
+		}
+		return mode;
+	}
 }

@@ -1,5 +1,11 @@
 package com.dhangofa.networktoggle.command;
 
+/**
+ * Implementation of CommandExecutor that relies on Shizuku for elevated privileges.
+ * This is great for users who don't have a rooted device but want to use ADB-level commands.
+ * It hooks into the Shizuku Binder to execute the shell command.
+ */
+
 import android.content.pm.PackageManager;
 import com.dhangofa.networktoggle.model.CommandResult;
 import java.lang.reflect.Method;

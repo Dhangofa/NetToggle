@@ -1,9 +1,14 @@
 package com.dhangofa.networktoggle.model;
 
+/**
+ * Enum representing which SIM slot the app should target (SIM 1, SIM 2, or Auto).
+ */
+
 public enum TargetSim {
     AUTO(0, -1),
     SIM_1(1, 0),
-    SIM_2(2, 1);
+    SIM_2(2, 1),
+    BOTH(3, -1);
 
     private final int value;
     private final int manualSlotIndex;
