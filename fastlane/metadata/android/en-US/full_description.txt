@@ -1,4 +1,4 @@
-NetToggle is a lightweight Android Quick Settings (QS) tile app for cellular network control. Create custom tile cycles, target one or both SIMs, build shortcuts, automate changes, and troubleshoot failures with detailed diagnostics.<br><br>
+NetToggle is a lightweight Android Quick Settings (QS) tile app for cellular network control. Create custom tile cycles, target one or both SIMs, build shortcuts, secure broadcast automation, and troubleshoot failures with detailed diagnostics.<br><br>
 <b>⚙️ NETWORK MODES</b>
 <ul>
 <li><b>Preferred 5G (5G/4G/3G/2G)</b>: Recommended for daily use. Allows 5G SA and NSA, including UW, UC, 5G+, or 5G++ where supported, with LTE and legacy fallback.</li>
