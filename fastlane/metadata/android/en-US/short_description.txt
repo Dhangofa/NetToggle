@@ -1,1 +1,1 @@
-Force 5G/4G Only or Pref modes directly from Quick Settings using Root/Shizuku
+5G network control with custom Quick Settings cycles, shortcuts and automation
