@@ -6,6 +6,7 @@
   [![Build status](https://img.shields.io/github/actions/workflow/status/Dhangofa/NetToggle/build.yml?label=Build%20Status&status=Passing)](https://github.com/Dhangofa/NetToggle/actions/workflows/build.yml)
   [![GitHub release](https://img.shields.io/github/v/release/Dhangofa/NetToggle?label=Release&color=B57EDC)](https://github.com/Dhangofa/NetToggle/releases)
   [![License](https://img.shields.io/github/license/Dhangofa/NetToggle?label=License&color=FF9100)](LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/Dhangofa/NetToggle/total?label=Downloads&color=95C271)](https://github.com/Dhangofa/NetToggle/releases)
 
 </div>
 <p align="center">
