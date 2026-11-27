@@ -23,6 +23,7 @@ public final class AppPreferences {
     private static final String KEY_TARGET_SIM = "target_sim";
     private static final String KEY_NETWORK_STATE = "net_state";
     private static final String KEY_LAST_NETWORK_CHECK = "last_network_check";
+    private static final String KEY_CACHED_MODE_DATA_SUB_ID = "cached_mode_data_sub_id";
     private static final String KEY_AUTO_SIM_ERROR = "auto_sim_error";
     private static final String KEY_EXTERNAL_AUTOMATION = "external_automation_enabled";
     private static final String KEY_AUTOMATION_TOKEN = "automation_token";
@@ -89,6 +90,28 @@ public final class AppPreferences {
 
     public void clearCachedNetworkMode() {
         setCachedNetworkMode(NetworkMode.UNKNOWN);
+    }
+
+    /**
+     * Default data subscription the tile's cached mode was read/applied for (Auto SIM only).
+     * Used to detect that the user switched the mobile data SIM, so the cache no longer applies.
+     */
+    public int getCachedModeDataSubId() {
+        return preferences.getInt(KEY_CACHED_MODE_DATA_SUB_ID, -1);
+    }
+
+    public void setCachedModeDataSubId(int subId) {
+        preferences.edit().putInt(KEY_CACHED_MODE_DATA_SUB_ID, subId).apply();
+    }
+
+    /** Last known network mode for a specific subscription (used to show it instantly after a data SIM switch). */
+    public NetworkMode getCachedNetworkModeForSub(int subId) {
+        return NetworkMode.fromStateValue(
+                preferences.getInt(KEY_NETWORK_STATE + "_sub_" + subId, NetworkMode.UNKNOWN.getStateValue()));
+    }
+
+    public void setCachedNetworkModeForSub(int subId, NetworkMode mode) {
+        preferences.edit().putInt(KEY_NETWORK_STATE + "_sub_" + subId, mode.getStateValue()).apply();
     }
 
     public long getLastNetworkCheckTimestamp() {
