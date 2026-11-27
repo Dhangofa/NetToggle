@@ -7,12 +7,18 @@ package com.dhangofa.networktoggle;
  * and executes the change using the chosen backend (Root/Shizuku).
  * It also dynamically draws the tile icon to reflect the currently active mode.
  */
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import rikka.shizuku.Shizuku;
 import android.content.pm.PackageManager;
+import android.telephony.SubscriptionManager;
 import android.widget.Toast;
 
 import com.dhangofa.networktoggle.config.AppPreferences;
@@ -40,6 +46,26 @@ public class NetworkTileService extends TileService {
     private NetworkModeController networkModeController;
     private TileCycleManager tileCycleManager;
     private com.dhangofa.networktoggle.telephony.SimResolver simResolver;
+
+    /*
+     * The system broadcasts this when the user picks another SIM for mobile data
+     * (e.g. from the SIM picker under the Quick Settings tiles). Same value as
+     * TelephonyManager.ACTION_DEFAULT_DATA_SUBSCRIPTION_CHANGED (public since API 30),
+     * written out so it also works on the app's minSdk.
+     */
+    private static final String ACTION_DEFAULT_DATA_SUB_CHANGED =
+            "android.intent.action.ACTION_DEFAULT_DATA_SUBSCRIPTION_CHANGED";
+
+    private boolean dataSubReceiverRegistered = false;
+
+    private final BroadcastReceiver dataSubChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // The broadcast is sticky: the copy delivered on register is handled by onStartListening.
+            if (isInitialStickyBroadcast()) return;
+            mainHandler.post(NetworkTileService.this::onDataSimMaybeChanged);
+        }
+    };
 
     private final Runnable shizukuGraceCheckRunnable = () -> {
         if (appPreferences != null && appPreferences.getExecutionMode() == ExecutionMode.SHIZUKU) {
@@ -111,6 +137,7 @@ public class NetworkTileService extends TileService {
     public void onDestroy() {
         super.onDestroy();
         mainHandler.removeCallbacksAndMessages(null);
+        unregisterDataSubReceiver();
         try {
             Shizuku.removeBinderReceivedListener(binderReceivedListener);
             Shizuku.removeBinderDeadListener(binderDeadListener);
@@ -121,6 +148,7 @@ public class NetworkTileService extends TileService {
     public void onStopListening() {
         super.onStopListening();
         mainHandler.removeCallbacks(shizukuGraceCheckRunnable);
+        unregisterDataSubReceiver();
     }
 
     @Override
@@ -150,13 +178,27 @@ public class NetworkTileService extends TileService {
             }
         }
 
+        registerDataSubReceiver();
+
+        // The data SIM may have been switched while the shade was closed:
+        // the cached mode then belongs to the other SIM and must not be shown.
+        boolean dataSimChanged = invalidateCacheIfDataSimChanged();
+
         NetworkMode cachedMode = appPreferences.getCachedNetworkMode();
-        updateTileUI(cachedMode);
+        if (dataSimChanged && cachedMode == NetworkMode.UNKNOWN
+                && appPreferences.getExecutionMode() != ExecutionMode.NONE) {
+            // First time this SIM is seen: nothing known to show yet.
+            updateTileSwitchingUI();
+        } else {
+            updateTileUI(cachedMode);
+        }
 
         if (appPreferences.getExecutionMode() == ExecutionMode.NONE) {
             return;
         }
 
+        // A data SIM switch alone doesn't trigger a modem read: the new SIM's remembered mode is shown.
+        // Only a SIM with nothing remembered yet (UNKNOWN) is read, as before.
         boolean shouldRefresh = (cachedMode == NetworkMode.UNKNOWN);
         long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
 
@@ -173,6 +215,70 @@ public class NetworkTileService extends TileService {
             return;
         }
 
+        refreshModeFromModem();
+    }
+
+    /**
+     * Called when the system reports a mobile data SIM change while the tile is visible.
+     */
+    private void onDataSimMaybeChanged() {
+        if (appPreferences.getExecutionMode() == ExecutionMode.NONE) return;
+        if (IS_SWITCHING.get()) {
+            // A tile action is running; re-check once it has had time to finish.
+            mainHandler.postDelayed(this::onDataSimMaybeChanged, 500);
+            return;
+        }
+        if (!invalidateCacheIfDataSimChanged()) return;
+
+        NetworkMode knownMode = appPreferences.getCachedNetworkMode();
+        if (knownMode != NetworkMode.UNKNOWN) {
+            // Instant, no Shizuku/root: new SIM number + its remembered mode.
+            updateTileUI(knownMode);
+        } else {
+            // First time this SIM is seen: nothing remembered, so read it once.
+            updateTileSwitchingUI();
+            refreshModeFromModem();
+        }
+    }
+
+    /**
+     * In Auto SIM mode the tile follows the mobile data SIM. If the data SIM differs from the
+     * one the cached mode was read for, swap in the new SIM's last known mode (or UNKNOWN).
+     *
+     * @return true if the data SIM changed.
+     */
+    private boolean invalidateCacheIfDataSimChanged() {
+        if (appPreferences.getTargetSim() != com.dhangofa.networktoggle.model.TargetSim.AUTO) {
+            return false;
+        }
+        int currentSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+        if (!simResolver.isValidSubId(currentSubId)) {
+            return false;
+        }
+        if (currentSubId == appPreferences.getCachedModeDataSubId()) {
+            return false;
+        }
+        // Switch the cache to the new data SIM: its remembered mode (if any) is shown right away.
+        appPreferences.setCachedNetworkMode(appPreferences.getCachedNetworkModeForSub(currentSubId));
+        appPreferences.setCachedModeDataSubId(currentSubId);
+        return true;
+    }
+
+    /** Remembers which data SIM the cached mode belongs to (Auto SIM mode only). */
+    private void rememberCachedModeDataSub() {
+        if (appPreferences.getTargetSim() == com.dhangofa.networktoggle.model.TargetSim.AUTO) {
+            int subId = SubscriptionManager.getDefaultDataSubscriptionId();
+            appPreferences.setCachedModeDataSubId(subId);
+            if (simResolver.isValidSubId(subId)) {
+                appPreferences.setCachedNetworkModeForSub(subId, appPreferences.getCachedNetworkMode());
+            }
+        }
+    }
+
+    private void refreshModeFromModem() {
+        NetworkMode cachedMode = appPreferences.getCachedNetworkMode();
+        long lastCheck = appPreferences.getLastNetworkCheckTimestamp();
+
         AppExecutors.executeTelephony(() -> {
             NetworkMode realMode = networkModeReader.readCurrentMode();
 
@@ -188,6 +294,7 @@ public class NetworkTileService extends TileService {
 
                 if (realMode != NetworkMode.UNKNOWN) {
                     appPreferences.setCachedNetworkMode(realMode);
+                    rememberCachedModeDataSub();
                     appPreferences.setLastNetworkCheckTimestamp(System.currentTimeMillis());
 
                     // Auto-restore preferred mode if user enabled it and OS/carrier changed mode
@@ -202,11 +309,33 @@ public class NetworkTileService extends TileService {
                         });
                         return;
                     }
-
-                    updateTileUI(realMode);
                 }
+
+                // Also redraws when the read failed, so a "switching" placeholder never sticks.
+                updateTileUI(appPreferences.getCachedNetworkMode());
             });
         });
+    }
+
+    private void registerDataSubReceiver() {
+        if (dataSubReceiverRegistered) return;
+        IntentFilter filter = new IntentFilter(ACTION_DEFAULT_DATA_SUB_CHANGED);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(dataSubChangedReceiver, filter, Context.RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(dataSubChangedReceiver, filter);
+            }
+            dataSubReceiverRegistered = true;
+        } catch (Exception ignored) {}
+    }
+
+    private void unregisterDataSubReceiver() {
+        if (!dataSubReceiverRegistered) return;
+        try {
+            unregisterReceiver(dataSubChangedReceiver);
+        } catch (Exception ignored) {}
+        dataSubReceiverRegistered = false;
     }
 
     @Override
@@ -222,6 +351,16 @@ public class NetworkTileService extends TileService {
         if (executionMode == ExecutionMode.NONE) {
             IS_SWITCHING.set(false);
             updateTileUI(NetworkMode.UNKNOWN);
+            return;
+        }
+
+        // If the data SIM changed and the new SIM's mode was never seen, don't cycle
+        // from the other SIM's mode: read the real mode first and show it.
+        if (invalidateCacheIfDataSimChanged()
+                && appPreferences.getCachedNetworkMode() == NetworkMode.UNKNOWN) {
+            IS_SWITCHING.set(false);
+            updateTileSwitchingUI();
+            refreshModeFromModem();
             return;
         }
 
@@ -301,6 +440,7 @@ public class NetworkTileService extends TileService {
 
         if (result.isSuccess()) {
             appPreferences.setCachedNetworkMode(targetMode);
+            rememberCachedModeDataSub();
             if (!isAutoRestore) {
                 appPreferences.setLastUserSelectedMode(targetMode);
             }
